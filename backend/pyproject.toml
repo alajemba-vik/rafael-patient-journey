@@ -1,0 +1,37 @@
+[project]
+name = "rafael-backend"
+version = "0.1.0"
+description = "Backend API for the Institut Rafaël patient journey platform"
+requires-python = ">=3.12"
+dependencies = [
+    "alembic>=1.16",
+    "fastapi[standard]>=0.115",
+    "httpx>=0.28",
+    "psycopg[binary]>=3.2",
+    "pydantic-settings>=2.6",
+    "pyjwt[crypto]>=2.10",
+    "sqlalchemy>=2.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "ruff>=0.8",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = ["migrations/versions"]
+
+[tool.ruff.lint]
+# E/F: errors · I: import order · N: naming · UP: modern syntax · B: likely bugs · SIM: simplifications
+select = ["E", "F", "I", "N", "UP", "B", "SIM"]
+ignore = ["B008"] # FastAPI's Depends() in default arguments is intended
+
+[tool.ruff.format]
+quote-style = "double"
