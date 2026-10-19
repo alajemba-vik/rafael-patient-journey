@@ -10,7 +10,7 @@ import httpx
 import jwt
 
 from app.config import get_settings
-from app.errors import ConflictError, UnauthorizedError
+from app.errors import UnauthorizedError
 
 
 def create_account(email: str, password: str) -> str:
@@ -29,8 +29,6 @@ def create_account(email: str, password: str) -> str:
         json={"email": email, "password": password, "email_confirm": True},
         timeout=10,
     )
-    if response.status_code == 422 and response.json().get("error_code") == "email_exists":
-        raise ConflictError("An account with this email already exists")
     response.raise_for_status()
     return response.json()["id"]
 

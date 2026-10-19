@@ -23,7 +23,7 @@ from app.errors import ForbiddenError
 from app.modules.care_team import service as care_team
 from app.modules.care_team.schemas import AssignmentCreate
 from app.modules.identity_access import service as identity
-from app.modules.identity_access.schemas import AccountCreate, UserCreate
+from app.modules.identity_access.schemas import UserCreate
 from app.modules.identity_access.service import CurrentUser, Role
 from app.modules.patients import service as patients
 from app.modules.patients.schemas import PatientCreate
@@ -46,9 +46,7 @@ PATIENTS = [
 
 def seed(db: Session, password: str) -> None:
     email, full_name = ADMIN
-    admin = identity.bootstrap_admin(
-        db, AccountCreate(email=email, full_name=full_name, password=password)
-    )
+    admin = identity.bootstrap_admin(db, email, full_name, password)
     actor = CurrentUser(id=admin.id, role=Role.ADMIN)
     logger.info("admin: %s", email)
 

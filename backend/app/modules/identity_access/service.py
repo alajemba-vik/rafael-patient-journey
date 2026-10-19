@@ -12,7 +12,7 @@ from app import audit, auth
 from app.db import get_db
 from app.errors import ConflictError, ForbiddenError, UnauthorizedError
 from app.modules.identity_access.models import Role, User
-from app.modules.identity_access.schemas import AccountCreate, UserCreate, UserOut
+from app.modules.identity_access.schemas import UserCreate, UserOut
 
 __all__ = [
     "CurrentUser",
@@ -63,14 +63,15 @@ def list_users(db: Session, user: CurrentUser) -> list[UserOut]:
     return [UserOut.model_validate(u) for u in users]
 
 
-def bootstrap_admin(db: Session, data: AccountCreate) -> UserOut:
+def bootstrap_admin(db: Session, email: str, full_name: str, password: str) -> UserOut:
     """Create the very first admin, from the command line.
 
     Refused once any admin exists, so it can never be used to gain admin rights later.
     """
     if db.scalar(select(User.id).where(User.role == Role.ADMIN)) is not None:
         raise ForbiddenError("An admin already exists")
-    return _create_user(db, None, UserCreate(**data.model_dump(), role=Role.ADMIN))
+    data = UserCreate(email=email, full_name=full_name, password=password, role=Role.ADMIN)
+    return _create_user(db, None, data)
 
 
 def is_patient_account(db: Session, user_id: uuid.UUID) -> bool:
