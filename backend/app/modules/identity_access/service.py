@@ -17,7 +17,6 @@ from app.modules.identity_access.schemas import UserCreate, UserOut
 __all__ = [
     "CurrentUser",
     "Role",
-    "bootstrap_admin",
     "create_user",
     "get_current_user",
     "get_role",
@@ -52,7 +51,17 @@ def create_user(db: Session, user: CurrentUser, data: UserCreate) -> UserOut:
     # instead of an initial password chosen by staff?
     if user.role != Role.ADMIN:
         raise ForbiddenError("Only admins can create accounts")
-    return _create_user(db, user.id, data)
+    email = data.email.lower()
+    if db.scalar(select(User.id).where(User.email == email)) is not None:
+        raise ConflictError("An account with this email already exists")
+
+    subject = auth.create_account(email, data.password)
+    account = User(auth_subject=subject, email=email, full_name=data.full_name, role=data.role)
+    db.add(account)
+    db.flush()
+    audit.record(db, user.id, "user.create", None)
+    db.commit()
+    return UserOut.model_validate(account)
 
 
 def list_users(db: Session, user: CurrentUser) -> list[UserOut]:
@@ -60,17 +69,6 @@ def list_users(db: Session, user: CurrentUser) -> list[UserOut]:
         raise ForbiddenError("Only admins can list accounts")
     users = db.scalars(select(User).order_by(User.full_name))
     return [UserOut.model_validate(u) for u in users]
-
-
-def bootstrap_admin(db: Session, email: str, full_name: str, password: str) -> UserOut:
-    """Create the very first admin, from the command line.
-
-    Refused once any admin exists, so it can never be used to gain admin rights later.
-    """
-    if db.scalar(select(User.id).where(User.role == Role.ADMIN)) is not None:
-        raise ForbiddenError("An admin already exists")
-    data = UserCreate(email=email, full_name=full_name, password=password, role=Role.ADMIN)
-    return _create_user(db, None, data)
 
 
 def get_role(db: Session, user_id: uuid.UUID) -> Role | None:
@@ -82,19 +80,6 @@ def get_users(db: Session, user_ids: list[uuid.UUID]) -> list[UserOut]:
     """Names and roles for a set of accounts, for other modules that display people."""
     users = db.scalars(select(User).where(User.id.in_(user_ids)).order_by(User.full_name))
     return [UserOut.model_validate(u) for u in users]
-
-
-def _create_user(db: Session, actor_id: uuid.UUID | None, data: UserCreate) -> UserOut:
-    email = data.email.lower()
-    if db.scalar(select(User.id).where(User.email == email)) is not None:
-        raise ConflictError("An account with this email already exists")
-    subject = auth.create_account(email, data.password)
-    user = User(auth_subject=subject, email=email, full_name=data.full_name, role=data.role)
-    db.add(user)
-    db.flush()
-    audit.record(db, actor_id or user.id, "user.create", None)
-    db.commit()
-    return UserOut.model_validate(user)
 
 
 def get_current_user(
