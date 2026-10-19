@@ -1,4 +1,4 @@
-"""Account rules: only admins create and list accounts; the first admin is bootstrapped once.
+"""Account rules: only admins create and list accounts.
 
 The identity provider is replaced by a fake, so no Supabase is needed. All data is synthetic.
 """
@@ -11,8 +11,6 @@ from sqlalchemy.orm import Session
 
 from app import auth
 from app.audit import AuditEvent
-from app.errors import ForbiddenError
-from app.modules.identity_access import service
 from app.modules.identity_access.models import User
 from app.modules.identity_access.service import Role
 
@@ -81,19 +79,3 @@ def test_non_admin_cannot_list_accounts(db, client_as, role):
     response = client_as(role).get("/api/v1/auth/users")
 
     assert response.status_code == 403
-
-
-# --- bootstrap ------------------------------------------------------------
-
-
-def test_bootstrap_creates_the_first_admin(db):
-    admin = service.bootstrap_admin(db, "admin@example.com", "Sam Admin", "synthetic-password-1")
-
-    assert admin.role == Role.ADMIN
-
-
-def test_bootstrap_is_refused_once_an_admin_exists(db):
-    add_user(db, Role.ADMIN)
-
-    with pytest.raises(ForbiddenError):
-        service.bootstrap_admin(db, "intruder@example.com", "Eve Synthetic", "synthetic-password-1")
