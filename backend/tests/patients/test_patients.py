@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from app.audit import AuditEvent
 from app.modules.care_team.models import CareAssignment
+from app.modules.identity_access.models import User
 from app.modules.identity_access.service import Role
 from app.modules.patients.models import Patient
 
@@ -25,6 +26,18 @@ def add_patient(db: Session, user_id: uuid.UUID | None = None) -> Patient:
     db.add(patient)
     db.commit()
     return patient
+
+
+def add_account(db: Session, role: Role) -> User:
+    account = User(
+        auth_subject=str(uuid.uuid4()),
+        email=f"{uuid.uuid4().hex}@example.com",
+        full_name="Alex Synthetic",
+        role=role,
+    )
+    db.add(account)
+    db.commit()
+    return account
 
 
 def assign(db: Session, professional_id: uuid.UUID, patient_id: uuid.UUID) -> None:
@@ -46,6 +59,38 @@ def test_professional_cannot_register_patient(db, client_as):
     response = client_as(Role.PROFESSIONAL).post("/api/v1/patients", json=NEW_PATIENT)
 
     assert response.status_code == 403
+
+
+def test_secretary_links_patient_to_their_login(db, client_as):
+    account = add_account(db, Role.PATIENT)
+
+    response = client_as(Role.SECRETARY).post(
+        "/api/v1/patients", json={**NEW_PATIENT, "user_id": str(account.id)}
+    )
+
+    assert response.status_code == 201
+    assert db.scalar(select(Patient.user_id)) == account.id
+
+
+def test_staff_login_cannot_be_linked_to_a_patient(db, client_as):
+    account = add_account(db, Role.PROFESSIONAL)
+
+    response = client_as(Role.SECRETARY).post(
+        "/api/v1/patients", json={**NEW_PATIENT, "user_id": str(account.id)}
+    )
+
+    assert response.status_code == 404
+
+
+def test_login_already_linked_cannot_be_linked_again(db, client_as):
+    account = add_account(db, Role.PATIENT)
+    add_patient(db, user_id=account.id)
+
+    response = client_as(Role.SECRETARY).post(
+        "/api/v1/patients", json={**NEW_PATIENT, "user_id": str(account.id)}
+    )
+
+    assert response.status_code == 409
 
 
 # --- read -----------------------------------------------------------------

@@ -14,8 +14,9 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app import audit
-from app.errors import ForbiddenError, NotFoundError
+from app.errors import ConflictError, ForbiddenError, NotFoundError
 from app.modules.care_team import service as care_team
+from app.modules.identity_access import service as identity
 from app.modules.identity_access.service import CurrentUser, Role
 from app.modules.patients.models import Patient
 from app.modules.patients.schemas import PatientAdministrative, PatientCreate, PatientDetail
@@ -27,6 +28,8 @@ OFFICE_ROLES = {Role.SECRETARY, Role.ADMIN}
 def create_patient(db: Session, user: CurrentUser, data: PatientCreate) -> PatientAdministrative:
     if user.role not in OFFICE_ROLES:
         raise ForbiddenError("Only reception or admins can register patients")
+    if data.user_id is not None:
+        _check_account_can_be_linked(db, data.user_id)
     patient = Patient(**data.model_dump())
     db.add(patient)
     db.flush()
@@ -63,6 +66,13 @@ def list_patients(db: Session, user: CurrentUser) -> list[PatientAdministrative]
     elif user.role not in OFFICE_ROLES:
         raise ForbiddenError("You are not allowed to list patients")
     return [PatientAdministrative.model_validate(p) for p in db.scalars(query)]
+
+
+def _check_account_can_be_linked(db: Session, user_id: uuid.UUID) -> None:
+    if not identity.is_patient_account(db, user_id):
+        raise NotFoundError("No patient account with this id")
+    if db.scalar(select(Patient.id).where(Patient.user_id == user_id)) is not None:
+        raise ConflictError("This account is already linked to a patient")
 
 
 def _can_see_clinical(db: Session, user: CurrentUser, patient: Patient) -> bool:

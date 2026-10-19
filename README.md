@@ -26,11 +26,15 @@ Run checks: `uv run ruff format . && uv run ruff check . && uv run pytest`. Test
 
 CI (`.github/workflows/ci.yml`) runs the same checks on every pull request, and also applies the migrations to a fresh Postgres and fails if `models.py` changed without a migration (`alembic check`).
 
-### First login
+### Demo data and first login
 
-1. Create the person in Supabase → Authentication → Users.
-2. Add a matching row in `users` with their Supabase user id as `auth_subject` and a role: `patient`, `secretary`, `professional`, `coordinator` or `admin`.
-3. `POST /api/v1/auth/login` returns a token. In `/docs`, click **Authorize** and paste it.
+On an empty database, the seed script creates synthetic accounts (admin, secretary, coordinator, professional, two patients) and patient records. It needs `SUPABASE_SECRET_KEY` in `.env`.
+
+```bash
+SEED_PASSWORD='choose-12-or-more-characters' uv run python -m scripts.seed
+```
+
+Every seeded account uses `SEED_PASSWORD`; the emails are printed (e.g. `admin@example.com`). `POST /api/v1/auth/login` returns a token; in `/docs`, click **Authorize** and paste it. After that, admins create accounts with `POST /api/v1/auth/users`.
 
 ## Repo layout
 

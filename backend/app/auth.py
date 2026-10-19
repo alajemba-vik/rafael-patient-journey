@@ -1,7 +1,7 @@
-"""Identity provider calls: sign in and verify tokens.
+"""Identity provider calls: create accounts, sign in and verify tokens.
 
 This is the only file that talks to Supabase Auth. Swapping provider (e.g. Keycloak)
-means rewriting these two functions and nothing else.
+means rewriting these functions and nothing else.
 """
 
 from functools import lru_cache
@@ -10,7 +10,29 @@ import httpx
 import jwt
 
 from app.config import get_settings
-from app.errors import UnauthorizedError
+from app.errors import ConflictError, UnauthorizedError
+
+
+def create_account(email: str, password: str) -> str:
+    """Create a confirmed login and return its identity-provider user id.
+
+    Uses the server-only secret key; the email is marked confirmed because staff create
+    accounts on people's behalf.
+    """
+    settings = get_settings()
+    response = httpx.post(
+        f"{settings.supabase_url}/auth/v1/admin/users",
+        headers={
+            "apikey": settings.supabase_secret_key,
+            "Authorization": f"Bearer {settings.supabase_secret_key}",
+        },
+        json={"email": email, "password": password, "email_confirm": True},
+        timeout=10,
+    )
+    if response.status_code == 422 and response.json().get("error_code") == "email_exists":
+        raise ConflictError("An account with this email already exists")
+    response.raise_for_status()
+    return response.json()["id"]
 
 
 def sign_in(email: str, password: str) -> str:
