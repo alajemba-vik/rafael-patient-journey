@@ -22,7 +22,6 @@ __all__ = [
     "get_current_user",
     "get_role",
     "get_users",
-    "is_patient_account",
     "list_users",
     "login",
 ]
@@ -72,11 +71,6 @@ def bootstrap_admin(db: Session, email: str, full_name: str, password: str) -> U
         raise ForbiddenError("An admin already exists")
     data = UserCreate(email=email, full_name=full_name, password=password, role=Role.ADMIN)
     return _create_user(db, None, data)
-
-
-def is_patient_account(db: Session, user_id: uuid.UUID) -> bool:
-    """Lets the patients module check an account before linking it to a patient record."""
-    return db.scalar(select(User.role).where(User.id == user_id)) == Role.PATIENT
 
 
 def get_role(db: Session, user_id: uuid.UUID) -> Role | None:

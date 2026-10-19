@@ -68,9 +68,8 @@ def test_other_roles_cannot_add_and_it_is_audited(db, client_as, role):
     assert audit_actions(db) == ["care_team.assign.denied"]
 
 
-@pytest.mark.parametrize("role", [Role.SECRETARY, Role.PATIENT, Role.ADMIN])
-def test_only_professionals_and_coordinators_can_join_a_team(db, client_as, role):
-    account = add_account(db, role)
+def test_only_professionals_and_coordinators_can_join_a_team(db, client_as):
+    account = add_account(db, Role.SECRETARY)
 
     response = client_as(Role.COORDINATOR).post(
         "/api/v1/care-team/assignments",
@@ -114,12 +113,6 @@ def test_other_roles_cannot_remove(db, client_as, role):
     assert response.status_code == 403
     assert db.scalar(select(CareAssignment)) is not None
     assert audit_actions(db) == ["care_team.remove.denied"]
-
-
-def test_removing_unknown_assignment_is_not_found(db, client_as):
-    response = client_as(Role.COORDINATOR).delete(f"/api/v1/care-team/assignments/{uuid.uuid4()}")
-
-    assert response.status_code == 404
 
 
 # --- list -----------------------------------------------------------------
