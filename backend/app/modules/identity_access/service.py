@@ -20,7 +20,7 @@ __all__ = [
     "bootstrap_admin",
     "create_user",
     "get_current_user",
-    "is_patient_account",
+    "get_role",
     "list_users",
     "login",
 ]
@@ -72,9 +72,9 @@ def bootstrap_admin(db: Session, email: str, full_name: str, password: str) -> U
     return _create_user(db, None, data)
 
 
-def is_patient_account(db: Session, user_id: uuid.UUID) -> bool:
-    """Lets the patients module check an account before linking it to a patient record."""
-    return db.scalar(select(User.role).where(User.id == user_id)) == Role.PATIENT
+def get_role(db: Session, user_id: uuid.UUID) -> Role | None:
+    """The account's role, or None if there is no such account."""
+    return db.scalar(select(User.role).where(User.id == user_id))
 
 
 def _create_user(db: Session, actor_id: uuid.UUID | None, data: UserCreate) -> UserOut:

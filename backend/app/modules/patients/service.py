@@ -69,7 +69,7 @@ def list_patients(db: Session, user: CurrentUser) -> list[PatientAdministrative]
 
 
 def _check_account_can_be_linked(db: Session, user_id: uuid.UUID) -> None:
-    if not identity.is_patient_account(db, user_id):
+    if identity.get_role(db, user_id) != Role.PATIENT:
         raise NotFoundError("No patient account with this id")
     if db.scalar(select(Patient.id).where(Patient.user_id == user_id)) is not None:
         raise ConflictError("This account is already linked to a patient")
