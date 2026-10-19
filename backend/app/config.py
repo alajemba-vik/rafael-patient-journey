@@ -12,6 +12,8 @@ class Settings(BaseSettings):
     supabase_url: str = ""
     supabase_publishable_key: str = ""
     jwt_audience: str = "authenticated"
+    # Frontend addresses allowed to call the API from a browser. JSON list in .env.
+    cors_origins: list[str] = ["http://localhost:5173"]
 
 
 @lru_cache

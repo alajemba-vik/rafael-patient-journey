@@ -24,6 +24,8 @@ uv run fastapi dev app/main.py # http://localhost:8000/docs
 
 Run checks: `uv run ruff format . && uv run ruff check . && uv run pytest`. Tests need no Supabase or `.env`.
 
+CI (`.github/workflows/ci.yml`) runs the same checks on every pull request, and also applies the migrations to a fresh Postgres and fails if `models.py` changed without a migration (`alembic check`).
+
 ### First login
 
 1. Create the person in Supabase → Authentication → Users.

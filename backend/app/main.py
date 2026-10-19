@@ -1,6 +1,8 @@
 from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+from app.config import get_settings
 from app.errors import AppError
 from app.modules.analytics.router import router as analytics_router
 from app.modules.care_team.router import router as care_team_router
@@ -14,6 +16,14 @@ from app.modules.reception.router import router as reception_router
 from app.modules.scheduling.router import router as scheduling_router
 
 app = FastAPI(title="Institut Rafaël – Patient Journey API", version="0.1.0")
+
+# The frontend sends a bearer token header, not cookies, so credentials stay off.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=get_settings().cors_origins,
+    allow_methods=["GET", "POST", "PATCH", "DELETE"],
+    allow_headers=["Authorization", "Content-Type"],
+)
 
 
 @app.exception_handler(AppError)
