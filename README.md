@@ -52,9 +52,9 @@ AGENTS.md               code guidelines and rules for people and AI agents
 
 | Module | Owns | Owner | Status |
 |---|---|---|---|
-| `identity_access` | users, roles, login | Louis | started |
+| `identity_access` | users, roles, login | Louis | login, admin account creation |
 | `patients` | patient profiles | Victoria | reference module |
-| `care_team` | who cares for which patient | Hugo | started (no endpoints yet) |
+| `care_team` | who cares for which patient | Hugo | assign, remove, list team |
 | `pathways` | ~6-month care pathway, reviews | Hugo | files ready, not started |
 | `scheduling` | appointments, group workshops | Victoria | files ready, not started |
 | `reception` | check-in, waiting room | Victoria | files ready, not started |

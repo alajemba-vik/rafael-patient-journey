@@ -12,6 +12,7 @@ rules and audit apply. All people here are fictional.
 import logging
 import os
 import sys
+import uuid
 from datetime import date
 
 from sqlalchemy.orm import Session
@@ -19,6 +20,8 @@ from sqlalchemy.orm import Session
 from app.config import get_settings
 from app.db import SessionLocal
 from app.errors import ForbiddenError
+from app.modules.care_team import service as care_team
+from app.modules.care_team.schemas import AssignmentCreate
 from app.modules.identity_access import service as identity
 from app.modules.identity_access.schemas import AccountCreate, UserCreate
 from app.modules.identity_access.service import CurrentUser, Role
@@ -49,12 +52,26 @@ def seed(db: Session, password: str) -> None:
     actor = CurrentUser(id=admin.id, role=Role.ADMIN)
     logger.info("admin: %s", email)
 
+    staff_ids = {}
     for email, full_name, role in STAFF:
-        identity.create_user(
+        account = identity.create_user(
             db, actor, UserCreate(email=email, full_name=full_name, password=password, role=role)
         )
+        staff_ids[role] = account.id
         logger.info("%s: %s", role.value, email)
 
+    patient_ids = _seed_patients(db, actor, password)
+
+    # The first patient is followed by the coordinator and the practitioner.
+    for role in (Role.COORDINATOR, Role.PROFESSIONAL):
+        care_team.create_assignment(
+            db, actor, AssignmentCreate(patient_id=patient_ids[0], professional_id=staff_ids[role])
+        )
+    logger.info("care team: coordinator and practitioner follow the first patient")
+
+
+def _seed_patients(db: Session, actor: CurrentUser, password: str) -> list[uuid.UUID]:
+    patient_ids = []
     for email, first_name, last_name, birth_date in PATIENTS:
         user_id = None
         if email is not None:
@@ -69,7 +86,7 @@ def seed(db: Session, password: str) -> None:
                 ),
             )
             user_id = account.id
-        patients.create_patient(
+        patient = patients.create_patient(
             db,
             actor,
             PatientCreate(
@@ -80,7 +97,9 @@ def seed(db: Session, password: str) -> None:
                 user_id=user_id,
             ),
         )
+        patient_ids.append(patient.id)
         logger.info("patient: %s %s (%s)", first_name, last_name, email or "no login")
+    return patient_ids
 
 
 def main() -> int:

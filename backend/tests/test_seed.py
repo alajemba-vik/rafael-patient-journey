@@ -7,6 +7,7 @@ from sqlalchemy import func, select
 
 from app import auth
 from app.errors import ForbiddenError
+from app.modules.care_team.models import CareAssignment
 from app.modules.identity_access.models import User
 from app.modules.patients.models import Patient
 from scripts.seed import PATIENTS, STAFF, seed
@@ -26,6 +27,7 @@ def test_seed_creates_staff_patients_and_links_patient_logins(db):
     assert db.scalar(select(func.count(User.id))) == 1 + len(STAFF) + len(patients_with_login)
     assert db.scalar(select(func.count(Patient.id))) == len(PATIENTS)
     assert db.scalar(select(func.count(Patient.user_id))) == len(patients_with_login)
+    assert db.scalar(select(func.count(CareAssignment.id))) == 2
 
 
 def test_seed_refuses_a_database_that_already_has_an_admin(db):
