@@ -1,0 +1,76 @@
+/*
+ * Institut Rafaël design tokens.
+ * Source of truth: the "Institut Rafaël" design system artifact
+ * (https://claude.ai/artifact/B58d9rTBaBKvZt6UQzzVGZ), built from institut-rafael.fr.
+ * Change values there first, then mirror them here.
+ */
+
+@import url("https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Krona+One&display=swap");
+
+/* Colors: Clair (light) is the default theme. */
+:root,
+[data-theme="light"] {
+  --surface: #fffef9;
+  --surface-raised: #ffffff;
+  --surface-tint: rgba(0, 19, 69, 0.05);
+  --ink: #001345;
+  --ink-muted: #4a5674;
+  --band: #001345;
+  --on-band: #fffef9;
+  --accent: #ffa724;
+  --on-accent: #001345;
+  --accent-gold: #f9b004;
+  --tag-media: #ffc0cb;
+  --hairline: #e2e2e2;
+  --focus-ring: #001345;
+}
+
+/* Colors: Nuit (dark), opt in with data-theme="dark" on <html>. */
+[data-theme="dark"] {
+  --surface: #001345;
+  --surface-raised: #0b2258;
+  --surface-tint: rgba(255, 254, 249, 0.06);
+  --ink: #fffef9;
+  --ink-muted: #b9c0d2;
+  --band: #13306b;
+  --hairline: rgba(255, 254, 249, 0.16);
+  --focus-ring: #ffa724;
+  color-scheme: dark;
+}
+
+/* Fonts, spacing, radii. */
+:root {
+  /* Pilat Extended Bold is the site's licensed face; Krona One is the free stand-in. */
+  --font-display: "Pilat Extended Bold", "Krona One", Helvetica, Arial, sans-serif;
+  --font-body: "Archivo", Helvetica, Arial, sans-serif;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 10px;
+  --space-4: 14px;
+  --space-5: 20px;
+  --space-6: 28px;
+  --space-7: 40px;
+  --space-8: 45px;
+
+  --radius-xs: 3px;
+  --radius-md: 10px;
+  --radius-pill: 20px;
+  --radius-xl: 25px;
+  --radius-hero: 100px;
+}
+
+/* Type styles: display face. Headings are uppercase except title and stat. */
+.rf-display-xl { font-family: var(--font-display); font-size: 32px; line-height: 32px; font-weight: 400; text-transform: uppercase; }
+.rf-display-lg { font-family: var(--font-display); font-size: 27px; line-height: 29.7px; font-weight: 400; letter-spacing: 2px; text-transform: uppercase; }
+.rf-stat-number { font-family: var(--font-display); font-size: 35px; line-height: 45px; font-weight: 400; font-variant-numeric: tabular-nums; }
+.rf-title { font-family: var(--font-display); font-size: 20px; line-height: 30px; font-weight: 400; }
+.rf-nav-text { font-family: var(--font-display); font-size: 14px; line-height: 14px; font-weight: 400; letter-spacing: 0.5px; text-transform: uppercase; }
+.rf-label { font-family: var(--font-display); font-size: 12px; line-height: 20.4px; font-weight: 400; letter-spacing: 0.5px; text-transform: uppercase; }
+
+/* Type styles: body face. */
+.rf-lead { font-family: var(--font-body); font-size: 21px; line-height: 35.7px; font-weight: 500; }
+.rf-body { font-family: var(--font-body); font-size: 16px; line-height: 27.2px; font-weight: 400; }
+.rf-body-sm { font-family: var(--font-body); font-size: 14px; line-height: 23.8px; font-weight: 500; }
+.rf-caption { font-family: var(--font-body); font-size: 12px; line-height: 20.4px; font-weight: 500; }
+.rf-card-title { font-family: var(--font-body); font-size: 13px; line-height: 16px; font-weight: 600; }
