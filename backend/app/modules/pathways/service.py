@@ -1,8 +1,10 @@
 """The ~6-month care pathway: opened by a coordinator, with intake, review and final review.
 
 Access policy:
-- coordinator in the patient's care team → open and close the pathway, record milestones
-- professional or coordinator in the team → read the patient's pathways, notes included
+- coordinator in the patient's care team → open and close the pathway, record milestones,
+                                           resolve flagged needs
+- professional or coordinator in the team → read the patient's pathways, notes included, and
+                                           flag a new need to the referent coordinator
 - patient                                → their own pathways, without the coordinator's notes
 - secretary, admin                       → no access (clinical data)
 """
@@ -24,11 +26,14 @@ from app.modules.pathways.models import (
     CarePathway,
     MilestoneKind,
     PathwayMilestone,
+    PathwayNeed,
     PathwayStatus,
 )
 from app.modules.pathways.schemas import (
     Milestone,
     MilestoneCreate,
+    NeedCreate,
+    NeedOut,
     PathwayOpen,
     PathwayOut,
     PathwaySummary,
@@ -157,6 +162,79 @@ def list_led_pathways(db: Session, user: CurrentUser) -> list[PathwaySummary]:
     audit.record_many(db, user.id, "pathway.list", {p.patient_id for p in pathways})
     db.commit()
     return [_summary(p, milestones[p.id], names.get(p.patient_id, "")) for p in pathways]
+
+
+def raise_need(db: Session, user: CurrentUser, pathway_id: uuid.UUID, data: NeedCreate) -> NeedOut:
+    """A practitioner in the team tells the referent coordinator about a new need."""
+    pathway = _get(db, pathway_id)
+    if user.role not in CARE_ROLES or not care_team.is_in_care_team(
+        db, user.id, pathway.patient_id
+    ):
+        _deny(db, user, "pathway.need.denied", pathway.patient_id)
+    if pathway.status != PathwayStatus.OPEN:
+        raise ConflictError("This pathway is closed")
+
+    need = PathwayNeed(
+        pathway_id=pathway.id, raised_by=user.id, raised_at=datetime.now(UTC), note=data.note
+    )
+    db.add(need)
+    audit.record(db, user.id, "pathway.need", pathway.patient_id)
+    db.commit()
+    return _needs_out(db, [(need, pathway)])[0]
+
+
+def list_open_needs(db: Session, user: CurrentUser) -> list[NeedOut]:
+    """A coordinator's inbox: unresolved needs on the pathways they lead, oldest first."""
+    if user.role != Role.COORDINATOR:
+        raise ForbiddenError("Only coordinators receive flagged needs")
+
+    query = (
+        select(PathwayNeed, CarePathway)
+        .join(CarePathway, PathwayNeed.pathway_id == CarePathway.id)
+        .where(CarePathway.coordinator_id == user.id, PathwayNeed.resolved_at.is_(None))
+        .order_by(PathwayNeed.raised_at)
+    )
+    rows = [(need, pathway) for need, pathway in db.execute(query)]
+    audit.record_many(db, user.id, "pathway.need.list", {p.patient_id for _, p in rows})
+    db.commit()
+    return _needs_out(db, rows)
+
+
+def resolve_need(db: Session, user: CurrentUser, need_id: uuid.UUID) -> NeedOut:
+    need = db.get(PathwayNeed, need_id)
+    if need is None:
+        raise NotFoundError("Need not found")
+    pathway = _get(db, need.pathway_id)
+    if not _is_team_coordinator(db, user, pathway.patient_id):
+        _deny(db, user, "pathway.need.resolve.denied", pathway.patient_id)
+    if need.resolved_at is not None:
+        raise ConflictError("This need is already resolved")
+
+    need.resolved_at = datetime.now(UTC)
+    need.resolved_by = user.id
+    audit.record(db, user.id, "pathway.need.resolve", pathway.patient_id)
+    db.commit()
+    return _needs_out(db, [(need, pathway)])[0]
+
+
+def _needs_out(db: Session, rows: list[tuple[PathwayNeed, CarePathway]]) -> list[NeedOut]:
+    """Add patient and practitioner names with two queries in total."""
+    patient_names = patients.get_names(db, {p.patient_id for _, p in rows})
+    staff_ids = list({n.raised_by for n, _ in rows})
+    staff_names = {u.id: u.full_name for u in identity.get_users(db, staff_ids)} if rows else {}
+    return [
+        NeedOut(
+            id=need.id,
+            pathway_id=pathway.id,
+            patient_id=pathway.patient_id,
+            patient_name=patient_names.get(pathway.patient_id, ""),
+            raised_by_name=staff_names.get(need.raised_by, ""),
+            raised_at=need.raised_at,
+            note=need.note,
+            resolved_at=need.resolved_at,
+        )
+        for need, pathway in rows
+    ]
 
 
 def _summary(

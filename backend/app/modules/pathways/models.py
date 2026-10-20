@@ -65,3 +65,18 @@ class PathwayMilestone(Base):
     plan: Mapped[str] = mapped_column(Text, default="")
     # The coordinator's own note: shown to the care team, not to the patient.
     note: Mapped[str] = mapped_column(Text, default="")
+
+
+class PathwayNeed(Base):
+    """A new need a practitioner flags to the referent coordinator, who adjusts the plan."""
+
+    __tablename__ = "pathway_needs"
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    pathway_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("care_pathways.id"), index=True)
+    raised_by: Mapped[uuid.UUID] = mapped_column(Uuid)
+    raised_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    note: Mapped[str] = mapped_column(Text)
+    # Open while these are empty.
+    resolved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    resolved_by: Mapped[uuid.UUID | None] = mapped_column(Uuid)
