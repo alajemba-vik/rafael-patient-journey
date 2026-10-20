@@ -5,7 +5,7 @@
  * Change values there first, then mirror them here.
  */
 
-@import url("https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Krona+One&display=swap");
+/* Fonts (Archivo, Krona One) are loaded by index.html, so they download in parallel with the app. */
 
 /* Colors: Clair (light) is the default theme. */
 :root,

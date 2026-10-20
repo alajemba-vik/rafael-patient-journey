@@ -72,3 +72,75 @@
 .rf-page:first-child { border-radius: var(--radius-xs) 0 0 var(--radius-xs); margin-left: 0; }
 .rf-page:last-child { border-radius: 0 var(--radius-xs) var(--radius-xs) 0; }
 .rf-page[aria-current="page"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); position: relative; }
+
+/* App shell */
+.rf-shell { min-height: 100vh; display: flex; flex-direction: column; }
+.rf-skip-link { position: absolute; left: var(--space-4); top: -100px; z-index: 10; }
+.rf-skip-link:focus { top: var(--space-4); display: inline-flex; align-items: center; min-height: 44px; box-sizing: border-box; background: var(--surface-raised); color: var(--ink); padding: 0 var(--space-4); }
+.rf-shell__header { background: var(--surface-raised); border-bottom: 1px solid var(--hairline); }
+.rf-shell__bar {
+  max-width: 1080px; margin: 0 auto; box-sizing: border-box;
+  padding: var(--space-2) var(--space-5);
+  display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-7);
+}
+.rf-shell__brand { display: inline-flex; align-items: center; min-height: 44px; font-family: var(--font-display); font-size: 16px; text-transform: uppercase; color: var(--ink); text-decoration: none; }
+.rf-shell__account { margin-left: auto; display: flex; align-items: center; gap: var(--space-4); }
+.rf-shell__user { font-size: 14px; color: var(--ink-muted); }
+.rf-shell__main { flex: 1; width: 100%; max-width: 1080px; margin: 0 auto; box-sizing: border-box; padding: var(--space-7) var(--space-5); }
+.rf-shell__main:focus { outline: none; }
+
+/* Page structure */
+.rf-page-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-4); margin-bottom: var(--space-7); }
+.rf-page-header h1 { margin: 0; }
+.rf-page-header__actions { display: flex; flex-wrap: wrap; gap: var(--space-4); }
+.rf-narrow { max-width: 640px; }
+.rf-section { margin-bottom: var(--space-7); }
+.rf-section > h2 { margin: 0 0 var(--space-4); }
+
+/* Forms */
+.rf-form { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-5); }
+.rf-field { display: flex; flex-direction: column; gap: var(--space-2); width: 100%; }
+.rf-field__label { font-size: 14px; font-weight: 600; }
+.rf-input {
+  font: inherit; color: var(--ink); background: var(--surface-raised);
+  min-height: 44px; box-sizing: border-box; padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--ink-muted); border-radius: var(--radius-xs);
+}
+.rf-input[aria-invalid="true"] { border: 2px solid var(--ink); }
+.rf-field__hint, .rf-field__error { margin: 0; font-size: 14px; color: var(--ink-muted); }
+.rf-field__error { color: var(--ink); font-weight: 600; }
+.rf-field__error::before { content: "Erreur : "; }
+
+/* Feedback */
+.rf-spinner {
+  width: 14px; height: 14px; border-radius: 50%;
+  border: 2px solid currentColor; border-right-color: transparent;
+  animation: rf-spin 0.8s linear infinite;
+}
+.rf-skeleton { display: flex; flex-direction: column; gap: var(--space-3); min-height: 60px; }
+.rf-skeleton__line { height: 16px; border-radius: var(--radius-xs); background: var(--surface-tint); animation: rf-pulse 1.2s ease-in-out infinite; }
+.rf-skeleton__line:last-child { width: 60%; }
+.rf-state {
+  display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-3);
+  padding: var(--space-5); border: 1px solid var(--hairline); border-radius: var(--radius-md); background: var(--surface-raised);
+}
+.rf-state p { margin: 0; }
+.rf-state__title { font-weight: 600; }
+.rf-banner { padding: var(--space-4) var(--space-5); background: var(--surface-tint); border-radius: var(--radius-md); margin: 0 0 var(--space-5); }
+@keyframes rf-spin { to { transform: rotate(360deg); } }
+@keyframes rf-pulse { 50% { opacity: 0.5; } }
+@media (prefers-reduced-motion: reduce) {
+  .rf-spinner, .rf-skeleton__line { animation: none; }
+}
+
+/* Disclosure (FAQ answers) */
+.rf-disclosure { border-bottom: 1px solid var(--hairline); }
+.rf-disclosure summary {
+  cursor: pointer; min-height: 44px; display: flex; align-items: center; justify-content: space-between;
+  gap: var(--space-4); font-weight: 600; list-style: none;
+}
+.rf-disclosure summary::-webkit-details-marker { display: none; }
+/* A plus that turns into a minus shows the question can be opened, and whether it is. */
+.rf-disclosure summary::after { content: "+"; font-family: var(--font-display); font-size: 20px; line-height: 1; }
+.rf-disclosure[open] summary::after { content: "−"; }
+.rf-disclosure__body { margin: 0 0 var(--space-4); color: var(--ink); }
