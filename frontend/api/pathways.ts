@@ -38,3 +38,57 @@ export function useRaiseNeed() {
     onSuccess: () => void queryClient.invalidateQueries({ queryKey: PATHWAYS }),
   });
 }
+
+export type MilestoneCreate = Schemas["MilestoneCreate"];
+
+function useRefreshPathways() {
+  const queryClient = useQueryClient();
+  return () => void queryClient.invalidateQueries({ queryKey: PATHWAYS });
+}
+
+export function useOpenPathway() {
+  const onSuccess = useRefreshPathways();
+  return useMutation({
+    mutationFn: (patientId: string) => unwrap(api.POST("/api/v1/pathways", { body: { patient_id: patientId } })),
+    onSuccess,
+  });
+}
+
+export function useRecordMilestone() {
+  const onSuccess = useRefreshPathways();
+  return useMutation({
+    mutationFn: ({ pathwayId, body }: { pathwayId: string; body: MilestoneCreate }) =>
+      unwrap(
+        api.POST("/api/v1/pathways/{pathway_id}/milestones", { params: { path: { pathway_id: pathwayId } }, body }),
+      ),
+    onSuccess,
+  });
+}
+
+export function useClosePathway() {
+  const onSuccess = useRefreshPathways();
+  return useMutation({
+    mutationFn: (pathwayId: string) =>
+      unwrap(api.POST("/api/v1/pathways/{pathway_id}/close", { params: { path: { pathway_id: pathwayId } } })),
+    onSuccess,
+  });
+}
+
+/** The open pathways a coordinator leads, with the next milestone due. */
+export function useLedPathways() {
+  return useQuery({ queryKey: [...PATHWAYS, "led"], queryFn: () => unwrap(api.GET("/api/v1/pathways/led")) });
+}
+
+/** The coordinator's inbox of flagged needs. */
+export function useOpenNeeds() {
+  return useQuery({ queryKey: [...PATHWAYS, "needs"], queryFn: () => unwrap(api.GET("/api/v1/pathways/needs")) });
+}
+
+export function useResolveNeed() {
+  const onSuccess = useRefreshPathways();
+  return useMutation({
+    mutationFn: (needId: string) =>
+      unwrap(api.POST("/api/v1/pathways/needs/{need_id}/resolve", { params: { path: { need_id: needId } } })),
+    onSuccess,
+  });
+}

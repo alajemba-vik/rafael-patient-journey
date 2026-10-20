@@ -18,13 +18,13 @@ export const NAV_BY_ROLE: Record<Role, NavItem[]> = {
     { to: "/pro", label: "Mon planning" },
     { to: "/pro/patients", label: "Mes patients" },
     { to: "/pro/tableau-de-bord", label: "Tableau de bord" },
-    FAQ,
   ],
   coordinator: [
     { to: "/pro", label: "Mon planning" },
     { to: "/pro/patients", label: "Patients" },
+    { to: "/pro/parcours", label: "Mes parcours" },
+    { to: "/pro/besoins", label: "Besoins signalés" },
     { to: "/pro/tableau-de-bord", label: "Tableau de bord" },
-    FAQ,
   ],
   admin: [FAQ],
 };

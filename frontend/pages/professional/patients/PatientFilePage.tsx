@@ -1,6 +1,9 @@
 import { useParams } from "react-router";
 
+import { useAddToCareTeam } from "../../../api/careTeam";
+import { useMe } from "../../../api/me";
 import { isDetail, usePatient } from "../../../api/patients";
+import { Button } from "../../../components/forms/Button";
 import { QueryState } from "../../../components/feedback/QueryState";
 import { formatDate } from "../../../components/format";
 import { PageHeader } from "../../../components/layout/PageHeader";
@@ -12,6 +15,8 @@ import { ScoresSection } from "./ScoresSection";
 export function PatientFilePage() {
   const { patientId = "" } = useParams();
   const patient = usePatient(patientId);
+  const me = useMe().data;
+  const takeOn = useAddToCareTeam();
 
   return (
     <QueryState query={patient}>
@@ -47,10 +52,19 @@ export function PatientFilePage() {
               <AppointmentsSection patientId={record.id} />
             </>
           ) : (
-            <p className="rf-banner">
-              Vous voyez les informations administratives de ce patient, qui n’a pas encore de coordinatrice ou de
-              coordinateur.
-            </p>
+            <div className="rf-banner rf-stack">
+              <p>Ce patient n’a pas encore de coordinatrice ou de coordinateur.</p>
+              {me?.role === "coordinator" && (
+                <div>
+                  <Button
+                    pending={takeOn.isPending}
+                    onClick={() => takeOn.mutate({ patient_id: record.id, professional_id: me.id })}
+                  >
+                    Prendre en charge
+                  </Button>
+                </div>
+              )}
+            </div>
           )}
         </>
       )}
