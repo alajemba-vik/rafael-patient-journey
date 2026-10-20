@@ -3,8 +3,8 @@
 Access policy (role + care relationship):
 - patient      → own record, administrative + clinical
 - professional → only patients in their care team, administrative + clinical
-- coordinator  → patients in their care team, administrative + clinical; every other patient,
-                 administrative only, so they can take on new patients
+- coordinator  → patients in their care team, administrative + clinical; patients with no
+                 coordinator yet ("unassigned"), administrative only, so they can take them on
 - secretary,
   admin        → every patient, administrative only
 """
@@ -24,9 +24,8 @@ from app.modules.patients.schemas import PatientAdministrative, PatientCreate, P
 
 CARE_ROLES = {Role.PROFESSIONAL, Role.COORDINATOR}
 OFFICE_ROLES = {Role.SECRETARY, Role.ADMIN}
-# TODO(validate): may coordinators see every patient's administrative record, as the
-# coordination unit contacting new patients suggests? (V-06, V-07)
-ADMINISTRATIVE_ROLES = OFFICE_ROLES | {Role.COORDINATOR}
+# TODO(validate): how are new patients given a coordinator, and what may coordinators see
+# before that? For now they see unassigned patients' administrative data. (V-06, V-07)
 LIST_LIMIT = 100
 
 
@@ -52,7 +51,7 @@ def get_patient(
 
     if _can_see_clinical(db, user, patient):
         view = PatientDetail.model_validate(patient)
-    elif user.role in ADMINISTRATIVE_ROLES:
+    elif user.role in OFFICE_ROLES or _is_unassigned_for_coordinator(db, user, patient.id):
         view = PatientAdministrative.model_validate(patient)
     else:
         audit.record(db, user.id, "patient.read.denied", patient.id)
@@ -65,17 +64,20 @@ def get_patient(
 
 
 def list_patients(
-    db: Session, user: CurrentUser, search: str | None = None, mine: bool = False
+    db: Session, user: CurrentUser, search: str | None = None, unassigned: bool = False
 ) -> list[PatientAdministrative]:
     """Alphabetical, at most LIST_LIMIT rows.
 
-    `search` matches the start of a first or last name; `mine` keeps a coordinator's own care
-    team (a practitioner only ever sees theirs).
+    Practitioners and coordinators get their own care-team patients; with `unassigned`, a
+    coordinator gets the patients nobody coordinates yet. `search` matches the start of a
+    first or last name.
     """
     query = select(Patient).order_by(Patient.last_name, Patient.first_name).limit(LIST_LIMIT)
-    if user.role == Role.PROFESSIONAL or (user.role == Role.COORDINATOR and mine):
+    if user.role == Role.COORDINATOR and unassigned:
+        query = query.where(Patient.id.not_in(care_team.coordinated_patient_ids(db)))
+    elif user.role in CARE_ROLES:
         query = query.where(Patient.id.in_(care_team.patient_ids_for(db, user.id)))
-    elif user.role not in ADMINISTRATIVE_ROLES:
+    elif user.role not in OFFICE_ROLES:
         raise ForbiddenError("You are not allowed to list patients")
     if search:
         escaped = search.strip().replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
@@ -113,6 +115,10 @@ def _check_account_can_be_linked(db: Session, user_id: uuid.UUID) -> None:
         raise NotFoundError("No patient account with this id")
     if db.scalar(select(Patient.id).where(Patient.user_id == user_id)) is not None:
         raise ConflictError("This account is already linked to a patient")
+
+
+def _is_unassigned_for_coordinator(db: Session, user: CurrentUser, patient_id: uuid.UUID) -> bool:
+    return user.role == Role.COORDINATOR and patient_id not in care_team.coordinated_patient_ids(db)
 
 
 def _can_see_clinical(db: Session, user: CurrentUser, patient: Patient) -> bool:

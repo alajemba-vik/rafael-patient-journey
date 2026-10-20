@@ -21,6 +21,7 @@ __all__ = [
     "get_current_user",
     "get_role",
     "get_users",
+    "list_ids_with_role",
     "list_care_staff",
     "list_users",
     "login",
@@ -57,7 +58,13 @@ def create_user(db: Session, user: CurrentUser, data: UserCreate) -> UserOut:
         raise ConflictError("An account with this email already exists")
 
     subject = auth.create_account(email, data.password)
-    account = User(auth_subject=subject, email=email, full_name=data.full_name, role=data.role)
+    account = User(
+        auth_subject=subject,
+        email=email,
+        full_name=data.full_name,
+        role=data.role,
+        discipline=data.discipline,
+    )
     db.add(account)
     db.flush()
     audit.record(db, user.id, "user.create", None)
@@ -78,6 +85,11 @@ def list_care_staff(db: Session, user: CurrentUser) -> list[UserOut]:
         raise ForbiddenError("You are not allowed to list staff")
     query = select(User).where(User.role.in_([Role.PROFESSIONAL, Role.COORDINATOR]))
     return [UserOut.model_validate(u) for u in db.scalars(query.order_by(User.full_name))]
+
+
+def list_ids_with_role(db: Session, role: Role) -> list[uuid.UUID]:
+    """For other modules: every account id with this role."""
+    return list(db.scalars(select(User.id).where(User.role == role)))
 
 
 def get_role(db: Session, user_id: uuid.UUID) -> Role | None:

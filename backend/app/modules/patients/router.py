@@ -23,11 +23,11 @@ def create_patient(
 @router.get("")
 def list_patients(
     search: str | None = None,
-    mine: bool = False,
+    unassigned: bool = False,
     user: CurrentUser = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> list[PatientAdministrative]:
-    return service.list_patients(db, user, search, mine)
+    return service.list_patients(db, user, search, unassigned)
 
 
 @router.get("/{patient_id}")
