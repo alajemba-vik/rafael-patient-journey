@@ -78,13 +78,16 @@
 .rf-skip-link { position: absolute; left: var(--space-4); top: -100px; z-index: 10; }
 .rf-skip-link:focus { top: var(--space-4); display: inline-flex; align-items: center; min-height: 44px; box-sizing: border-box; background: var(--surface-raised); color: var(--ink); padding: 0 var(--space-4); }
 .rf-shell__header { background: var(--surface-raised); border-bottom: 1px solid var(--hairline); }
+/* Brand and account on the first row, the menu on its own row below. */
 .rf-shell__bar {
   max-width: 1080px; margin: 0 auto; box-sizing: border-box;
   padding: var(--space-2) var(--space-5);
-  display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-7);
+  display: grid; grid-template-columns: 1fr auto; grid-template-areas: "brand account" "nav nav";
+  align-items: center; gap: 0 var(--space-5);
 }
-.rf-shell__brand { display: inline-flex; align-items: center; min-height: 44px; font-family: var(--font-display); font-size: 16px; text-transform: uppercase; color: var(--ink); text-decoration: none; }
-.rf-shell__account { margin-left: auto; display: flex; align-items: center; gap: var(--space-4); }
+.rf-shell__bar > .rf-nav { grid-area: nav; }
+.rf-shell__brand { grid-area: brand; justify-self: start; display: inline-flex; align-items: center; min-height: 44px; font-family: var(--font-display); font-size: 16px; text-transform: uppercase; color: var(--ink); text-decoration: none; }
+.rf-shell__account { grid-area: account; display: flex; align-items: center; gap: var(--space-4); }
 .rf-shell__user { font-size: 14px; color: var(--ink-muted); }
 .rf-shell__main { flex: 1; width: 100%; max-width: 1080px; margin: 0 auto; box-sizing: border-box; padding: var(--space-7) var(--space-5); }
 .rf-shell__main:focus { outline: none; }
@@ -118,7 +121,7 @@
   animation: rf-spin 0.8s linear infinite;
 }
 .rf-skeleton { display: flex; flex-direction: column; gap: var(--space-3); min-height: 60px; }
-.rf-skeleton__line { height: 16px; border-radius: var(--radius-xs); background: var(--surface-tint); animation: rf-pulse 1.2s ease-in-out infinite; }
+.rf-skeleton__line { height: 16px; border-radius: var(--radius-xs); background: var(--hairline); animation: rf-pulse 1.2s ease-in-out infinite; }
 .rf-skeleton__line:last-child { width: 60%; }
 .rf-state {
   display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-3);
@@ -144,3 +147,69 @@
 .rf-disclosure summary::after { content: "+"; font-family: var(--font-display); font-size: 20px; line-height: 1; }
 .rf-disclosure[open] summary::after { content: "−"; }
 .rf-disclosure__body { margin: 0 0 var(--space-4); color: var(--ink); }
+
+/* Panels, grids and lists */
+.rf-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: var(--space-5); align-items: start; }
+.rf-panel {
+  display: flex; flex-direction: column; gap: var(--space-4); min-width: 0;
+  padding: var(--space-5); background: var(--surface-raised);
+  border: 1px solid var(--hairline); border-radius: var(--radius-md);
+}
+.rf-panel > h2 { margin: 0; }
+.rf-panel--highlight { border: 2px solid var(--ink); }
+.rf-panel p { margin: 0; }
+.rf-list { list-style: none; margin: 0; padding: 0; }
+.rf-list > li {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  gap: var(--space-2) var(--space-4); padding: var(--space-3) 0; border-bottom: 1px solid var(--hairline);
+}
+.rf-list > li:last-child { border-bottom: 0; }
+.rf-muted { color: var(--ink-muted); font-size: 14px; }
+.rf-link { display: inline-flex; align-items: center; min-height: 44px; color: var(--ink); font-weight: 600; }
+.rf-figure { font-family: var(--font-display); font-size: 35px; line-height: 45px; font-variant-numeric: tabular-nums; }
+.rf-dl { display: grid; grid-template-columns: max-content 1fr; gap: var(--space-2) var(--space-5); margin: 0; }
+.rf-dl dt { color: var(--ink-muted); font-size: 14px; }
+.rf-dl dd { margin: 0; }
+/* In narrow panels, each label sits above its value. */
+.rf-panel .rf-dl { grid-template-columns: 1fr; gap: 0; }
+.rf-panel .rf-dl dd { margin-bottom: var(--space-3); }
+
+/* Tables */
+.rf-table-wrap { overflow-x: auto; }
+.rf-table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.rf-table th, .rf-table td { text-align: left; vertical-align: middle; padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--hairline); }
+.rf-table th { font-size: 14px; font-weight: 600; color: var(--ink-muted); }
+.rf-table td.rf-num, .rf-table th.rf-num { text-align: right; }
+
+/* Status badges: the word carries the meaning, the style reinforces it */
+.rf-badge {
+  display: inline-flex; align-items: center; white-space: nowrap;
+  padding: 0 var(--space-2); font-size: 12px; line-height: 20px; font-weight: 600;
+  color: var(--ink); border: 1px solid var(--ink-muted); border-radius: var(--radius-xs);
+}
+.rf-badge--arrived { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.rf-badge--done { background: var(--surface-tint); border-color: transparent; }
+.rf-badge--no_show { border: 2px solid var(--ink); }
+.rf-badge--cancelled { color: var(--ink-muted); text-decoration: line-through; }
+
+/* Questionnaire answers: large, tappable choices */
+.rf-question { border: 0; margin: 0; padding: 0; min-width: 0; }
+.rf-question legend { padding: 0; margin-bottom: var(--space-3); font-weight: 600; }
+.rf-choices { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.rf-choice { position: relative; }
+.rf-choice input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.rf-choice span {
+  display: inline-flex; align-items: center; min-height: 44px; box-sizing: border-box; padding: 0 var(--space-4);
+  background: var(--surface-raised); border: 1px solid var(--ink-muted); border-radius: var(--radius-xs); cursor: pointer;
+}
+.rf-choice input:checked + span { background: var(--ink); border-color: var(--ink); color: var(--surface); font-weight: 600; }
+.rf-choice input:focus-visible + span { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+.rf-table caption { caption-side: top; text-align: left; padding-bottom: var(--space-2); }
+
+/* Phones: one scrollable menu row, and no name next to the sign-out button. */
+@media (max-width: 600px) {
+  .rf-shell__bar > .rf-nav { flex-wrap: nowrap; overflow-x: auto; gap: var(--space-5); scrollbar-width: none; }
+  .rf-shell__bar > .rf-nav .rf-navlink { flex: none; }
+  .rf-shell__user { display: none; }
+  .rf-shell__main { padding: var(--space-5) var(--space-4); }
+}

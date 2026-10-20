@@ -40,7 +40,7 @@ components/
   feedback/              alerts, loading and empty states
 pages/
   public/                login · faq · request_care (ask for a care pathway)
-  patient/               home · appointments · pathway · questionnaires · profile
+  patient/               home · appointments · pathway · questionnaires
   professional/          home · patients · schedule · pathways (coordinator view) · questionnaires
   secretariat/           home · reception (check-in, waiting room) · appointments · patients · requests
   admin/                 home · users · faq · analytics · audit

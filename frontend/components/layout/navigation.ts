@@ -6,7 +6,13 @@ const FAQ: NavItem = { to: "/faq", label: "Questions fréquentes" };
 
 /** Menu per role. Each role's pages are added here as they're built. */
 export const NAV_BY_ROLE: Record<Role, NavItem[]> = {
-  patient: [FAQ],
+  patient: [
+    { to: "/patient", label: "Accueil" },
+    { to: "/patient/rendez-vous", label: "Rendez-vous" },
+    { to: "/patient/parcours", label: "Mon parcours" },
+    { to: "/patient/questionnaires", label: "Questionnaires" },
+    FAQ,
+  ],
   secretary: [FAQ],
   professional: [FAQ],
   coordinator: [FAQ],

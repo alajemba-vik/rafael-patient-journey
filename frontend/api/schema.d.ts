@@ -21,6 +21,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/analytics/dashboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Dashboard */
+        get: operations["get_dashboard_api_v1_analytics_dashboard_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/care-team/assignments": {
         parameters: {
             query?: never;
@@ -216,6 +233,182 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/auth/care-staff": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Care Staff */
+        get: operations["list_care_staff_api_v1_auth_care_staff_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pathways": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Open Pathway */
+        post: operations["open_pathway_api_v1_pathways_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pathways/{pathway_id}/milestones": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Record Milestone */
+        post: operations["record_milestone_api_v1_pathways__pathway_id__milestones_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pathways/{pathway_id}/close": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Close Pathway */
+        post: operations["close_pathway_api_v1_pathways__pathway_id__close_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pathways/mine": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List My Pathways */
+        get: operations["list_my_pathways_api_v1_pathways_mine_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pathways/led": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Led Pathways
+         * @description A coordinator's open pathways, with the next milestone due.
+         */
+        get: operations["list_led_pathways_api_v1_pathways_led_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pathways/patients/{patient_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Patient Pathways */
+        get: operations["list_patient_pathways_api_v1_pathways_patients__patient_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pathways/{pathway_id}/needs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Raise Need */
+        post: operations["raise_need_api_v1_pathways__pathway_id__needs_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pathways/needs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Open Needs
+         * @description The coordinator's inbox of needs flagged by practitioners.
+         */
+        get: operations["list_open_needs_api_v1_pathways_needs_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pathways/needs/{need_id}/resolve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Resolve Need */
+        post: operations["resolve_need_api_v1_pathways_needs__need_id__resolve_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/patients": {
         parameters: {
             query?: never;
@@ -251,10 +444,251 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/questionnaires/due": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Due
+         * @description The patient's questionnaires to answer now, with their questions and choices.
+         */
+        get: operations["list_due_api_v1_questionnaires_due_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/questionnaires/{instrument}/responses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Submit Response */
+        post: operations["submit_response_api_v1_questionnaires__instrument__responses_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/questionnaires/scores/mine": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List My Scores */
+        get: operations["list_my_scores_api_v1_questionnaires_scores_mine_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/questionnaires/patients/{patient_id}/scores": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Patient Scores */
+        get: operations["list_patient_scores_api_v1_questionnaires_patients__patient_id__scores_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reception/today": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Today */
+        get: operations["list_today_api_v1_reception_today_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reception/appointments/{appointment_id}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Change Status */
+        post: operations["change_status_api_v1_reception_appointments__appointment_id__status_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/scheduling/appointments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create Appointment */
+        post: operations["create_appointment_api_v1_scheduling_appointments_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/scheduling/appointments/{appointment_id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancel Appointment */
+        post: operations["cancel_appointment_api_v1_scheduling_appointments__appointment_id__cancel_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/scheduling/appointments/mine": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List My Appointments
+         * @description Defaults to the coming weeks from now.
+         */
+        get: operations["list_my_appointments_api_v1_scheduling_appointments_mine_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/scheduling/patients/{patient_id}/appointments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Patient Appointments */
+        get: operations["list_patient_appointments_api_v1_scheduling_patients__patient_id__appointments_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AppointmentCreate */
+        AppointmentCreate: {
+            /**
+             * Patient Id
+             * Format: uuid
+             */
+            patient_id: string;
+            /**
+             * Professional Id
+             * Format: uuid
+             */
+            professional_id: string;
+            /**
+             * Starts At
+             * Format: date-time
+             */
+            starts_at: string;
+            /**
+             * Ends At
+             * Format: date-time
+             */
+            ends_at: string;
+        };
+        /**
+         * AppointmentOut
+         * @description Administrative view: who, with whom, when, and where it stands. Nothing clinical.
+         */
+        AppointmentOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Patient Id
+             * Format: uuid
+             */
+            patient_id: string;
+            /** Patient Name */
+            patient_name: string;
+            /**
+             * Professional Id
+             * Format: uuid
+             */
+            professional_id: string;
+            /** Professional Name */
+            professional_name: string;
+            /**
+             * Starts At
+             * Format: date-time
+             */
+            starts_at: string;
+            /**
+             * Ends At
+             * Format: date-time
+             */
+            ends_at: string;
+            status: components["schemas"]["AppointmentStatus"];
+        };
+        /**
+         * AppointmentStatus
+         * @description The one lifecycle every module reads: reception moves it, analytics counts it.
+         * @enum {string}
+         */
+        AppointmentStatus: "scheduled" | "arrived" | "done" | "no_show" | "cancelled";
         /** AssignmentCreate */
         AssignmentCreate: {
             /**
@@ -286,6 +720,20 @@ export interface components {
              */
             professional_id: string;
         };
+        /** Attendance */
+        Attendance: {
+            /**
+             * Since
+             * Format: date
+             */
+            since: string;
+            /** Done */
+            done: number;
+            /** No Show */
+            no_show: number;
+            /** No Show Rate */
+            no_show_rate: number | null;
+        };
         /** CareTeamMember */
         CareTeamMember: {
             /**
@@ -301,6 +749,8 @@ export interface components {
             /** Full Name */
             full_name: string;
             role: components["schemas"]["Role"];
+            /** Discipline */
+            discipline: string | null;
         };
         /** CategoryCreate */
         CategoryCreate: {
@@ -330,6 +780,37 @@ export interface components {
             name?: string | null;
             /** Position */
             position?: number | null;
+        };
+        /** Choice */
+        Choice: {
+            /** Value */
+            value: number;
+            /** Label */
+            label: string;
+        };
+        /** Dashboard */
+        Dashboard: {
+            /**
+             * Generated At
+             * Format: date-time
+             */
+            generated_at: string;
+            /** Min Group Size */
+            min_group_size: number;
+            /** Active Pathways */
+            active_pathways: number;
+            attendance: components["schemas"]["Attendance"];
+            /** Quality Of Life */
+            quality_of_life: components["schemas"]["MonthlyScore"][];
+            satisfaction: components["schemas"]["Satisfaction"];
+            self_assessment: components["schemas"]["SelfAssessment"];
+        };
+        /** DimensionChange */
+        DimensionChange: {
+            /** Dimension */
+            dimension: string;
+            /** Average Change */
+            average_change: number | null;
         };
         /** EntryCreate */
         EntryCreate: {
@@ -395,6 +876,11 @@ export interface components {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
         };
+        /**
+         * Instrument
+         * @enum {string}
+         */
+        Instrument: "quality_of_life" | "satisfaction";
         /** LoginRequest */
         LoginRequest: {
             /**
@@ -414,6 +900,192 @@ export interface components {
              * @default bearer
              */
             token_type: string;
+        };
+        /**
+         * Milestone
+         * @description A milestone as the care team sees it.
+         */
+        Milestone: {
+            kind: components["schemas"]["MilestoneKind"];
+            /**
+             * Recorded At
+             * Format: date-time
+             */
+            recorded_at: string;
+            /** Physical */
+            physical: number;
+            /** Psychological */
+            psychological: number;
+            /** Emotional */
+            emotional: number;
+            /** Sexual */
+            sexual: number;
+            /** Socio Professional */
+            socio_professional: number;
+            /** Symptoms */
+            symptoms: components["schemas"]["Symptom"][];
+            /** Goals */
+            goals: string;
+            /** Plan */
+            plan: string;
+            /** Note */
+            note: string;
+        };
+        /** MilestoneCreate */
+        MilestoneCreate: {
+            kind: components["schemas"]["MilestoneKind"];
+            /** Physical */
+            physical: number;
+            /** Psychological */
+            psychological: number;
+            /** Emotional */
+            emotional: number;
+            /** Sexual */
+            sexual: number;
+            /** Socio Professional */
+            socio_professional: number;
+            /**
+             * Symptoms
+             * @default []
+             */
+            symptoms: components["schemas"]["Symptom"][];
+            /**
+             * Goals
+             * @default
+             */
+            goals: string;
+            /**
+             * Plan
+             * @default
+             */
+            plan: string;
+            /**
+             * Note
+             * @default
+             */
+            note: string;
+        };
+        /**
+         * MilestoneKind
+         * @enum {string}
+         */
+        MilestoneKind: "intake" | "review" | "final";
+        /** MonthlyScore */
+        MonthlyScore: {
+            /** Period */
+            period: string;
+            /** Respondents */
+            respondents: number;
+            /** Average */
+            average: number | null;
+        };
+        /** NeedCreate */
+        NeedCreate: {
+            /** Note */
+            note: string;
+        };
+        /**
+         * NeedOut
+         * @description A flagged need, as the coordinator sees it in their inbox.
+         */
+        NeedOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Pathway Id
+             * Format: uuid
+             */
+            pathway_id: string;
+            /**
+             * Patient Id
+             * Format: uuid
+             */
+            patient_id: string;
+            /** Patient Name */
+            patient_name: string;
+            /** Raised By Name */
+            raised_by_name: string;
+            /**
+             * Raised At
+             * Format: date-time
+             */
+            raised_at: string;
+            /** Note */
+            note: string;
+            /** Resolved At */
+            resolved_at: string | null;
+        };
+        /** PathwayOpen */
+        PathwayOpen: {
+            /**
+             * Patient Id
+             * Format: uuid
+             */
+            patient_id: string;
+        };
+        /** PathwayOut */
+        PathwayOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Patient Id
+             * Format: uuid
+             */
+            patient_id: string;
+            /**
+             * Coordinator Id
+             * Format: uuid
+             */
+            coordinator_id: string;
+            /** Coordinator Name */
+            coordinator_name: string;
+            status: components["schemas"]["PathwayStatus"];
+            /**
+             * Opened At
+             * Format: date-time
+             */
+            opened_at: string;
+            /** Closed At */
+            closed_at: string | null;
+            /** Milestones */
+            milestones: components["schemas"]["Milestone"][];
+        };
+        /**
+         * PathwayStatus
+         * @enum {string}
+         */
+        PathwayStatus: "open" | "closed";
+        /**
+         * PathwaySummary
+         * @description A row in a coordinator's list: whose pathway, and which milestone comes next and when.
+         */
+        PathwaySummary: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Patient Id
+             * Format: uuid
+             */
+            patient_id: string;
+            /** Patient Name */
+            patient_name: string;
+            /**
+             * Opened At
+             * Format: date-time
+             */
+            opened_at: string;
+            next_milestone: components["schemas"]["MilestoneKind"] | null;
+            /** Next Due On */
+            next_due_on: string | null;
         };
         /**
          * PatientAdministrative
@@ -484,6 +1156,57 @@ export interface components {
             medical_summary: string | null;
         };
         /**
+         * PatientMilestone
+         * @description A milestone as the patient sees it: everything but the coordinator's note.
+         */
+        PatientMilestone: {
+            kind: components["schemas"]["MilestoneKind"];
+            /**
+             * Recorded At
+             * Format: date-time
+             */
+            recorded_at: string;
+            /** Physical */
+            physical: number;
+            /** Psychological */
+            psychological: number;
+            /** Emotional */
+            emotional: number;
+            /** Sexual */
+            sexual: number;
+            /** Socio Professional */
+            socio_professional: number;
+            /** Symptoms */
+            symptoms: components["schemas"]["Symptom"][];
+            /** Goals */
+            goals: string;
+            /** Plan */
+            plan: string;
+        };
+        /**
+         * PatientPathway
+         * @description The patient's own pathway: who their coordinator is and what was recorded together.
+         */
+        PatientPathway: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Coordinator Name */
+            coordinator_name: string;
+            status: components["schemas"]["PathwayStatus"];
+            /**
+             * Opened At
+             * Format: date-time
+             */
+            opened_at: string;
+            /** Closed At */
+            closed_at: string | null;
+            /** Milestones */
+            milestones: components["schemas"]["PatientMilestone"][];
+        };
+        /**
          * PublicCategory
          * @description What everyone sees: a category and its published entries, in order.
          */
@@ -510,11 +1233,113 @@ export interface components {
             /** Answer */
             answer: string;
         };
+        /** Question */
+        Question: {
+            /** Id */
+            id: string;
+            /** Text */
+            text: string;
+        };
+        /** QuestionAverage */
+        QuestionAverage: {
+            /** Question */
+            question: string;
+            /** Average */
+            average: number | null;
+        };
+        /**
+         * Questionnaire
+         * @description What the patient portal needs to show a questionnaire.
+         */
+        Questionnaire: {
+            instrument: components["schemas"]["Instrument"];
+            /** Title */
+            title: string;
+            /** Introduction */
+            introduction: string;
+            /** Questions */
+            questions: components["schemas"]["Question"][];
+            /** Choices */
+            choices: components["schemas"]["Choice"][];
+        };
+        /** ResponseCreate */
+        ResponseCreate: {
+            /** Answers */
+            answers: {
+                [key: string]: number;
+            };
+        };
         /**
          * Role
          * @enum {string}
          */
         Role: "patient" | "secretary" | "professional" | "coordinator" | "admin";
+        /** Satisfaction */
+        Satisfaction: {
+            /** Respondents */
+            respondents: number;
+            /** Average */
+            average: number | null;
+            /** By Question */
+            by_question: components["schemas"]["QuestionAverage"][];
+        };
+        /**
+         * ScoreOut
+         * @description One quality-of-life result: 0 to 100, higher is better, with the change since the last.
+         */
+        ScoreOut: {
+            /** Period */
+            period: string;
+            /** Score */
+            score: number;
+            /** Change */
+            change: number | null;
+            /**
+             * Submitted At
+             * Format: date-time
+             */
+            submitted_at: string;
+        };
+        /**
+         * SelfAssessment
+         * @description Final review minus intake, on the 0–4 self-assessment, over finished pathways.
+         */
+        SelfAssessment: {
+            /** Pathways */
+            pathways: number;
+            /** By Dimension */
+            by_dimension: components["schemas"]["DimensionChange"][];
+        };
+        /**
+         * StatusChange
+         * @description arrived, no_show, done, or back to scheduled to undo a mistake.
+         */
+        StatusChange: {
+            status: components["schemas"]["AppointmentStatus"];
+        };
+        /** SubmittedOut */
+        SubmittedOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            instrument: components["schemas"]["Instrument"];
+            /** Score */
+            score: number;
+            /**
+             * Submitted At
+             * Format: date-time
+             */
+            submitted_at: string;
+        };
+        /** Symptom */
+        Symptom: {
+            /** Name */
+            name: string;
+            /** Intensity */
+            intensity: number;
+        };
         /**
          * UserCreate
          * @description A new login. The initial password is set by whoever creates the account.
@@ -530,6 +1355,8 @@ export interface components {
             /** Password */
             password: string;
             role: components["schemas"]["Role"];
+            /** Discipline */
+            discipline?: string | null;
         };
         /** UserOut */
         UserOut: {
@@ -543,6 +1370,8 @@ export interface components {
             /** Full Name */
             full_name: string;
             role: components["schemas"]["Role"];
+            /** Discipline */
+            discipline?: string | null;
         };
         /** ValidationError */
         ValidationError: {
@@ -584,6 +1413,26 @@ export interface operations {
                     "application/json": {
                         [key: string]: string;
                     };
+                };
+            };
+        };
+    };
+    get_dashboard_api_v1_analytics_dashboard_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Dashboard"];
                 };
             };
         };
@@ -1041,7 +1890,7 @@ export interface operations {
             };
         };
     };
-    list_patients_api_v1_patients_get: {
+    list_care_staff_api_v1_auth_care_staff_get: {
         parameters: {
             query?: never;
             header?: never;
@@ -1056,7 +1905,295 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    "application/json": components["schemas"]["UserOut"][];
+                };
+            };
+        };
+    };
+    open_pathway_api_v1_pathways_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PathwayOpen"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PathwayOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    record_milestone_api_v1_pathways__pathway_id__milestones_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                pathway_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MilestoneCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PathwayOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    close_pathway_api_v1_pathways__pathway_id__close_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                pathway_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PathwayOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_my_pathways_api_v1_pathways_mine_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PatientPathway"][];
+                };
+            };
+        };
+    };
+    list_led_pathways_api_v1_pathways_led_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PathwaySummary"][];
+                };
+            };
+        };
+    };
+    list_patient_pathways_api_v1_pathways_patients__patient_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                patient_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PathwayOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    raise_need_api_v1_pathways__pathway_id__needs_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                pathway_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NeedCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NeedOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_open_needs_api_v1_pathways_needs_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NeedOut"][];
+                };
+            };
+        };
+    };
+    resolve_need_api_v1_pathways_needs__need_id__resolve_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                need_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NeedOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_patients_api_v1_patients_get: {
+        parameters: {
+            query?: {
+                search?: string | null;
+                unassigned?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
                     "application/json": components["schemas"]["PatientAdministrative"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
@@ -1112,6 +2249,294 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PatientDetail"] | components["schemas"]["PatientAdministrative"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_due_api_v1_questionnaires_due_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Questionnaire"][];
+                };
+            };
+        };
+    };
+    submit_response_api_v1_questionnaires__instrument__responses_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                instrument: components["schemas"]["Instrument"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResponseCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubmittedOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_my_scores_api_v1_questionnaires_scores_mine_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScoreOut"][];
+                };
+            };
+        };
+    };
+    list_patient_scores_api_v1_questionnaires_patients__patient_id__scores_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                patient_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScoreOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_today_api_v1_reception_today_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AppointmentOut"][];
+                };
+            };
+        };
+    };
+    change_status_api_v1_reception_appointments__appointment_id__status_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                appointment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StatusChange"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AppointmentOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_appointment_api_v1_scheduling_appointments_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AppointmentCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AppointmentOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    cancel_appointment_api_v1_scheduling_appointments__appointment_id__cancel_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                appointment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AppointmentOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_my_appointments_api_v1_scheduling_appointments_mine_get: {
+        parameters: {
+            query?: {
+                start?: string | null;
+                end?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AppointmentOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_patient_appointments_api_v1_scheduling_patients__patient_id__appointments_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                patient_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AppointmentOut"][];
                 };
             };
             /** @description Validation Error */
