@@ -68,6 +68,21 @@ def list_patients(db: Session, user: CurrentUser) -> list[PatientAdministrative]
     return [PatientAdministrative.model_validate(p) for p in db.scalars(query)]
 
 
+def get_names(db: Session, patient_ids: set[uuid.UUID]) -> dict[uuid.UUID, str]:
+    """Display names for other modules' lists. The calling module checks access and audits."""
+    if not patient_ids:
+        return {}
+    rows = db.execute(
+        select(Patient.id, Patient.first_name, Patient.last_name).where(Patient.id.in_(patient_ids))
+    )
+    return {row.id: f"{row.first_name} {row.last_name}" for row in rows}
+
+
+def get_patient_id_for_user(db: Session, user_id: uuid.UUID) -> uuid.UUID | None:
+    """The patient record behind a patient's login, if any."""
+    return db.scalar(select(Patient.id).where(Patient.user_id == user_id))
+
+
 def _check_account_can_be_linked(db: Session, user_id: uuid.UUID) -> None:
     if identity.get_role(db, user_id) != Role.PATIENT:
         raise NotFoundError("No patient account with this id")
