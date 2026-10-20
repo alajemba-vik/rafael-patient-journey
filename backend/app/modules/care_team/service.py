@@ -41,6 +41,17 @@ def patient_ids_for(db: Session, professional_id: uuid.UUID) -> list[uuid.UUID]:
     return list(db.scalars(query))
 
 
+def coordinated_patient_ids(db: Session) -> set[uuid.UUID]:
+    """For other modules: patients who already have a coordinator in their care team."""
+    coordinator_ids = identity.list_ids_with_role(db, Role.COORDINATOR)
+    if not coordinator_ids:
+        return set()
+    query = select(CareAssignment.patient_id).where(
+        CareAssignment.professional_id.in_(coordinator_ids)
+    )
+    return set(db.scalars(query))
+
+
 def create_assignment(db: Session, user: CurrentUser, data: AssignmentCreate) -> AssignmentOut:
     """Add a professional or coordinator to a patient's care team.
 
@@ -92,6 +103,7 @@ def list_members(db: Session, user: CurrentUser, patient_id: uuid.UUID) -> list[
             user_id=account.id,
             full_name=account.full_name,
             role=account.role,
+            discipline=account.discipline,
         )
         for account in accounts
     ]

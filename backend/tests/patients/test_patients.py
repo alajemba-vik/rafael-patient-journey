@@ -163,7 +163,7 @@ def test_patient_cannot_list_patients(db, client_as):
     assert response.status_code == 403
 
 
-def test_coordinator_sees_any_patient_administratively(db, client_as):
+def test_coordinator_sees_unassigned_patient_administratively(db, client_as):
     patient = add_patient(db)
 
     body = client_as(Role.COORDINATOR).get(f"/api/v1/patients/{patient.id}").json()
@@ -172,18 +172,30 @@ def test_coordinator_sees_any_patient_administratively(db, client_as):
     assert "medical_summary" not in body
 
 
-def test_coordinator_lists_every_patient_or_only_their_own(db, client_as):
-    coordinator_id = uuid.uuid4()
+def test_coordinator_cannot_see_another_coordinators_patient(db, client_as):
+    patient = add_patient(db)
+    other_coordinator = add_account(db, Role.COORDINATOR)
+    assign(db, other_coordinator.id, patient.id)
+
+    response = client_as(Role.COORDINATOR).get(f"/api/v1/patients/{patient.id}")
+
+    assert response.status_code == 403
+
+
+def test_coordinator_lists_own_patients_or_unassigned_ones(db, client_as):
+    coordinator_id = add_account(db, Role.COORDINATOR).id
     mine = add_patient(db)
-    add_patient(db)
     assign(db, coordinator_id, mine.id)
+    unassigned = add_patient(db)
+    taken = add_patient(db)
+    assign(db, add_account(db, Role.COORDINATOR).id, taken.id)
     client = client_as(Role.COORDINATOR, coordinator_id)
 
-    everyone = client.get("/api/v1/patients").json()
-    own = client.get("/api/v1/patients", params={"mine": True}).json()
+    own = client.get("/api/v1/patients").json()
+    waiting = client.get("/api/v1/patients", params={"unassigned": True}).json()
 
-    assert len(everyone) == 2
     assert [p["id"] for p in own] == [str(mine.id)]
+    assert [p["id"] for p in waiting] == [str(unassigned.id)]
 
 
 def test_search_matches_the_start_of_a_name_and_listing_is_audited(db, client_as):
