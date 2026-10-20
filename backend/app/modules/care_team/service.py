@@ -3,7 +3,8 @@
 Access policy:
 - coordinator, admin → add or remove anyone in any patient's team, and see any team
 - professional       → see the team of patients they are part of
-- secretary, patient → no access here
+- secretary          → see any team (names and roles), to book appointments with its members
+- patient            → no access here
 """
 
 import uuid
@@ -74,7 +75,8 @@ def delete_assignment(db: Session, user: CurrentUser, assignment_id: uuid.UUID) 
 
 
 def list_members(db: Session, user: CurrentUser, patient_id: uuid.UUID) -> list[CareTeamMember]:
-    allowed = user.role in MANAGER_ROLES or (
+    # TODO(validate): may reception see who is in a patient's care team? Needed to book. (V-07)
+    allowed = user.role in MANAGER_ROLES | {Role.SECRETARY} or (
         user.role == Role.PROFESSIONAL and is_in_care_team(db, user.id, patient_id)
     )
     if not allowed:

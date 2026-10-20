@@ -161,3 +161,37 @@ def test_patient_cannot_list_patients(db, client_as):
     response = client_as(Role.PATIENT).get("/api/v1/patients")
 
     assert response.status_code == 403
+
+
+def test_coordinator_sees_any_patient_administratively(db, client_as):
+    patient = add_patient(db)
+
+    body = client_as(Role.COORDINATOR).get(f"/api/v1/patients/{patient.id}").json()
+
+    assert body["last_name"] == "Synthetic"
+    assert "medical_summary" not in body
+
+
+def test_coordinator_lists_every_patient_or_only_their_own(db, client_as):
+    coordinator_id = uuid.uuid4()
+    mine = add_patient(db)
+    add_patient(db)
+    assign(db, coordinator_id, mine.id)
+    client = client_as(Role.COORDINATOR, coordinator_id)
+
+    everyone = client.get("/api/v1/patients").json()
+    own = client.get("/api/v1/patients", params={"mine": True}).json()
+
+    assert len(everyone) == 2
+    assert [p["id"] for p in own] == [str(mine.id)]
+
+
+def test_search_matches_the_start_of_a_name_and_listing_is_audited(db, client_as):
+    add_patient(db)
+
+    found = client_as(Role.SECRETARY).get("/api/v1/patients", params={"search": "synth"}).json()
+    wildcard = client_as(Role.SECRETARY).get("/api/v1/patients", params={"search": "%"}).json()
+
+    assert len(found) == 1
+    assert wildcard == []
+    assert db.scalar(select(AuditEvent.action).where(AuditEvent.action == "patient.list"))

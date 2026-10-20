@@ -1,16 +1,17 @@
 """Patient rules and permissions. Public API of the patients module.
 
 Access policy (role + care relationship):
-- patient       → own record, administrative + clinical
-- professional,
-  coordinator   → only patients in their care team, administrative + clinical
+- patient      → own record, administrative + clinical
+- professional → only patients in their care team, administrative + clinical
+- coordinator  → patients in their care team, administrative + clinical; every other patient,
+                 administrative only, so they can take on new patients
 - secretary,
-  admin         → every patient, administrative only
+  admin        → every patient, administrative only
 """
 
 import uuid
 
-from sqlalchemy import select
+from sqlalchemy import or_, select
 from sqlalchemy.orm import Session
 
 from app import audit
@@ -23,6 +24,10 @@ from app.modules.patients.schemas import PatientAdministrative, PatientCreate, P
 
 CARE_ROLES = {Role.PROFESSIONAL, Role.COORDINATOR}
 OFFICE_ROLES = {Role.SECRETARY, Role.ADMIN}
+# TODO(validate): may coordinators see every patient's administrative record, as the
+# coordination unit contacting new patients suggests? (V-06, V-07)
+ADMINISTRATIVE_ROLES = OFFICE_ROLES | {Role.COORDINATOR}
+LIST_LIMIT = 100
 
 
 def create_patient(db: Session, user: CurrentUser, data: PatientCreate) -> PatientAdministrative:
@@ -47,7 +52,7 @@ def get_patient(
 
     if _can_see_clinical(db, user, patient):
         view = PatientDetail.model_validate(patient)
-    elif user.role in OFFICE_ROLES:
+    elif user.role in ADMINISTRATIVE_ROLES:
         view = PatientAdministrative.model_validate(patient)
     else:
         audit.record(db, user.id, "patient.read.denied", patient.id)
@@ -59,13 +64,33 @@ def get_patient(
     return view
 
 
-def list_patients(db: Session, user: CurrentUser) -> list[PatientAdministrative]:
-    query = select(Patient).order_by(Patient.last_name, Patient.first_name)
-    if user.role in CARE_ROLES:
+def list_patients(
+    db: Session, user: CurrentUser, search: str | None = None, mine: bool = False
+) -> list[PatientAdministrative]:
+    """Alphabetical, at most LIST_LIMIT rows.
+
+    `search` matches the start of a first or last name; `mine` keeps a coordinator's own care
+    team (a practitioner only ever sees theirs).
+    """
+    query = select(Patient).order_by(Patient.last_name, Patient.first_name).limit(LIST_LIMIT)
+    if user.role == Role.PROFESSIONAL or (user.role == Role.COORDINATOR and mine):
         query = query.where(Patient.id.in_(care_team.patient_ids_for(db, user.id)))
-    elif user.role not in OFFICE_ROLES:
+    elif user.role not in ADMINISTRATIVE_ROLES:
         raise ForbiddenError("You are not allowed to list patients")
-    return [PatientAdministrative.model_validate(p) for p in db.scalars(query)]
+    if search:
+        escaped = search.strip().replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+        pattern = f"{escaped}%"
+        query = query.where(
+            or_(
+                Patient.last_name.ilike(pattern, escape="\\"),
+                Patient.first_name.ilike(pattern, escape="\\"),
+            )
+        )
+
+    patients = list(db.scalars(query))
+    audit.record_many(db, user.id, "patient.list", {p.id for p in patients})
+    db.commit()
+    return [PatientAdministrative.model_validate(p) for p in patients]
 
 
 def get_names(db: Session, patient_ids: set[uuid.UUID]) -> dict[uuid.UUID, str]:

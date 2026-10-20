@@ -145,7 +145,15 @@ def test_professional_in_team_sees_team(db, client_as):
     assert response.status_code == 200
 
 
-@pytest.mark.parametrize("role", [Role.PROFESSIONAL, Role.SECRETARY, Role.PATIENT])
+def test_secretary_sees_team_to_book_with_its_members(db, client_as):
+    assign(db, add_account(db, Role.PROFESSIONAL).id)
+
+    response = client_as(Role.SECRETARY).get(f"/api/v1/care-team/patients/{PATIENT_ID}/members")
+
+    assert response.status_code == 200
+
+
+@pytest.mark.parametrize("role", [Role.PROFESSIONAL, Role.PATIENT])
 def test_outsiders_cannot_see_team_and_it_is_audited(db, client_as, role):
     assign(db, add_account(db, Role.PROFESSIONAL).id)
 

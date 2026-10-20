@@ -28,6 +28,13 @@ def create_user(
     return service.create_user(db, user, body)
 
 
+@router.get("/care-staff")
+def list_care_staff(
+    user: CurrentUser = Depends(get_current_user), db: Session = Depends(get_db)
+) -> list[UserOut]:
+    return service.list_care_staff(db, user)
+
+
 @router.get("/users")
 def list_users(
     user: CurrentUser = Depends(get_current_user), db: Session = Depends(get_db)
