@@ -20,7 +20,12 @@ from app.modules.care_team import service as care_team
 from app.modules.identity_access import service as identity
 from app.modules.identity_access.service import CurrentUser, Role
 from app.modules.patients.models import Patient
-from app.modules.patients.schemas import PatientAdministrative, PatientCreate, PatientDetail
+from app.modules.patients.schemas import (
+    PatientAdministrative,
+    PatientCreate,
+    PatientDetail,
+    PatientUpdate,
+)
 
 CARE_ROLES = {Role.PROFESSIONAL, Role.COORDINATOR}
 OFFICE_ROLES = {Role.SECRETARY, Role.ADMIN}
@@ -38,6 +43,28 @@ def create_patient(db: Session, user: CurrentUser, data: PatientCreate) -> Patie
     db.add(patient)
     db.flush()
     audit.record(db, user.id, "patient.create", patient.id)
+    db.commit()
+    return PatientAdministrative.model_validate(patient)
+
+
+def update_patient(
+    db: Session, user: CurrentUser, patient_id: uuid.UUID, data: PatientUpdate
+) -> PatientAdministrative:
+    """Reception and admins update contact details or link the patient's login."""
+    patient = db.get(Patient, patient_id)
+    if patient is None:
+        raise NotFoundError("Patient not found")
+    if user.role not in OFFICE_ROLES:
+        audit.record(db, user.id, "patient.update.denied", patient.id)
+        db.commit()
+        raise ForbiddenError("Only reception or admins can update patients")
+    changes = data.model_dump(exclude_unset=True)
+    if changes.get("user_id") is not None and changes["user_id"] != patient.user_id:
+        _check_account_can_be_linked(db, changes["user_id"])
+
+    for field, value in changes.items():
+        setattr(patient, field, value)
+    audit.record(db, user.id, "patient.update", patient.id)
     db.commit()
     return PatientAdministrative.model_validate(patient)
 
