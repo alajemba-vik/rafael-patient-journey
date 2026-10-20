@@ -10,13 +10,12 @@ from zoneinfo import ZoneInfo
 from sqlalchemy.orm import Session
 
 from app import audit
+from app.config import get_settings
 from app.errors import ForbiddenError
 from app.modules.identity_access.service import CurrentUser, Role
 from app.modules.scheduling import service as scheduling
 from app.modules.scheduling.service import AppointmentOut, AppointmentStatus
 
-# TODO(validate): does Hartmann share this platform, and in which time zone? (V-02)
-INSTITUTE_TIME_ZONE = ZoneInfo("Europe/Paris")
 # TODO(validate): what does reception do on arrival, and are no-shows recorded? (V-04, V-05)
 RECEPTION_ROLES = {Role.SECRETARY}
 
@@ -24,8 +23,10 @@ RECEPTION_ROLES = {Role.SECRETARY}
 def list_today(db: Session, user: CurrentUser) -> list[AppointmentOut]:
     """Today's appointments at the Institute, in order, cancelled ones left out."""
     _require_reception(db, user)
-    today = datetime.now(INSTITUTE_TIME_ZONE).date()
-    start = datetime.combine(today, time.min, tzinfo=INSTITUTE_TIME_ZONE).astimezone(UTC)
+    # TODO(validate): does Hartmann share this platform, and in which time zone? (V-02)
+    time_zone = ZoneInfo(get_settings().institute_time_zone)
+    today = datetime.now(time_zone).date()
+    start = datetime.combine(today, time.min, tzinfo=time_zone).astimezone(UTC)
     appointments = scheduling.list_between(db, start, start + timedelta(days=1))
     audit.record_many(db, user.id, "reception.read", {a.patient_id for a in appointments})
     db.commit()
