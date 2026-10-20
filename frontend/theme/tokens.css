@@ -19,8 +19,6 @@
   --on-band: #fffef9;
   --accent: #ffa724;
   --on-accent: #001345;
-  --accent-gold: #f9b004;
-  --tag-media: #ffc0cb;
   --hairline: #e2e2e2;
   --focus-ring: #001345;
 }
@@ -55,9 +53,6 @@
 
   --radius-xs: 3px;
   --radius-md: 10px;
-  --radius-pill: 20px;
-  --radius-xl: 25px;
-  --radius-hero: 100px;
 }
 
 /* Type styles: display face. Headings are uppercase except title and stat. */
@@ -73,4 +68,3 @@
 .rf-body { font-family: var(--font-body); font-size: 16px; line-height: 27.2px; font-weight: 400; }
 .rf-body-sm { font-family: var(--font-body); font-size: 14px; line-height: 23.8px; font-weight: 500; }
 .rf-caption { font-family: var(--font-body); font-size: 12px; line-height: 20.4px; font-weight: 500; }
-.rf-card-title { font-family: var(--font-body); font-size: 13px; line-height: 16px; font-weight: 600; }
