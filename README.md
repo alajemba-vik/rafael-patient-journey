@@ -56,7 +56,7 @@ AGENTS.md               code guidelines and rules for people and AI agents
 | `reception` | check-in, waiting room | Victoria | files ready, not started |
 | `questionnaires` | questionnaires and answers | Téo | files ready, not started |
 | `analytics` | de-identified indicators | — | files ready, not started |
-| `faq` | FAQ content | Louis | files ready, not started |
+| `faq` | FAQ content | Louis | public read, admin editing |
 | `notifications` | reminders, emails | — | files ready, not started |
 
 ## Team rules
