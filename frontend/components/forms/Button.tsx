@@ -6,10 +6,10 @@ type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
   pending?: boolean;
 };
 
-export function Button({ variant = "primary", pending = false, disabled, children, ...rest }: Props) {
-  const className = variant === "primary" ? "rf-btn" : "rf-btn rf-btn--secondary";
+export function Button({ variant = "primary", pending = false, disabled, className, children, ...rest }: Props) {
+  const classes = ["rf-btn", variant === "secondary" && "rf-btn--secondary", className].filter(Boolean).join(" ");
   return (
-    <button type="button" {...rest} className={className} disabled={disabled || pending} aria-busy={pending}>
+    <button type="button" {...rest} className={classes} disabled={disabled || pending} aria-busy={pending}>
       {pending && <span className="rf-spinner" aria-hidden="true" />}
       {children}
     </button>

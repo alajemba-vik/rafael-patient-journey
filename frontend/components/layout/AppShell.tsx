@@ -41,8 +41,14 @@ export function AppShell() {
           </Link>
           {me && (
             <nav className="rf-nav" aria-label="Navigation principale">
-              {NAV_BY_ROLE[me.role].map((item) => (
-                <NavLink key={item.to} to={item.to} className="rf-navlink">
+              {NAV_BY_ROLE[me.role].map((item, _, items) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  className="rf-navlink"
+                  // "/accueil" must not also light up on "/accueil/patients", which has its own item.
+                  end={items.some((other) => other.to.startsWith(`${item.to}/`))}
+                >
                   {item.label}
                 </NavLink>
               ))}
