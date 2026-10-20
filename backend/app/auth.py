@@ -12,6 +12,10 @@ import jwt
 from app.config import get_settings
 from app.errors import UnauthorizedError
 
+# One client for every call, so the connection to Supabase is reused instead of reopened
+# (a new TLS handshake costs roughly a hundred milliseconds per login).
+_http = httpx.Client(timeout=10)
+
 
 def create_account(email: str, password: str) -> str:
     """Create a confirmed login and return its identity-provider user id.
@@ -20,14 +24,13 @@ def create_account(email: str, password: str) -> str:
     accounts on people's behalf.
     """
     settings = get_settings()
-    response = httpx.post(
+    response = _http.post(
         f"{settings.supabase_url}/auth/v1/admin/users",
         headers={
             "apikey": settings.supabase_secret_key,
             "Authorization": f"Bearer {settings.supabase_secret_key}",
         },
         json={"email": email, "password": password, "email_confirm": True},
-        timeout=10,
     )
     response.raise_for_status()
     return response.json()["id"]
@@ -36,12 +39,11 @@ def create_account(email: str, password: str) -> str:
 def sign_in(email: str, password: str) -> str:
     """Exchange email + password for an access token."""
     settings = get_settings()
-    response = httpx.post(
+    response = _http.post(
         f"{settings.supabase_url}/auth/v1/token",
         params={"grant_type": "password"},
         headers={"apikey": settings.supabase_publishable_key},
         json={"email": email, "password": password},
-        timeout=10,
     )
     if response.status_code != 200:
         raise UnauthorizedError("Invalid email or password")
