@@ -81,15 +81,17 @@ def list_members(db: Session, user: CurrentUser, patient_id: uuid.UUID) -> list[
         _deny(db, user, "care_team.read.denied", patient_id)
 
     assignments = db.scalars(select(CareAssignment).where(CareAssignment.patient_id == patient_id))
-    assignment_ids = {a.professional_id: a.id for a in assignments}
+    assignment_by_member = {a.professional_id: a.id for a in assignments}
+    # Skip the names query when the team is empty: one database round trip less.
+    accounts = identity.get_users(db, list(assignment_by_member)) if assignment_by_member else []
     members = [
         CareTeamMember(
-            assignment_id=assignment_ids[account.id],
+            assignment_id=assignment_by_member[account.id],
             user_id=account.id,
             full_name=account.full_name,
             role=account.role,
         )
-        for account in identity.get_users(db, list(assignment_ids))
+        for account in accounts
     ]
     audit.record(db, user.id, "care_team.read", patient_id)
     db.commit()
