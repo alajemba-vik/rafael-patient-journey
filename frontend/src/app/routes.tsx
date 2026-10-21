@@ -1,5 +1,6 @@
 import { createBrowserRouter, type RouteObject } from "react-router";
 
+import { RouteError } from "../components/feedback/RouteError";
 import { AppShell } from "../components/layout/AppShell";
 import { RequireAuth, RoleHome } from "../components/layout/RequireAuth";
 import { FaqPage } from "../pages/public/faq/FaqPage";
@@ -17,6 +18,7 @@ function page(path: string, load: () => Promise<{ Component: React.ComponentType
 export const router = createBrowserRouter([
   {
     element: <AppShell />,
+    errorElement: <RouteError />,
     children: [
       { path: paths.login, element: <LoginPage /> },
       { path: paths.faq, element: <FaqPage /> },
