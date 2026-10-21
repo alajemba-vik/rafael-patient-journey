@@ -7,8 +7,8 @@ import { Button } from "../../../components/forms/Button";
 import { QueryState } from "../../../components/feedback/QueryState";
 import { formatDate } from "../../../components/format";
 import { PageHeader } from "../../../components/layout/PageHeader";
-import { AppointmentsSection } from "./AppointmentsSection";
-import { CareTeamSection } from "./CareTeamSection";
+import { AppointmentsSection } from "../../../components/patient/AppointmentsSection";
+import { CareTeamSection } from "../../../components/patient/CareTeamSection";
 import { PathwaySection } from "./PathwaySection";
 import { ScoresSection } from "./ScoresSection";
 

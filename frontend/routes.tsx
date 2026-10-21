@@ -86,6 +86,33 @@ export const router = createBrowserRouter([
           },
         ],
       },
+      {
+        path: "/accueil",
+        element: <RequireAuth roles={["secretary"]} />,
+        children: [
+          {
+            index: true,
+            lazy: () =>
+              import("./pages/secretariat/reception/ReceptionBoardPage").then((m) => ({
+                Component: m.ReceptionBoardPage,
+              })),
+          },
+          {
+            path: "patients",
+            lazy: () =>
+              import("./pages/secretariat/patients/ReceptionPatientsPage").then((m) => ({
+                Component: m.ReceptionPatientsPage,
+              })),
+          },
+          {
+            path: "patients/:patientId",
+            lazy: () =>
+              import("./pages/secretariat/patients/ReceptionPatientPage").then((m) => ({
+                Component: m.ReceptionPatientPage,
+              })),
+          },
+        ],
+      },
       { path: "*", element: <NotFoundPage /> },
     ],
   },

@@ -13,7 +13,11 @@ export const NAV_BY_ROLE: Record<Role, NavItem[]> = {
     { to: "/patient/questionnaires", label: "Questionnaires" },
     FAQ,
   ],
-  secretary: [FAQ],
+  secretary: [
+    { to: "/accueil", label: "Accueil du jour" },
+    { to: "/accueil/patients", label: "Patients" },
+    FAQ,
+  ],
   professional: [
     { to: "/pro", label: "Mon planning" },
     { to: "/pro/patients", label: "Mes patients" },

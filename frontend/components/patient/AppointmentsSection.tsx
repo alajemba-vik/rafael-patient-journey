@@ -1,10 +1,10 @@
-import { useMe } from "../../../api/me";
-import { useCancelAppointment, usePatientAppointments } from "../../../api/scheduling";
-import { QueryState } from "../../../components/feedback/QueryState";
-import { StatusBadge } from "../../../components/feedback/StatusBadge";
-import { BookingForm } from "../../../components/forms/BookingForm";
-import { ConfirmButton } from "../../../components/forms/ConfirmButton";
-import { formatDate, formatTime } from "../../../components/format";
+import { useMe } from "../../api/me";
+import { useCancelAppointment, usePatientAppointments } from "../../api/scheduling";
+import { QueryState } from "../feedback/QueryState";
+import { StatusBadge } from "../feedback/StatusBadge";
+import { BookingForm } from "../forms/BookingForm";
+import { ConfirmButton } from "../forms/ConfirmButton";
+import { formatDate, formatTime } from "../format";
 
 /** A patient's appointments. Coordinators and reception book and cancel here. */
 export function AppointmentsSection({ patientId }: { patientId: string }) {

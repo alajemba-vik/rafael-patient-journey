@@ -1,12 +1,12 @@
 import { useState, type FormEvent } from "react";
 
-import { useAddToCareTeam, useCareStaff, useCareTeam, useRemoveFromCareTeam } from "../../../api/careTeam";
-import { useMe } from "../../../api/me";
-import { QueryState } from "../../../components/feedback/QueryState";
-import { Button } from "../../../components/forms/Button";
-import { ConfirmButton } from "../../../components/forms/ConfirmButton";
-import { SelectField } from "../../../components/forms/SelectField";
-import { ROLE_LABELS } from "../../../components/labels";
+import { useAddToCareTeam, useCareStaff, useCareTeam, useRemoveFromCareTeam } from "../../api/careTeam";
+import { useMe } from "../../api/me";
+import { QueryState } from "../feedback/QueryState";
+import { Button } from "../forms/Button";
+import { ConfirmButton } from "../forms/ConfirmButton";
+import { SelectField } from "../forms/SelectField";
+import { ROLE_LABELS } from "../labels";
 
 export function CareTeamSection({ patientId }: { patientId: string }) {
   const team = useCareTeam(patientId);
