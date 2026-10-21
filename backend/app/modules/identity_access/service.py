@@ -20,6 +20,7 @@ __all__ = [
     "create_user",
     "get_current_user",
     "get_role",
+    "get_users",
     "list_users",
     "login",
 ]
@@ -73,6 +74,12 @@ def list_users(db: Session, user: CurrentUser) -> list[UserOut]:
 def get_role(db: Session, user_id: uuid.UUID) -> Role | None:
     """The account's role, or None if there is no such account."""
     return db.scalar(select(User.role).where(User.id == user_id))
+
+
+def get_users(db: Session, user_ids: list[uuid.UUID]) -> list[UserOut]:
+    """Names and roles for a set of accounts, for other modules that display people."""
+    users = db.scalars(select(User).where(User.id.in_(user_ids)).order_by(User.full_name))
+    return [UserOut.model_validate(u) for u in users]
 
 
 def get_current_user(
