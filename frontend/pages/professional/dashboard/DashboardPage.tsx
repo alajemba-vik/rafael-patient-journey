@@ -6,6 +6,15 @@ import { PageHeader } from "../../../components/layout/PageHeader";
 
 const HIDDEN = "Masqué";
 
+/** A count hidden because too few patients are behind it, worded so it still reads naturally. */
+const FEW = "moins de 5";
+
+/** "3 séances", or "moins de 5 séances" when the count is hidden. */
+function counted(value: number | null, noun: string): string {
+  if (value === null) return `${FEW} ${noun}s`;
+  return `${value} ${noun}${value > 1 ? "s" : ""}`;
+}
+
 /** An average, or "Masqué" when too few patients are behind it to stay anonymous. */
 function shown(value: number | null, format = formatNumber): string {
   return value === null ? HIDDEN : format(value);
@@ -21,7 +30,7 @@ export function DashboardPage() {
         {(data) => (
           <>
             <p className="rf-muted">
-              Données anonymisées. Les moyennes calculées sur moins de {data.min_group_size} patients sont masquées.
+              Données anonymisées. Les chiffres portant sur moins de {data.min_group_size} patients sont masqués.
             </p>
             <div className="rf-grid rf-section">
               <section className="rf-panel" aria-labelledby="active-title">
@@ -39,9 +48,12 @@ export function DashboardPage() {
                   {data.attendance.no_show_rate !== null && " %"}
                 </p>
                 <p className="rf-muted">
-                  {data.attendance.no_show} absence{data.attendance.no_show > 1 ? "s" : ""} pour {data.attendance.done}{" "}
-                  séance{data.attendance.done > 1 ? "s" : ""} réalisée{data.attendance.done > 1 ? "s" : ""} depuis le{" "}
-                  {formatDate(data.attendance.since)}
+                  {counted(data.attendance.no_show, "absence")} sur{" "}
+                  {counted(
+                    data.attendance.done === null ? null : data.attendance.done + (data.attendance.no_show ?? 0),
+                    "séance",
+                  )}{" "}
+                  depuis le {formatDate(data.attendance.since)}
                 </p>
               </section>
               <section className="rf-panel" aria-labelledby="satisfaction-title">
@@ -52,10 +64,7 @@ export function DashboardPage() {
                   <span className="rf-figure">{shown(data.satisfaction.average)}</span>
                   {data.satisfaction.average !== null && " / 100"}
                 </p>
-                <p className="rf-muted">
-                  {data.satisfaction.respondents} réponse{data.satisfaction.respondents > 1 ? "s" : ""} en fin de
-                  parcours
-                </p>
+                <p className="rf-muted">{counted(data.satisfaction.respondents, "réponse")} en fin de parcours</p>
               </section>
             </div>
 
@@ -79,7 +88,7 @@ export function DashboardPage() {
                     {data.quality_of_life.map((m) => (
                       <tr key={m.period}>
                         <td>{formatMonth(m.period)}</td>
-                        <td className="rf-num">{m.respondents}</td>
+                        <td className="rf-num">{m.respondents ?? FEW}</td>
                         <td>
                           {m.average === null ? (
                             HIDDEN
@@ -103,7 +112,7 @@ export function DashboardPage() {
                   Évolution entre premier bilan et bilan final
                 </h2>
                 <p className="rf-muted">
-                  Auto-évaluation de 0 à 4, sur {data.self_assessment.pathways} parcours terminés
+                  Auto-évaluation de 0 à 4, sur {data.self_assessment.pathways ?? FEW} parcours terminés
                 </p>
                 <table className="rf-table">
                   <tbody>
