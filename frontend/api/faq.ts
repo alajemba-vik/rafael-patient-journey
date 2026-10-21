@@ -7,6 +7,11 @@ export type FaqEntry = Schemas["EntryOut"];
 
 const FAQ = ["faq"] as const;
 
+/** The public FAQ: published entries grouped by category. No login needed. */
+export function usePublishedFaq() {
+  return useQuery({ queryKey: [...FAQ, "published"], queryFn: () => unwrap(api.GET("/api/v1/faq")) });
+}
+
 export function useFaqCategories() {
   return useQuery({ queryKey: [...FAQ, "categories"], queryFn: () => unwrap(api.GET("/api/v1/faq/categories")) });
 }

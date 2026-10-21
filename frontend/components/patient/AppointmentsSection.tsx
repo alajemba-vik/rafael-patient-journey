@@ -1,4 +1,4 @@
-import { useMe } from "../../api/me";
+import { usePermissions } from "../../api/permissions";
 import { useCancelAppointment, usePatientAppointments } from "../../api/scheduling";
 import { QueryState } from "../feedback/QueryState";
 import { StatusBadge } from "../feedback/StatusBadge";
@@ -9,8 +9,7 @@ import { formatDate, formatTime } from "../format";
 /** A patient's appointments. Coordinators and reception book and cancel here. */
 export function AppointmentsSection({ patientId }: { patientId: string }) {
   const appointments = usePatientAppointments(patientId);
-  const role = useMe().data?.role;
-  const canBook = role === "coordinator" || role === "secretary";
+  const canBook = usePermissions().bookAppointments;
   const cancel = useCancelAppointment();
 
   return (

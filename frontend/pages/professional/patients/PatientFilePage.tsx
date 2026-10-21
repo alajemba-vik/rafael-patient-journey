@@ -2,6 +2,7 @@ import { useParams } from "react-router";
 
 import { useAddToCareTeam } from "../../../api/careTeam";
 import { useMe } from "../../../api/me";
+import { usePermissions } from "../../../api/permissions";
 import { isDetail, usePatient } from "../../../api/patients";
 import { Button } from "../../../components/forms/Button";
 import { QueryState } from "../../../components/feedback/QueryState";
@@ -16,6 +17,7 @@ export function PatientFilePage() {
   const { patientId = "" } = useParams();
   const patient = usePatient(patientId);
   const me = useMe().data;
+  const can = usePermissions();
   const takeOn = useAddToCareTeam();
 
   return (
@@ -54,7 +56,7 @@ export function PatientFilePage() {
           ) : (
             <div className="rf-banner rf-stack">
               <p>Ce patient n’a pas encore de coordinatrice ou de coordinateur.</p>
-              {me?.role === "coordinator" && (
+              {can.takeOnPatients && me && (
                 <div>
                   <Button
                     pending={takeOn.isPending}
@@ -71,3 +73,6 @@ export function PatientFilePage() {
     </QueryState>
   );
 }
+
+// React Router loads a lazy route's component from this export.
+export { PatientFilePage as Component };

@@ -7,6 +7,7 @@ import { useMyAppointments } from "../../../api/scheduling";
 import { QueryState } from "../../../components/feedback/QueryState";
 import { formatChange, formatDate, formatNumber, formatTime, formatWeekday } from "../../../components/format";
 import { PageHeader } from "../../../components/layout/PageHeader";
+import { paths } from "../../../app/paths";
 
 const UPCOMING_SHOWN = 3;
 
@@ -30,7 +31,7 @@ export function PatientHomePage() {
               Un questionnaire vous attend
             </h2>
             <p>{due.data[0].title}. Quelques minutes suffisent.</p>
-            <Link to="/patient/questionnaires" className="rf-btn">
+            <Link to={paths.patient.questionnaires} className="rf-btn">
               Répondre
             </Link>
           </section>
@@ -56,7 +57,7 @@ export function PatientHomePage() {
                     </li>
                   ))}
                 </ul>
-                <Link to="/patient/rendez-vous" className="rf-link">
+                <Link to={paths.patient.appointments} className="rf-link">
                   Voir tous vos rendez-vous
                 </Link>
               </>
@@ -80,7 +81,7 @@ export function PatientHomePage() {
                   <dt>Commencé le</dt>
                   <dd>{formatDate(current.opened_at)}</dd>
                 </dl>
-                <Link to="/patient/parcours" className="rf-link">
+                <Link to={paths.patient.pathway} className="rf-link">
                   Voir votre parcours
                 </Link>
               </>
@@ -118,3 +119,6 @@ export function PatientHomePage() {
     </>
   );
 }
+
+// React Router loads a lazy route's component from this export.
+export { PatientHomePage as Component };

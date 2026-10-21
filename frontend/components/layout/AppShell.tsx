@@ -4,7 +4,8 @@ import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router";
 
 import { useMe } from "../../api/me";
 import { session } from "../../api/session";
-import { NAV_BY_ROLE } from "./navigation";
+import { NAV_BY_ROLE } from "../../app/navigation";
+import { paths } from "../../app/paths";
 
 export function AppShell() {
   const { data: me } = useMe();
@@ -26,7 +27,7 @@ export function AppShell() {
   function signOut() {
     session.end();
     queryClient.clear();
-    navigate("/connexion");
+    navigate(paths.login);
   }
 
   return (
@@ -36,7 +37,7 @@ export function AppShell() {
       </a>
       <header className="rf-shell__header">
         <div className="rf-shell__bar">
-          <Link to="/" className="rf-shell__brand">
+          <Link to={paths.home} className="rf-shell__brand">
             Institut Rafaël
           </Link>
           {me && (
@@ -46,7 +47,7 @@ export function AppShell() {
                   key={item.to}
                   to={item.to}
                   className="rf-navlink"
-                  // "/accueil" must not also light up on "/accueil/patients", which has its own item.
+                  // A section's first item must not also light up on a sibling item's deeper page.
                   end={items.some((other) => other.to.startsWith(`${item.to}/`))}
                 >
                   {item.label}
@@ -63,8 +64,8 @@ export function AppShell() {
                 </button>
               </>
             ) : (
-              location.pathname !== "/connexion" && (
-                <Link to="/connexion" className="rf-btn rf-btn--secondary">
+              location.pathname !== paths.login && (
+                <Link to={paths.login} className="rf-btn rf-btn--secondary">
                   Se connecter
                 </Link>
               )

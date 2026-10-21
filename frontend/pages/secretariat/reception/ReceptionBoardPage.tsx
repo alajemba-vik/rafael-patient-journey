@@ -7,6 +7,7 @@ import { StatusBadge } from "../../../components/feedback/StatusBadge";
 import { Button } from "../../../components/forms/Button";
 import { formatTime, formatWeekday } from "../../../components/format";
 import { PageHeader } from "../../../components/layout/PageHeader";
+import { paths } from "../../../app/paths";
 
 /** What reception can do next from each status, with an undo for a mistaken click. */
 const ACTIONS: Record<BoardStatus, { status: BoardStatus; label: string; primary?: boolean }[]> = {
@@ -66,7 +67,7 @@ export function ReceptionBoardPage() {
                     <tr key={a.id}>
                       <td>{formatTime(a.starts_at)}</td>
                       <td>
-                        <Link className="rf-link" to={`/accueil/patients/${a.patient_id}`}>
+                        <Link className="rf-link" to={paths.reception.patient(a.patient_id)}>
                           {a.patient_name}
                         </Link>
                       </td>
@@ -104,3 +105,6 @@ export function ReceptionBoardPage() {
     </>
   );
 }
+
+// React Router loads a lazy route's component from this export.
+export { ReceptionBoardPage as Component };

@@ -8,6 +8,7 @@ import { useDebouncedValue } from "../../../components/forms/useDebouncedValue";
 import { formatDate } from "../../../components/format";
 import { PageHeader } from "../../../components/layout/PageHeader";
 import { RegisterPatientForm } from "./RegisterPatientForm";
+import { paths } from "../../../app/paths";
 
 export function ReceptionPatientsPage() {
   const [search, setSearch] = useState("");
@@ -52,7 +53,7 @@ export function ReceptionPatientsPage() {
                 {list.map((p) => (
                   <tr key={p.id}>
                     <td>
-                      <Link className="rf-link" to={`/accueil/patients/${p.id}`}>
+                      <Link className="rf-link" to={paths.reception.patient(p.id)}>
                         {p.last_name.toUpperCase()} {p.first_name}
                       </Link>
                     </td>
@@ -68,3 +69,6 @@ export function ReceptionPatientsPage() {
     </>
   );
 }
+
+// React Router loads a lazy route's component from this export.
+export { ReceptionPatientsPage as Component };

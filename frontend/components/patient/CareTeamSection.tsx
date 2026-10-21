@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from "react";
 
 import { useAddToCareTeam, useCareStaff, useCareTeam, useRemoveFromCareTeam } from "../../api/careTeam";
-import { useMe } from "../../api/me";
+import { usePermissions } from "../../api/permissions";
 import { QueryState } from "../feedback/QueryState";
 import { Button } from "../forms/Button";
 import { ConfirmButton } from "../forms/ConfirmButton";
@@ -10,7 +10,7 @@ import { ROLE_LABELS } from "../labels";
 
 export function CareTeamSection({ patientId }: { patientId: string }) {
   const team = useCareTeam(patientId);
-  const isCoordinator = useMe().data?.role === "coordinator";
+  const canManage = usePermissions().manageCareTeam;
   const remove = useRemoveFromCareTeam();
 
   return (
@@ -28,7 +28,7 @@ export function CareTeamSection({ patientId }: { patientId: string }) {
                   <br />
                   <span className="rf-muted">{m.discipline ?? ROLE_LABELS[m.role]}</span>
                 </span>
-                {isCoordinator && (
+                {canManage && (
                   <ConfirmButton
                     question={`Retirer ${m.full_name} ?`}
                     confirmLabel="Retirer"
@@ -43,7 +43,7 @@ export function CareTeamSection({ patientId }: { patientId: string }) {
           </ul>
         )}
       </QueryState>
-      {isCoordinator && team.data && (
+      {canManage && team.data && (
         <AddMemberForm patientId={patientId} memberIds={new Set(team.data.map((m) => m.user_id))} />
       )}
     </section>

@@ -1,5 +1,5 @@
 // Dates, times and numbers the French way, in the Institute's time zone.
-const TIME_ZONE = "Europe/Paris";
+import { INSTITUTE_TIME_ZONE as TIME_ZONE } from "./time";
 
 const dateFormat = new Intl.DateTimeFormat("fr-FR", { dateStyle: "long", timeZone: TIME_ZONE });
 const weekdayFormat = new Intl.DateTimeFormat("fr-FR", {

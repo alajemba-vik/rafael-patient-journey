@@ -6,17 +6,20 @@ import { QueryState } from "../../../components/feedback/QueryState";
 import { StatusBadge } from "../../../components/feedback/StatusBadge";
 import { formatTime, formatWeekday } from "../../../components/format";
 import { PageHeader } from "../../../components/layout/PageHeader";
+import { addDays, instituteDateTime, instituteToday } from "../../../components/time";
+import { paths } from "../../../app/paths";
 
 const DAYS_SHOWN = 7;
 // Reception marks arrivals: check for them every minute while the page is open.
 const REFRESH_MS = 60_000;
 
+/** From today's midnight at the Institute to the same midnight a week later. */
 function thisWeek() {
-  const start = new Date();
-  start.setHours(0, 0, 0, 0);
-  const end = new Date(start);
-  end.setDate(end.getDate() + DAYS_SHOWN);
-  return { start: start.toISOString(), end: end.toISOString() };
+  const today = instituteToday();
+  return {
+    start: instituteDateTime(today).toISOString(),
+    end: instituteDateTime(addDays(today, DAYS_SHOWN)).toISOString(),
+  };
 }
 
 function byDay(appointments: Appointment[]): [string, Appointment[]][] {
@@ -49,7 +52,7 @@ export function SchedulePage() {
                   <li key={a.id}>
                     <span>
                       <strong>{formatTime(a.starts_at)}</strong>{" "}
-                      <Link className="rf-link" to={`/pro/patients/${a.patient_id}`}>
+                      <Link className="rf-link" to={paths.pro.patient(a.patient_id)}>
                         {a.patient_name}
                       </Link>
                     </span>
@@ -64,3 +67,6 @@ export function SchedulePage() {
     </>
   );
 }
+
+// React Router loads a lazy route's component from this export.
+export { SchedulePage as Component };

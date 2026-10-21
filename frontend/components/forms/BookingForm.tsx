@@ -4,6 +4,7 @@ import { ApiError } from "../../api/client";
 import { useCareTeam } from "../../api/careTeam";
 import { useBookAppointment } from "../../api/scheduling";
 import { ROLE_LABELS } from "../labels";
+import { instituteDateTime } from "../time";
 import { Button } from "./Button";
 import { SelectField } from "./SelectField";
 import { TextField } from "./TextField";
@@ -32,7 +33,8 @@ export function BookingForm({ patientId }: { patientId: string }) {
   function submit(event: FormEvent) {
     event.preventDefault();
     setBooked(false);
-    const start = new Date(`${date}T${time}`);
+    // The time typed means the Institute's clock, even from a browser set to another zone.
+    const start = instituteDateTime(date, time);
     const end = new Date(start.getTime() + minutes * 60_000);
     book.mutate(
       { patient_id: patientId, professional_id: memberId, starts_at: start.toISOString(), ends_at: end.toISOString() },
@@ -69,6 +71,7 @@ export function BookingForm({ patientId }: { patientId: string }) {
           label="Heure"
           type="time"
           required
+          hint="Heure de Paris"
           step={300}
           value={time}
           onChange={(event) => setTime(event.target.value)}

@@ -4,6 +4,7 @@ import { useNavigate } from "react-router";
 import { useRegisterPatient } from "../../../api/patients";
 import { Button } from "../../../components/forms/Button";
 import { TextField } from "../../../components/forms/TextField";
+import { paths } from "../../../app/paths";
 
 const EMPTY = { first_name: "", last_name: "", birth_date: "", email: "", phone: "" };
 
@@ -20,7 +21,7 @@ export function RegisterPatientForm() {
     event.preventDefault();
     register.mutate(
       { ...fields, email: fields.email || null, phone: fields.phone || null },
-      { onSuccess: (patient) => navigate(`/accueil/patients/${patient.id}`) },
+      { onSuccess: (patient) => navigate(paths.reception.patient(patient.id)) },
     );
   }
 
