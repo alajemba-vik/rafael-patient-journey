@@ -16,7 +16,7 @@ from collections.abc import Iterable
 from datetime import UTC, datetime, timedelta
 from typing import NoReturn
 
-from sqlalchemy import or_, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
 
 from app import audit
@@ -128,6 +128,16 @@ def set_status(db: Session, appointment_id: uuid.UUID, status: AppointmentStatus
         raise ConflictError(f"An appointment can't go from {appointment.status} to {status}")
     appointment.status = status
     return _to_out(db, [appointment])[0]
+
+
+def count_by_status(db: Session, start: datetime, end: datetime) -> dict[AppointmentStatus, int]:
+    """For analytics: how many appointments in a window are in each status. Totals only."""
+    query = (
+        select(Appointment.status, func.count())
+        .where(Appointment.starts_at >= start, Appointment.starts_at < end)
+        .group_by(Appointment.status)
+    )
+    return {status: count for status, count in db.execute(query)}
 
 
 def _can_see_patient(db: Session, user: CurrentUser, patient_id: uuid.UUID) -> bool:

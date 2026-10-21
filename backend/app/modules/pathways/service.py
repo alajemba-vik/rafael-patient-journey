@@ -14,8 +14,8 @@ from collections import defaultdict
 from datetime import UTC, datetime, timedelta
 from typing import NoReturn
 
-from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlalchemy import and_, func, select
+from sqlalchemy.orm import Session, aliased
 
 from app import audit
 from app.errors import ConflictError, ForbiddenError, NotFoundError
@@ -48,6 +48,7 @@ CARE_ROLES = {Role.PROFESSIONAL, Role.COORDINATOR}
 # TODO(validate): may every practitioner in the team see every score, including the
 # sexual-health dimension? (V-07)
 MILESTONE_ORDER = [MilestoneKind.INTAKE, MilestoneKind.REVIEW, MilestoneKind.FINAL]
+DIMENSIONS = ("physical", "psychological", "emotional", "sexual", "socio_professional")
 # As published by the Institute: a review around 3 months and a final review around 6.
 DUE_AFTER_OPENING = {
     MilestoneKind.INTAKE: timedelta(0),
@@ -254,6 +255,32 @@ def get_last_closed_pathway_id(db: Session, patient_id: uuid.UUID) -> uuid.UUID 
         .limit(1)
     )
     return db.scalar(query)
+
+
+def count_open(db: Session) -> int:
+    """For analytics: how many pathways are open."""
+    query = select(func.count()).where(CarePathway.status == PathwayStatus.OPEN)
+    return db.scalar(query.select_from(CarePathway)) or 0
+
+
+def average_self_assessment_change(db: Session) -> tuple[int, dict[str, float | None]]:
+    """For analytics: over pathways with both an intake and a final review, the average change
+    per dimension (final minus intake), in one query. Totals only."""
+    intake, final = aliased(PathwayMilestone), aliased(PathwayMilestone)
+    query = (
+        select(
+            func.count(),
+            *(func.avg(getattr(final, d) - getattr(intake, d)) for d in DIMENSIONS),
+        )
+        .select_from(intake)
+        .join(final, and_(final.pathway_id == intake.pathway_id, final.kind == MilestoneKind.FINAL))
+        .where(intake.kind == MilestoneKind.INTAKE)
+    )
+    count, *averages = db.execute(query).one()
+    return count, {
+        d: round(float(a), 2) if a is not None else None
+        for d, a in zip(DIMENSIONS, averages, strict=True)
+    }
 
 
 def _summary(

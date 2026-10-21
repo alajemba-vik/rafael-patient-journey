@@ -15,7 +15,7 @@ from statistics import mean
 from typing import NoReturn
 from zoneinfo import ZoneInfo
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app import audit
@@ -142,6 +142,32 @@ def list_patient_scores(db: Session, user: CurrentUser, patient_id: uuid.UUID) -
     audit.record(db, user.id, "questionnaire.read", patient_id)
     db.commit()
     return scores
+
+
+def monthly_quality_of_life(db: Session, since: str) -> list[tuple[str, int, float]]:
+    """For analytics: per month from `since` ("2026-01"), respondents and average score."""
+    query = (
+        select(
+            QuestionnaireResponse.period,
+            func.count(func.distinct(QuestionnaireResponse.patient_id)),
+            func.avg(QuestionnaireResponse.score),
+        )
+        .where(
+            QuestionnaireResponse.instrument == Instrument.QUALITY_OF_LIFE,
+            QuestionnaireResponse.period >= since,
+        )
+        .group_by(QuestionnaireResponse.period)
+        .order_by(QuestionnaireResponse.period)
+    )
+    return [(period, count, float(average)) for period, count, average in db.execute(query)]
+
+
+def satisfaction_answers(db: Session) -> list[dict[str, int]]:
+    """For analytics: every satisfaction answer set, with nothing that identifies the patient."""
+    query = select(QuestionnaireResponse.answers).where(
+        QuestionnaireResponse.instrument == Instrument.SATISFACTION
+    )
+    return list(db.scalars(query))
 
 
 def _due_period(db: Session, patient_id: uuid.UUID, instrument: Instrument) -> str | None:
