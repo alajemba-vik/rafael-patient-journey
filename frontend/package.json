@@ -11,7 +11,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run",
-    "api:generate": "cd ../backend && uv run python -c \"import json; from app.main import app; print(json.dumps(app.openapi()))\" > ../frontend/node_modules/.openapi.json && cd ../frontend && openapi-typescript node_modules/.openapi.json -o api/schema.d.ts"
+    "api:generate": "cd ../backend && uv run python -c \"import json; from app.main import app; print(json.dumps(app.openapi()))\" > ../frontend/node_modules/.openapi.json && cd ../frontend && openapi-typescript node_modules/.openapi.json -o src/api/schema.d.ts"
   },
   "dependencies": {
     "@tanstack/react-query": "5.104.5",
