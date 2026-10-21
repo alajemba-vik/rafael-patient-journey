@@ -20,8 +20,7 @@ export const router = createBrowserRouter([
         children: [
           {
             index: true,
-            lazy: () =>
-              import("./pages/patient/home/PatientHomePage").then((m) => ({ Component: m.PatientHomePage })),
+            lazy: () => import("./pages/patient/home/PatientHomePage").then((m) => ({ Component: m.PatientHomePage })),
           },
           {
             path: "rendez-vous",

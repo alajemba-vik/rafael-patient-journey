@@ -44,10 +44,7 @@ export function PatientQuestionnairesPage() {
         <h2 id="results-title" className="rf-title">
           Vos résultats de qualité de vie
         </h2>
-        <QueryState
-          query={scores}
-          empty={{ isEmpty: (list) => list.length === 0, title: "Pas encore de résultat." }}
-        >
+        <QueryState query={scores} empty={{ isEmpty: (list) => list.length === 0, title: "Pas encore de résultat." }}>
           {(list) => (
             <div className="rf-table-wrap">
               <table className="rf-table">

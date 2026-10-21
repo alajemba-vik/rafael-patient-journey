@@ -1,6 +1,6 @@
 import type { Role } from "../../api/me";
 
-export type NavItem = { to: string; label: string };
+type NavItem = { to: string; label: string };
 
 const FAQ: NavItem = { to: "/faq", label: "Questions fréquentes" };
 
@@ -13,11 +13,7 @@ export const NAV_BY_ROLE: Record<Role, NavItem[]> = {
     { to: "/patient/questionnaires", label: "Questionnaires" },
     FAQ,
   ],
-  secretary: [
-    { to: "/accueil", label: "Accueil du jour" },
-    { to: "/accueil/patients", label: "Patients" },
-    FAQ,
-  ],
+  secretary: [{ to: "/accueil", label: "Accueil du jour" }, { to: "/accueil/patients", label: "Patients" }, FAQ],
   professional: [
     { to: "/pro", label: "Mon planning" },
     { to: "/pro/patients", label: "Mes patients" },

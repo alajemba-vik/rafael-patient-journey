@@ -26,6 +26,18 @@ Run checks: `uv run ruff format . && uv run ruff check . && uv run pytest`. Test
 
 CI (`.github/workflows/ci.yml`) runs the same checks on every pull request, and also applies the migrations to a fresh Postgres and fails if `models.py` changed without a migration (`alembic check`).
 
+## Run the frontend
+
+Requires Node 24, with the backend running.
+
+```bash
+cd frontend
+npm install
+npm run dev                    # http://localhost:5173
+```
+
+Checks: `npm run format:check && npm run lint && npm run typecheck && npm test`. After any backend API change, `npm run api:generate` refreshes the typed client. More in `frontend/README.md`.
+
 ### First login
 
 1. Create the first admin by hand: in Supabase → Authentication → Users, add the person, then add a matching row in `users` with their Supabase user id as `auth_subject` and the role `admin`.
@@ -72,6 +84,5 @@ Full details are in [AGENTS.md](AGENTS.md).
 
 ## Open decisions
 
-- **Frontend framework:** NiceGUI or React.
 - **Rafaël / Hartmann:** do they share data or keep it separate?
-- **Institute workflows to confirm:** who enters appointments, what reception does, what clinical data each role may see.
+- **Institute workflows to confirm:** who enters appointments, what reception does, what clinical data each role may see, when a patient record is created, how new patients get a coordinator. Each is marked `TODO(validate)` in the code, with its question number.

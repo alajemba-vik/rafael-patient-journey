@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { api, unwrap, type Schemas } from "./client";
 import { session } from "./session";
 
-export type Me = Schemas["UserOut"];
+type Me = Schemas["UserOut"];
 export type Role = Me["role"];
 
 /** The logged-in account. Fetched once per session: it only changes when someone logs in. */

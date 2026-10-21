@@ -15,9 +15,7 @@ describe("BookingForm", () => {
   it("explains a taken slot instead of a generic error", async () => {
     vi.spyOn(globalThis, "fetch").mockImplementation(async (input) => {
       const request = input as Request;
-      return request.method === "GET"
-        ? Response.json(TEAM)
-        : Response.json({ detail: "Overlap" }, { status: 409 });
+      return request.method === "GET" ? Response.json(TEAM) : Response.json({ detail: "Overlap" }, { status: 409 });
     });
     render(
       <QueryClientProvider client={new QueryClient()}>

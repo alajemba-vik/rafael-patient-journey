@@ -6,7 +6,7 @@ import { SelectField } from "../../../components/forms/SelectField";
 import { TextArea } from "../../../components/forms/TextArea";
 import { TextField } from "../../../components/forms/TextField";
 
-export type EntryFields = { category_id: string; question: string; answer: string };
+type EntryFields = { category_id: string; question: string; answer: string };
 
 type Props = {
   categories: FaqCategory[];

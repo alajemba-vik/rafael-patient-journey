@@ -76,8 +76,21 @@ export function CreateAccountForm() {
           ))}
         </SelectField>
       )}
-      <TextField label="Nom complet" required autoComplete="off" value={fullName} onChange={(e) => setFullName(e.target.value)} />
-      <TextField label="Adresse e-mail" type="email" required autoComplete="off" value={email} onChange={(e) => setEmail(e.target.value)} />
+      <TextField
+        label="Nom complet"
+        required
+        autoComplete="off"
+        value={fullName}
+        onChange={(e) => setFullName(e.target.value)}
+      />
+      <TextField
+        label="Adresse e-mail"
+        type="email"
+        required
+        autoComplete="off"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
       {practises && (
         <TextField
           label="Discipline (facultatif)"

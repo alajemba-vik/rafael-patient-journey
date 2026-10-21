@@ -21,9 +21,7 @@ export function PatientAppointmentsPage() {
         {(list) => (
           <div className="rf-table-wrap">
             <table className="rf-table">
-              <caption className="rf-muted">
-                Les trois prochains mois
-              </caption>
+              <caption className="rf-muted">Les trois prochains mois</caption>
               <thead>
                 <tr>
                   <th scope="col">Date</th>

@@ -3,7 +3,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, unwrap, type Schemas } from "./client";
 import { PATIENTS } from "./patients";
 
-export type Account = Schemas["UserOut"];
 export type AccountCreate = Schemas["UserCreate"];
 
 const ACCOUNTS = ["accounts"] as const;

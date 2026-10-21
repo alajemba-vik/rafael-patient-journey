@@ -29,8 +29,20 @@ export function RegisterPatientForm() {
       {/* TODO(validate): when does a person get a patient record, and who creates it? (V-06) */}
       <p className="rf-muted">Pour une personne dont l’admission à l’Institut est confirmée.</p>
       <div className="rf-row">
-        <TextField label="Prénom" required autoComplete="off" value={fields.first_name} onChange={(e) => set("first_name", e.target.value)} />
-        <TextField label="Nom" required autoComplete="off" value={fields.last_name} onChange={(e) => set("last_name", e.target.value)} />
+        <TextField
+          label="Prénom"
+          required
+          autoComplete="off"
+          value={fields.first_name}
+          onChange={(e) => set("first_name", e.target.value)}
+        />
+        <TextField
+          label="Nom"
+          required
+          autoComplete="off"
+          value={fields.last_name}
+          onChange={(e) => set("last_name", e.target.value)}
+        />
       </div>
       <TextField
         label="Date de naissance"
@@ -40,8 +52,20 @@ export function RegisterPatientForm() {
         onChange={(e) => set("birth_date", e.target.value)}
       />
       <div className="rf-row">
-        <TextField label="E-mail (facultatif)" type="email" autoComplete="off" value={fields.email} onChange={(e) => set("email", e.target.value)} />
-        <TextField label="Téléphone (facultatif)" type="tel" autoComplete="off" value={fields.phone} onChange={(e) => set("phone", e.target.value)} />
+        <TextField
+          label="E-mail (facultatif)"
+          type="email"
+          autoComplete="off"
+          value={fields.email}
+          onChange={(e) => set("email", e.target.value)}
+        />
+        <TextField
+          label="Téléphone (facultatif)"
+          type="tel"
+          autoComplete="off"
+          value={fields.phone}
+          onChange={(e) => set("phone", e.target.value)}
+        />
       </div>
       {register.isError && (
         <p className="rf-field__error" role="alert">
