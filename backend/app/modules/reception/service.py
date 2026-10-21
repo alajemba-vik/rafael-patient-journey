@@ -4,7 +4,7 @@ Reads and changes appointments through scheduling.service; the status lifecycle 
 """
 
 import uuid
-from datetime import UTC, datetime, time, timedelta
+from datetime import UTC, date, datetime, time, timedelta
 from zoneinfo import ZoneInfo
 
 from sqlalchemy.orm import Session
@@ -25,12 +25,19 @@ def list_today(db: Session, user: CurrentUser) -> list[AppointmentOut]:
     _require_reception(db, user)
     # TODO(validate): does Hartmann share this platform, and in which time zone? (V-02)
     time_zone = ZoneInfo(get_settings().institute_time_zone)
-    today = datetime.now(time_zone).date()
-    start = datetime.combine(today, time.min, tzinfo=time_zone).astimezone(UTC)
-    appointments = scheduling.list_between(db, start, start + timedelta(days=1))
+    appointments = scheduling.list_between(
+        db, *day_window(datetime.now(time_zone).date(), time_zone)
+    )
     audit.record_many(db, user.id, "reception.read", {a.patient_id for a in appointments})
     db.commit()
     return appointments
+
+
+def day_window(day: date, time_zone: ZoneInfo) -> tuple[datetime, datetime]:
+    """Local midnight to the next local midnight, in UTC: 23 or 25 hours on clock-change days."""
+    start = datetime.combine(day, time.min, tzinfo=time_zone)
+    end = datetime.combine(day + timedelta(days=1), time.min, tzinfo=time_zone)
+    return start.astimezone(UTC), end.astimezone(UTC)
 
 
 def change_status(

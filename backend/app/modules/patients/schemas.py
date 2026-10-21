@@ -1,12 +1,15 @@
 import uuid
 from datetime import date
+from typing import Annotated
 
-from pydantic import BaseModel, ConfigDict, EmailStr, computed_field
+from pydantic import BaseModel, ConfigDict, EmailStr, StringConstraints, computed_field
+
+Name = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=100)]
 
 
 class PatientCreate(BaseModel):
-    first_name: str
-    last_name: str
+    first_name: Name
+    last_name: Name
     birth_date: date
     email: EmailStr | None = None
     phone: str | None = None

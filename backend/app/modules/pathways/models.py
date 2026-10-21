@@ -2,7 +2,18 @@ import uuid
 from datetime import datetime
 from enum import StrEnum
 
-from sqlalchemy import JSON, DateTime, Enum, ForeignKey, SmallInteger, Text, UniqueConstraint, Uuid
+from sqlalchemy import (
+    JSON,
+    DateTime,
+    Enum,
+    ForeignKey,
+    Index,
+    SmallInteger,
+    Text,
+    UniqueConstraint,
+    Uuid,
+    text,
+)
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db import Base
@@ -29,6 +40,16 @@ class CarePathway(Base):
     """A patient's ~6-month pathway, led by a referent coordinator."""
 
     __tablename__ = "care_pathways"
+    # The database itself refuses a second open pathway, even if two requests race.
+    __table_args__ = (
+        Index(
+            "uq_care_pathways_one_open_per_patient",
+            "patient_id",
+            unique=True,
+            postgresql_where=text("status = 'open'"),
+            sqlite_where=text("status = 'open'"),
+        ),
+    )
 
     id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
     patient_id: Mapped[uuid.UUID] = mapped_column(Uuid, index=True)  # id only: no cross-module FK

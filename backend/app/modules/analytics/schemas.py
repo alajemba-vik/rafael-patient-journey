@@ -1,4 +1,7 @@
-"""Response shapes for the dashboard. Every average is None when too few patients are behind it."""
+"""Response shapes for the dashboard.
+
+Every count and average about patients is None when it covers too few of them to stay anonymous.
+"""
 
 from datetime import date, datetime
 
@@ -7,14 +10,14 @@ from pydantic import BaseModel
 
 class Attendance(BaseModel):
     since: date
-    done: int
-    no_show: int
+    done: int | None
+    no_show: int | None
     no_show_rate: float | None
 
 
 class MonthlyScore(BaseModel):
     period: str
-    respondents: int
+    respondents: int | None
     average: float | None
 
 
@@ -24,7 +27,7 @@ class QuestionAverage(BaseModel):
 
 
 class Satisfaction(BaseModel):
-    respondents: int
+    respondents: int | None
     average: float | None
     by_question: list[QuestionAverage]
 
@@ -37,7 +40,7 @@ class DimensionChange(BaseModel):
 class SelfAssessment(BaseModel):
     """Final review minus intake, on the 0–4 self-assessment, over finished pathways."""
 
-    pathways: int
+    pathways: int | None
     by_dimension: list[DimensionChange]
 
 

@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from enum import StrEnum
 
-from sqlalchemy import DateTime, Enum, Index, Uuid
+from sqlalchemy import CheckConstraint, DateTime, Enum, Index, Uuid
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db import Base
@@ -25,6 +25,7 @@ class Appointment(Base):
     __table_args__ = (
         Index("ix_appointments_professional_start", "professional_id", "starts_at"),
         Index("ix_appointments_patient_start", "patient_id", "starts_at"),
+        CheckConstraint("ends_at > starts_at", name="ck_appointments_ends_after_start"),
     )
 
     id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)

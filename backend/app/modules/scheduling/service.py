@@ -48,6 +48,8 @@ _NEXT_STATUSES = {
 def create_appointment(db: Session, user: CurrentUser, data: AppointmentCreate) -> AppointmentOut:
     if user.role not in BOOKING_ROLES:
         _deny(db, user, "appointment.create.denied", data.patient_id)
+    if not patients.patient_exists(db, data.patient_id):
+        raise NotFoundError("Patient not found")
     if not care_team.is_in_care_team(db, data.professional_id, data.patient_id):
         raise ConflictError("This person isn't in the patient's care team")
     if _has_overlap(db, data):

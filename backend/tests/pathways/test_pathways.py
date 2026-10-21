@@ -8,6 +8,7 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.audit import AuditEvent
@@ -155,6 +156,14 @@ def test_second_open_pathway_is_refused(db, client_as, team):
     )
 
     assert response.status_code == 409
+
+
+def test_database_refuses_a_second_open_pathway_even_without_the_service(db, team):
+    patient, coordinator, _ = team
+    add_pathway(db, patient.id, coordinator.id)
+
+    with pytest.raises(IntegrityError):
+        add_pathway(db, patient.id, coordinator.id)
 
 
 def test_coordinator_closes_pathway(db, client_as, team):
