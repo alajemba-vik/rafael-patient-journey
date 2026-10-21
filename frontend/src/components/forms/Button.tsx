@@ -11,7 +11,7 @@ export function Button({ variant = "primary", pending = false, disabled, classNa
   return (
     <button type="button" {...rest} className={classes} disabled={disabled || pending} aria-busy={pending}>
       {pending && <span className="rf-spinner" aria-hidden="true" />}
-      {children}
+      <span className="rf-btn__label">{children}</span>
     </button>
   );
 }
