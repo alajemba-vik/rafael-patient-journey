@@ -38,9 +38,7 @@ export const api = createClient<paths>({ baseUrl: API_URL, fetch: (request) => f
 api.use(authMiddleware);
 
 /** Return the response data, or throw an ApiError carrying the backend's message. */
-export async function unwrap<T>(
-  request: Promise<{ data?: T; error?: unknown; response: Response }>,
-): Promise<T> {
+export async function unwrap<T>(request: Promise<{ data?: T; error?: unknown; response: Response }>): Promise<T> {
   const { data, error, response } = await request;
   if (!response.ok) {
     const detail =

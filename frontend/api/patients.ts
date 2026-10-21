@@ -2,8 +2,7 @@ import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tansta
 
 import { api, unwrap, type Schemas } from "./client";
 
-export type PatientSummary = Schemas["PatientAdministrative"];
-export type PatientRecord = Schemas["PatientDetail"] | Schemas["PatientAdministrative"];
+type PatientRecord = Schemas["PatientDetail"] | Schemas["PatientAdministrative"];
 
 export const PATIENTS = ["patients"] as const;
 
@@ -21,8 +20,7 @@ export function usePatients(search: string, unassigned = false) {
 export function usePatient(patientId: string) {
   return useQuery({
     queryKey: [...PATIENTS, patientId],
-    queryFn: () =>
-      unwrap(api.GET("/api/v1/patients/{patient_id}", { params: { path: { patient_id: patientId } } })),
+    queryFn: () => unwrap(api.GET("/api/v1/patients/{patient_id}", { params: { path: { patient_id: patientId } } })),
   });
 }
 

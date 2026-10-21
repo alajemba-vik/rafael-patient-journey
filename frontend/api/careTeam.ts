@@ -3,9 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, unwrap, type Schemas } from "./client";
 import { PATIENTS } from "./patients";
 
-export type CareTeamMember = Schemas["CareTeamMember"];
-
-export const CARE_TEAM = ["care-team"] as const;
+const CARE_TEAM = ["care-team"] as const;
 
 export function useCareTeam(patientId: string, enabled = true) {
   return useQuery({
@@ -19,8 +17,6 @@ export function useCareTeam(patientId: string, enabled = true) {
     enabled,
   });
 }
-
-export type StaffMember = Schemas["UserOut"];
 
 /** Practitioners and coordinators to choose from. Rarely changes, so cached longer. */
 export function useCareStaff() {

@@ -3,9 +3,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, unwrap, type Schemas } from "./client";
 
 export type Questionnaire = Schemas["Questionnaire"];
-export type Score = Schemas["ScoreOut"];
 
-export const QUESTIONNAIRES = ["questionnaires"] as const;
+const QUESTIONNAIRES = ["questionnaires"] as const;
 
 export function useDueQuestionnaires() {
   return useQuery({
@@ -24,7 +23,13 @@ export function useMyScores() {
 export function useSubmitQuestionnaire() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ instrument, answers }: { instrument: Questionnaire["instrument"]; answers: Record<string, number> }) =>
+    mutationFn: ({
+      instrument,
+      answers,
+    }: {
+      instrument: Questionnaire["instrument"];
+      answers: Record<string, number>;
+    }) =>
       unwrap(
         api.POST("/api/v1/questionnaires/{instrument}/responses", {
           params: { path: { instrument } },

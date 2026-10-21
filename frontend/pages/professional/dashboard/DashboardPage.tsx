@@ -21,8 +21,7 @@ export function DashboardPage() {
         {(data) => (
           <>
             <p className="rf-muted">
-              Données anonymisées. Les moyennes calculées sur moins de {data.min_group_size} patients sont
-              masquées.
+              Données anonymisées. Les moyennes calculées sur moins de {data.min_group_size} patients sont masquées.
             </p>
             <div className="rf-grid rf-section">
               <section className="rf-panel" aria-labelledby="active-title">

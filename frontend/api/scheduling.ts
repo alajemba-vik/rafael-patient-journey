@@ -31,8 +31,7 @@ export function usePatientAppointments(patientId: string) {
 export function useBookAppointment() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (body: Schemas["AppointmentCreate"]) =>
-      unwrap(api.POST("/api/v1/scheduling/appointments", { body })),
+    mutationFn: (body: Schemas["AppointmentCreate"]) => unwrap(api.POST("/api/v1/scheduling/appointments", { body })),
     onSuccess: () => void queryClient.invalidateQueries({ queryKey: APPOINTMENTS }),
   });
 }

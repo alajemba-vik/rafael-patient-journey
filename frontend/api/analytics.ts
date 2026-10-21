@@ -1,8 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { api, unwrap, type Schemas } from "./client";
-
-export type Dashboard = Schemas["Dashboard"];
+import { api, unwrap } from "./client";
 
 export function useDashboard() {
   return useQuery({

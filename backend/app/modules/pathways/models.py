@@ -47,7 +47,8 @@ class PathwayMilestone(Base):
     __table_args__ = (UniqueConstraint("pathway_id", "kind"),)
 
     id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
-    pathway_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("care_pathways.id"), index=True)
+    # Indexed through the unique constraint, which starts with it.
+    pathway_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("care_pathways.id"))
     kind: Mapped[MilestoneKind] = mapped_column(_enum(MilestoneKind, 8))
     recorded_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     recorded_by: Mapped[uuid.UUID] = mapped_column(Uuid)

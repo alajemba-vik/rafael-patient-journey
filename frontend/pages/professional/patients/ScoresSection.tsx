@@ -12,7 +12,10 @@ export function ScoresSection({ patientId }: { patientId: string }) {
       <h2 id="scores-title" className="rf-title">
         Qualité de vie
       </h2>
-      <QueryState query={scores} empty={{ isEmpty: (list) => list.length === 0, title: "Pas encore de questionnaire." }}>
+      <QueryState
+        query={scores}
+        empty={{ isEmpty: (list) => list.length === 0, title: "Pas encore de questionnaire." }}
+      >
         {(list) => (
           <table className="rf-table">
             <caption className="rf-muted">Sur 100, derniers mois</caption>

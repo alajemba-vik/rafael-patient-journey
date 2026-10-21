@@ -13,10 +13,10 @@ npm run dev          # http://localhost:5173, calls the API at http://localhost:
 
 Point it at another API with `VITE_API_URL=https://… npm run dev`.
 
-| Command | Does |
-|---|---|
-| `npm run api:generate` | Regenerate `api/schema.d.ts` from the backend. Run it after any backend endpoint or schema change; CI fails if it's out of date. |
-| `npm run lint` · `npm run typecheck` · `npm test` · `npm run build` | The checks CI runs. |
+| Command                                                             | Does                                                                                                                             |
+| ------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `npm run api:generate`                                              | Regenerate `api/schema.d.ts` from the backend. Run it after any backend endpoint or schema change; CI fails if it's out of date. |
+| `npm run lint` · `npm run typecheck` · `npm test` · `npm run build` | The checks CI runs.                                                                                                              |
 
 ## Rules
 
@@ -50,10 +50,10 @@ One folder per page. A component used by one page lives in that page's folder; m
 
 ## Ownership
 
-| Folder | Owner |
-|---|---|
-| `pages/patient/`, `pages/public/request_care/` | Téo |
-| `pages/professional/` | Hugo |
-| `pages/secretariat/` | Victoria |
-| `pages/admin/`, `pages/public/login/`, `pages/public/faq/` | Louis |
-| `components/`, `api/` | shared: changes need one reviewer from another owner |
+| Folder                                                     | Owner                                                |
+| ---------------------------------------------------------- | ---------------------------------------------------- |
+| `pages/patient/`, `pages/public/request_care/`             | Téo                                                  |
+| `pages/professional/`                                      | Hugo                                                 |
+| `pages/secretariat/`                                       | Victoria                                             |
+| `pages/admin/`, `pages/public/login/`, `pages/public/faq/` | Louis                                                |
+| `components/`, `api/`                                      | shared: changes need one reviewer from another owner |

@@ -6,9 +6,9 @@ The full design system (brand book, usage rules, live previews) is the [Institut
 
 ## Files
 
-| File | What |
-|---|---|
-| `tokens.css` | CSS variables (`--ink`, `--accent`, `--space-5`, `--radius-xs`…) and `rf-` type classes (`rf-display-xl`, `rf-body`…). Load first. |
+| File             | What                                                                                                                                                |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `tokens.css`     | CSS variables (`--ink`, `--accent`, `--space-5`, `--radius-xs`…) and `rf-` type classes (`rf-display-xl`, `rf-body`…). Load first.                  |
 | `components.css` | Component classes: `rf-btn` (buttons), `rf-navlink` (navigation), `rf-tag` (FAQ categories), `rf-stat` (dashboard figures), `rf-page` (pagination). |
 
 ## Use

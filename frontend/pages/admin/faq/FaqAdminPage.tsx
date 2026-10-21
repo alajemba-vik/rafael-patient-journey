@@ -122,7 +122,13 @@ function CategoriesSection({ categories }: { categories: FaqCategory[] }) {
         </p>
       )}
       <form className="rf-toolbar" onSubmit={submit}>
-        <TextField label="Nouvelle catégorie" required maxLength={120} value={name} onChange={(e) => setName(e.target.value)} />
+        <TextField
+          label="Nouvelle catégorie"
+          required
+          maxLength={120}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
         <Button type="submit" variant="secondary" pending={create.isPending}>
           Ajouter
         </Button>

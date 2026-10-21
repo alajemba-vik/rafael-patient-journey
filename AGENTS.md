@@ -7,7 +7,7 @@ Rules for everyone working in this repo: people and AI coding agents (Claude Cod
 Patient journey and management platform for Institut Rafaël (integrative post-cancer care) and Institut Hartmann. Users: patients, healthcare professionals, care coordinators, reception (secretariat), admins.
 
 - **Backend:** FastAPI, SQLAlchemy 2.0, Alembic, Postgres (Supabase). Python 3.12+, managed with `uv`.
-- **Frontend:** framework not chosen yet; see `frontend/README.md`.
+- **Frontend:** React and TypeScript (Vite, TanStack Query, a client generated from the API); see `frontend/README.md`.
 - **Data:** synthetic only. Never use, paste or ask for real patient data, in code, tests, prompts or screenshots.
 
 ## Repo map

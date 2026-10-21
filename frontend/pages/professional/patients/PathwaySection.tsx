@@ -29,7 +29,11 @@ export function PathwaySection({ patientId }: { patientId: string }) {
           if (!current || current.status === "closed") {
             return (
               <div className="rf-stack">
-                <p>{current ? `Dernier parcours terminé le ${formatDate(current.closed_at ?? "")}.` : "Aucun parcours ouvert."}</p>
+                <p>
+                  {current
+                    ? `Dernier parcours terminé le ${formatDate(current.closed_at ?? "")}.`
+                    : "Aucun parcours ouvert."}
+                </p>
                 {isCoordinator && (
                   <div>
                     <Button onClick={() => open.mutate(patientId)} pending={open.isPending}>

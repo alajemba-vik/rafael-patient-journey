@@ -2,10 +2,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { api, unwrap, type Schemas } from "./client";
 
-export type PatientPathway = Schemas["PatientPathway"];
 export type Pathway = Schemas["PathwayOut"];
 
-export const PATHWAYS = ["pathways"] as const;
+const PATHWAYS = ["pathways"] as const;
 
 /** The patient's own pathways, newest first. */
 export function useMyPathways() {
