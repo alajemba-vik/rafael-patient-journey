@@ -28,9 +28,9 @@ CI (`.github/workflows/ci.yml`) runs the same checks on every pull request, and 
 
 ### First login
 
-1. Create the person in Supabase → Authentication → Users.
-2. Add a matching row in `users` with their Supabase user id as `auth_subject` and a role: `patient`, `secretary`, `professional`, `coordinator` or `admin`.
-3. `POST /api/v1/auth/login` returns a token. In `/docs`, click **Authorize** and paste it.
+1. Create the first admin by hand: in Supabase → Authentication → Users, add the person, then add a matching row in `users` with their Supabase user id as `auth_subject` and the role `admin`.
+2. `POST /api/v1/auth/login` returns a token. In `/docs`, click **Authorize** and paste it.
+3. From then on, the admin creates every other account with `POST /api/v1/auth/users` (needs `SUPABASE_SECRET_KEY` in `.env`).
 
 ## Repo layout
 

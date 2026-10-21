@@ -1,8 +1,17 @@
 import uuid
 
-from pydantic import BaseModel, ConfigDict, EmailStr
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 from app.modules.identity_access.models import Role
+
+
+class UserCreate(BaseModel):
+    """A new login. The initial password is set by whoever creates the account."""
+
+    email: EmailStr
+    full_name: str = Field(min_length=1, max_length=255)
+    password: str = Field(min_length=12, max_length=128)
+    role: Role
 
 
 class LoginRequest(BaseModel):

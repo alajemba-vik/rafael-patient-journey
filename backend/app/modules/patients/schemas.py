@@ -10,6 +10,8 @@ class PatientCreate(BaseModel):
     birth_date: date
     email: EmailStr | None = None
     phone: str | None = None
+    # The patient's own login, created beforehand by an admin. Optional.
+    user_id: uuid.UUID | None = None
 
 
 class PatientAdministrative(BaseModel):

@@ -8,12 +8,21 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app import auth
+from app import audit, auth
 from app.db import get_db
-from app.errors import UnauthorizedError
+from app.errors import ConflictError, ForbiddenError, UnauthorizedError
 from app.modules.identity_access.models import Role, User
+from app.modules.identity_access.schemas import UserCreate, UserOut
 
-__all__ = ["CurrentUser", "Role", "get_current_user", "login"]
+__all__ = [
+    "CurrentUser",
+    "Role",
+    "create_user",
+    "get_current_user",
+    "get_role",
+    "list_users",
+    "login",
+]
 
 _bearer = HTTPBearer(auto_error=False)
 
@@ -33,6 +42,37 @@ def get_user(db: Session, user_id: uuid.UUID) -> User:
     if user is None:
         raise UnauthorizedError("Unknown user")
     return user
+
+
+def create_user(db: Session, user: CurrentUser, data: UserCreate) -> UserOut:
+    """Admins create every account, staff and patients alike."""
+    # TODO(validate): should patients get an invitation email to set their own password
+    # instead of an initial password chosen by staff?
+    if user.role != Role.ADMIN:
+        raise ForbiddenError("Only admins can create accounts")
+    email = data.email.lower()
+    if db.scalar(select(User.id).where(User.email == email)) is not None:
+        raise ConflictError("An account with this email already exists")
+
+    subject = auth.create_account(email, data.password)
+    account = User(auth_subject=subject, email=email, full_name=data.full_name, role=data.role)
+    db.add(account)
+    db.flush()
+    audit.record(db, user.id, "user.create", None)
+    db.commit()
+    return UserOut.model_validate(account)
+
+
+def list_users(db: Session, user: CurrentUser) -> list[UserOut]:
+    if user.role != Role.ADMIN:
+        raise ForbiddenError("Only admins can list accounts")
+    users = db.scalars(select(User).order_by(User.full_name))
+    return [UserOut.model_validate(u) for u in users]
+
+
+def get_role(db: Session, user_id: uuid.UUID) -> Role | None:
+    """The account's role, or None if there is no such account."""
+    return db.scalar(select(User.role).where(User.id == user_id))
 
 
 def get_current_user(
