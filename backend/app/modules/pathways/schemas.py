@@ -88,3 +88,20 @@ class PathwaySummary(BaseModel):
     opened_at: datetime
     next_milestone: MilestoneKind | None
     next_due_on: date | None
+
+
+class NeedCreate(BaseModel):
+    note: str = Field(min_length=1, max_length=2000)
+
+
+class NeedOut(BaseModel):
+    """A flagged need, as the coordinator sees it in their inbox."""
+
+    id: uuid.UUID
+    pathway_id: uuid.UUID
+    patient_id: uuid.UUID
+    patient_name: str
+    raised_by_name: str
+    raised_at: datetime
+    note: str
+    resolved_at: datetime | None

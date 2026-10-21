@@ -8,6 +8,8 @@ from app.modules.identity_access.service import CurrentUser, get_current_user
 from app.modules.pathways import service
 from app.modules.pathways.schemas import (
     MilestoneCreate,
+    NeedCreate,
+    NeedOut,
     PathwayOpen,
     PathwayOut,
     PathwaySummary,
@@ -67,3 +69,30 @@ def list_patient_pathways(
     db: Session = Depends(get_db),
 ) -> list[PathwayOut]:
     return service.list_patient_pathways(db, user, patient_id)
+
+
+@router.post("/{pathway_id}/needs", status_code=status.HTTP_201_CREATED)
+def raise_need(
+    pathway_id: uuid.UUID,
+    body: NeedCreate,
+    user: CurrentUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> NeedOut:
+    return service.raise_need(db, user, pathway_id, body)
+
+
+@router.get("/needs")
+def list_open_needs(
+    user: CurrentUser = Depends(get_current_user), db: Session = Depends(get_db)
+) -> list[NeedOut]:
+    """The coordinator's inbox of needs flagged by practitioners."""
+    return service.list_open_needs(db, user)
+
+
+@router.post("/needs/{need_id}/resolve")
+def resolve_need(
+    need_id: uuid.UUID,
+    user: CurrentUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> NeedOut:
+    return service.resolve_need(db, user, need_id)
