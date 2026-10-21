@@ -53,7 +53,7 @@ AGENTS.md               code guidelines and rules for people and AI agents
 | `care_team` | who cares for which patient | Hugo | assign, remove, list team |
 | `pathways` | ~6-month care pathway, reviews | Hugo | files ready, not started |
 | `scheduling` | appointments and their status | Victoria | book, cancel, schedules, status lifecycle |
-| `reception` | check-in, waiting room | Victoria | files ready, not started |
+| `reception` | check-in, waiting room | Victoria | today's board, arrivals, no-shows |
 | `questionnaires` | questionnaires and answers | Téo | files ready, not started |
 | `analytics` | de-identified indicators | — | files ready, not started |
 | `faq` | FAQ content | Louis | public read, admin editing |
