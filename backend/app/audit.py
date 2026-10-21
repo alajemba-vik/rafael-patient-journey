@@ -28,3 +28,8 @@ class AuditEvent(Base):
 def record(db: Session, actor_id: uuid.UUID, action: str, patient_id: uuid.UUID | None) -> None:
     """Add an audit event to the current transaction (committed with the caller's work)."""
     db.add(AuditEvent(actor_id=actor_id, action=action, patient_id=patient_id))
+
+
+def record_many(db: Session, actor_id: uuid.UUID, action: str, patient_ids: set[uuid.UUID]) -> None:
+    """One event per patient shown in a list, so "who saw this patient" stays answerable."""
+    db.add_all(AuditEvent(actor_id=actor_id, action=action, patient_id=p) for p in patient_ids)

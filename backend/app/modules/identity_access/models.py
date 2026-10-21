@@ -26,3 +26,5 @@ class User(Base):
     role: Mapped[Role] = mapped_column(
         Enum(Role, native_enum=False, length=32, values_callable=lambda r: [m.value for m in r])
     )
+    # A practitioner's discipline, e.g. "Sophrologie". Coordinators often practise one too.
+    discipline: Mapped[str | None] = mapped_column(String(120))

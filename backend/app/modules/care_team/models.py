@@ -13,5 +13,6 @@ class CareAssignment(Base):
     __table_args__ = (UniqueConstraint("patient_id", "professional_id"),)
 
     id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
-    patient_id: Mapped[uuid.UUID] = mapped_column(Uuid, index=True)  # id only: no cross-module FK
+    # id only: no cross-module FK. Indexed through the unique constraint, which starts with it.
+    patient_id: Mapped[uuid.UUID] = mapped_column(Uuid)
     professional_id: Mapped[uuid.UUID] = mapped_column(Uuid, index=True)

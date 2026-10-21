@@ -1,4 +1,4 @@
 """
-Tables: ReceptionEvent (appointment_id, status: expected/arrived/in_consultation/done,
-timestamps).
+No tables. An appointment's status (scheduled, arrived, done, no-show) belongs to scheduling, so
+reception, practitioners and analytics all read the same value.
 """

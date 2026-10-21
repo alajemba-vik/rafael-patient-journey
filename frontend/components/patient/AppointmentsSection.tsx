@@ -1,0 +1,76 @@
+import { usePermissions } from "../../api/permissions";
+import { useCancelAppointment, usePatientAppointments } from "../../api/scheduling";
+import { QueryState } from "../feedback/QueryState";
+import { StatusBadge } from "../feedback/StatusBadge";
+import { BookingForm } from "../forms/BookingForm";
+import { ConfirmButton } from "../forms/ConfirmButton";
+import { formatDate, formatTime } from "../format";
+
+/** A patient's appointments. Coordinators and reception book and cancel here. */
+export function AppointmentsSection({ patientId }: { patientId: string }) {
+  const appointments = usePatientAppointments(patientId);
+  const canBook = usePermissions().bookAppointments;
+  const cancel = useCancelAppointment();
+
+  return (
+    <section className="rf-section" aria-labelledby="appointments-title">
+      <h2 id="appointments-title" className="rf-title">
+        Rendez-vous
+      </h2>
+      {canBook && (
+        <details className="rf-disclosure rf-section">
+          <summary>Prendre un rendez-vous</summary>
+          <div className="rf-disclosure__body">
+            <BookingForm patientId={patientId} />
+          </div>
+        </details>
+      )}
+      <QueryState
+        query={appointments}
+        empty={{ isEmpty: (list) => list.length === 0, title: "Aucun rendez-vous pour ce patient." }}
+      >
+        {(list) => (
+          <div className="rf-table-wrap">
+            <table className="rf-table">
+              <thead>
+                <tr>
+                  <th scope="col">Date</th>
+                  <th scope="col">Heure</th>
+                  <th scope="col">Avec</th>
+                  <th scope="col">Statut</th>
+                  {canBook && <th scope="col">Action</th>}
+                </tr>
+              </thead>
+              <tbody>
+                {[...list].reverse().map((a) => (
+                  <tr key={a.id}>
+                    <td>{formatDate(a.starts_at)}</td>
+                    <td>{formatTime(a.starts_at)}</td>
+                    <td>{a.professional_name}</td>
+                    <td>
+                      <StatusBadge status={a.status} />
+                    </td>
+                    {canBook && (
+                      <td>
+                        {a.status === "scheduled" && (
+                          <ConfirmButton
+                            question="Annuler ce rendez-vous ?"
+                            confirmLabel="Annuler le rendez-vous"
+                            onConfirm={() => cancel.mutate(a.id)}
+                            pending={cancel.isPending && cancel.variables === a.id}
+                          >
+                            Annuler
+                          </ConfirmButton>
+                        )}
+                      </td>
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </QueryState>
+    </section>
+  );
+}

@@ -5,7 +5,7 @@
  * Change values there first, then mirror them here.
  */
 
-@import url("https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Krona+One&display=swap");
+/* Fonts (Archivo, Krona One) are loaded by index.html, so they download in parallel with the app. */
 
 /* Colors: Clair (light) is the default theme. */
 :root,
@@ -56,15 +56,73 @@
 }
 
 /* Type styles: display face. Headings are uppercase except title and stat. */
-.rf-display-xl { font-family: var(--font-display); font-size: 32px; line-height: 32px; font-weight: 400; text-transform: uppercase; }
-.rf-display-lg { font-family: var(--font-display); font-size: 27px; line-height: 29.7px; font-weight: 400; letter-spacing: 2px; text-transform: uppercase; }
-.rf-stat-number { font-family: var(--font-display); font-size: 35px; line-height: 45px; font-weight: 400; font-variant-numeric: tabular-nums; }
-.rf-title { font-family: var(--font-display); font-size: 20px; line-height: 30px; font-weight: 400; }
-.rf-nav-text { font-family: var(--font-display); font-size: 14px; line-height: 14px; font-weight: 400; letter-spacing: 0.5px; text-transform: uppercase; }
-.rf-label { font-family: var(--font-display); font-size: 12px; line-height: 20.4px; font-weight: 400; letter-spacing: 0.5px; text-transform: uppercase; }
+.rf-display-xl {
+  font-family: var(--font-display);
+  font-size: 32px;
+  line-height: 32px;
+  font-weight: 400;
+  text-transform: uppercase;
+}
+.rf-display-lg {
+  font-family: var(--font-display);
+  font-size: 27px;
+  line-height: 29.7px;
+  font-weight: 400;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.rf-stat-number {
+  font-family: var(--font-display);
+  font-size: 35px;
+  line-height: 45px;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+.rf-title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  line-height: 30px;
+  font-weight: 400;
+}
+.rf-nav-text {
+  font-family: var(--font-display);
+  font-size: 14px;
+  line-height: 14px;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.rf-label {
+  font-family: var(--font-display);
+  font-size: 12px;
+  line-height: 20.4px;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
 
 /* Type styles: body face. */
-.rf-lead { font-family: var(--font-body); font-size: 21px; line-height: 35.7px; font-weight: 500; }
-.rf-body { font-family: var(--font-body); font-size: 16px; line-height: 27.2px; font-weight: 400; }
-.rf-body-sm { font-family: var(--font-body); font-size: 14px; line-height: 23.8px; font-weight: 500; }
-.rf-caption { font-family: var(--font-body); font-size: 12px; line-height: 20.4px; font-weight: 500; }
+.rf-lead {
+  font-family: var(--font-body);
+  font-size: 21px;
+  line-height: 35.7px;
+  font-weight: 500;
+}
+.rf-body {
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 27.2px;
+  font-weight: 400;
+}
+.rf-body-sm {
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 23.8px;
+  font-weight: 500;
+}
+.rf-caption {
+  font-family: var(--font-body);
+  font-size: 12px;
+  line-height: 20.4px;
+  font-weight: 500;
+}

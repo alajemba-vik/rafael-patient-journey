@@ -22,3 +22,7 @@ class ForbiddenError(AppError):
 
 class UnauthorizedError(AppError):
     status_code = 401
+
+
+class ConflictError(AppError):
+    status_code = 409

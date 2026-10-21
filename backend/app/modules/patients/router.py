@@ -6,7 +6,12 @@ from sqlalchemy.orm import Session
 from app.db import get_db
 from app.modules.identity_access.service import CurrentUser, get_current_user
 from app.modules.patients import service
-from app.modules.patients.schemas import PatientAdministrative, PatientCreate, PatientDetail
+from app.modules.patients.schemas import (
+    PatientAdministrative,
+    PatientCreate,
+    PatientDetail,
+    PatientUpdate,
+)
 
 router = APIRouter(prefix="/patients", tags=["patients"])
 
@@ -22,9 +27,12 @@ def create_patient(
 
 @router.get("")
 def list_patients(
-    user: CurrentUser = Depends(get_current_user), db: Session = Depends(get_db)
+    search: str | None = None,
+    unassigned: bool = False,
+    user: CurrentUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
 ) -> list[PatientAdministrative]:
-    return service.list_patients(db, user)
+    return service.list_patients(db, user, search, unassigned)
 
 
 @router.get("/{patient_id}")
@@ -34,3 +42,13 @@ def get_patient(
     db: Session = Depends(get_db),
 ) -> PatientDetail | PatientAdministrative:
     return service.get_patient(db, user, patient_id)
+
+
+@router.patch("/{patient_id}")
+def update_patient(
+    patient_id: uuid.UUID,
+    body: PatientUpdate,
+    user: CurrentUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> PatientAdministrative:
+    return service.update_patient(db, user, patient_id, body)

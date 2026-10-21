@@ -26,11 +26,23 @@ Run checks: `uv run ruff format . && uv run ruff check . && uv run pytest`. Test
 
 CI (`.github/workflows/ci.yml`) runs the same checks on every pull request, and also applies the migrations to a fresh Postgres and fails if `models.py` changed without a migration (`alembic check`).
 
+## Run the frontend
+
+Requires Node 24, with the backend running.
+
+```bash
+cd frontend
+npm install
+npm run dev                    # http://localhost:5173
+```
+
+Checks: `npm run format:check && npm run lint && npm run typecheck && npm test`. After any backend API change, `npm run api:generate` refreshes the typed client. More in `frontend/README.md`.
+
 ### First login
 
-1. Create the person in Supabase → Authentication → Users.
-2. Add a matching row in `users` with their Supabase user id as `auth_subject` and a role: `patient`, `secretary`, `professional`, `coordinator` or `admin`.
-3. `POST /api/v1/auth/login` returns a token. In `/docs`, click **Authorize** and paste it.
+1. Create the first admin by hand: in Supabase → Authentication → Users, add the person, then add a matching row in `users` with their Supabase user id as `auth_subject` and the role `admin`.
+2. `POST /api/v1/auth/login` returns a token. In `/docs`, click **Authorize** and paste it.
+3. From then on, the admin creates every other account with `POST /api/v1/auth/users` (needs `SUPABASE_SECRET_KEY` in `.env`).
 
 ## Repo layout
 
@@ -42,21 +54,21 @@ backend/
                         patients/ is the reference
   migrations/           Alembic schema history
   tests/
-frontend/               pages per role + shared components (framework TBD)
+frontend/               React app: pages per role + shared components (see frontend/README.md)
 AGENTS.md               code guidelines and rules for people and AI agents
 ```
 
 | Module | Owns | Owner | Status |
 |---|---|---|---|
-| `identity_access` | users, roles, login | Louis | started |
+| `identity_access` | users, roles, login | Louis | login, admin account creation |
 | `patients` | patient profiles | Victoria | reference module |
-| `care_team` | who cares for which patient | Hugo | started (no endpoints yet) |
-| `pathways` | ~6-month care pathway, reviews | Hugo | files ready, not started |
-| `scheduling` | appointments, group workshops | Victoria | files ready, not started |
-| `reception` | check-in, waiting room | Victoria | files ready, not started |
-| `questionnaires` | questionnaires and answers | Téo | files ready, not started |
-| `analytics` | de-identified indicators | — | files ready, not started |
-| `faq` | FAQ content | Louis | files ready, not started |
+| `care_team` | who cares for which patient | Hugo | assign, remove, list team |
+| `pathways` | ~6-month care pathway, reviews | Hugo | open, milestones, close, patient and coordinator views |
+| `scheduling` | appointments and their status | Victoria | book, cancel, schedules, status lifecycle |
+| `reception` | check-in, waiting room | Victoria | today's board, arrivals, no-shows |
+| `questionnaires` | questionnaires and answers | Téo | monthly quality of life, end-of-pathway satisfaction, scores |
+| `analytics` | de-identified indicators | — | patient-experience dashboard |
+| `faq` | FAQ content | Louis | public read, admin editing |
 | `notifications` | reminders, emails | — | files ready, not started |
 
 ## Team rules
@@ -72,6 +84,5 @@ Full details are in [AGENTS.md](AGENTS.md).
 
 ## Open decisions
 
-- **Frontend framework:** NiceGUI or React.
 - **Rafaël / Hartmann:** do they share data or keep it separate?
-- **Institute workflows to confirm:** who enters appointments, what reception does, what clinical data each role may see.
+- **Institute workflows to confirm:** who enters appointments, what reception does, what clinical data each role may see, when a patient record is created, how new patients get a coordinator. Each is marked `TODO(validate)` in the code, with its question number.
