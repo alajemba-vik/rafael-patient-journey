@@ -44,6 +44,17 @@ Checks: `npm run format:check && npm run lint && npm run typecheck && npm test`.
 2. `POST /api/v1/auth/login` returns a token. In `/docs`, click **Authorize** and paste it.
 3. From then on, the admin creates every other account with `POST /api/v1/auth/users` (needs `SUPABASE_SECRET_KEY` in `.env`).
 
+## Deploy (Vercel)
+
+Two Vercel projects from this repository:
+
+| Project | Framework | Root Directory | Environment variables |
+|---|---|---|---|
+| API | FastAPI | `backend` | the values from `backend/.env`, with `CORS_ORIGINS=["https://<frontend>.vercel.app"]` |
+| App | Vite | `frontend` | `VITE_API_URL=https://<api>.vercel.app` |
+
+`backend/vercel.json` runs the API in Frankfurt, next to the Supabase database; `frontend/vercel.json` sends every page address to the app so links and refreshes work. Run `uv run alembic upgrade head` against the database before deploying a new migration.
+
 ## Repo layout
 
 ```
