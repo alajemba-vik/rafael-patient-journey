@@ -3,7 +3,8 @@
 Access policy:
 - coordinator, admin → add or remove anyone in any patient's team, and see any team
 - professional       → see the team of patients they are part of
-- secretary, patient → no access here
+- secretary          → see any team (names and roles), to book appointments with its members
+- patient            → no access here
 """
 
 import uuid
@@ -40,6 +41,17 @@ def patient_ids_for(db: Session, professional_id: uuid.UUID) -> list[uuid.UUID]:
     return list(db.scalars(query))
 
 
+def coordinated_patient_ids(db: Session) -> set[uuid.UUID]:
+    """For other modules: patients who already have a coordinator in their care team."""
+    coordinator_ids = identity.list_ids_with_role(db, Role.COORDINATOR)
+    if not coordinator_ids:
+        return set()
+    query = select(CareAssignment.patient_id).where(
+        CareAssignment.professional_id.in_(coordinator_ids)
+    )
+    return set(db.scalars(query))
+
+
 def create_assignment(db: Session, user: CurrentUser, data: AssignmentCreate) -> AssignmentOut:
     """Add a professional or coordinator to a patient's care team.
 
@@ -74,7 +86,8 @@ def delete_assignment(db: Session, user: CurrentUser, assignment_id: uuid.UUID) 
 
 
 def list_members(db: Session, user: CurrentUser, patient_id: uuid.UUID) -> list[CareTeamMember]:
-    allowed = user.role in MANAGER_ROLES or (
+    # TODO(validate): may reception see who is in a patient's care team? Needed to book. (V-07)
+    allowed = user.role in MANAGER_ROLES | {Role.SECRETARY} or (
         user.role == Role.PROFESSIONAL and is_in_care_team(db, user.id, patient_id)
     )
     if not allowed:
@@ -90,6 +103,7 @@ def list_members(db: Session, user: CurrentUser, patient_id: uuid.UUID) -> list[
             user_id=account.id,
             full_name=account.full_name,
             role=account.role,
+            discipline=account.discipline,
         )
         for account in accounts
     ]

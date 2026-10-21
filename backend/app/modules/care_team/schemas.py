@@ -26,3 +26,4 @@ class CareTeamMember(BaseModel):
     user_id: uuid.UUID
     full_name: str
     role: Role
+    discipline: str | None

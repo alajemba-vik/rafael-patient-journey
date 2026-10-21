@@ -12,6 +12,7 @@ class UserCreate(BaseModel):
     full_name: str = Field(min_length=1, max_length=255)
     password: str = Field(min_length=12, max_length=128)
     role: Role
+    discipline: str | None = Field(default=None, max_length=120)
 
 
 class LoginRequest(BaseModel):
@@ -31,3 +32,4 @@ class UserOut(BaseModel):
     email: str
     full_name: str
     role: Role
+    discipline: str | None = None
