@@ -2,6 +2,8 @@
 .env
 .env.*
 !.env.example
+# The frontend's local API address: not a secret, and needed by `npm run dev`.
+!frontend/.env.development
 
 # Python
 __pycache__/
