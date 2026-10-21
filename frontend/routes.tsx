@@ -68,6 +68,22 @@ export const router = createBrowserRouter([
             lazy: () =>
               import("./pages/professional/dashboard/DashboardPage").then((m) => ({ Component: m.DashboardPage })),
           },
+          {
+            element: <RequireAuth roles={["coordinator"]} />,
+            children: [
+              {
+                path: "parcours",
+                lazy: () =>
+                  import("./pages/professional/pathways/LedPathwaysPage").then((m) => ({
+                    Component: m.LedPathwaysPage,
+                  })),
+              },
+              {
+                path: "besoins",
+                lazy: () => import("./pages/professional/needs/NeedsPage").then((m) => ({ Component: m.NeedsPage })),
+              },
+            ],
+          },
         ],
       },
       { path: "*", element: <NotFoundPage /> },
