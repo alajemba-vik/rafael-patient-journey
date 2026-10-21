@@ -52,7 +52,7 @@ AGENTS.md               code guidelines and rules for people and AI agents
 | `patients` | patient profiles | Victoria | reference module |
 | `care_team` | who cares for which patient | Hugo | assign, remove, list team |
 | `pathways` | ~6-month care pathway, reviews | Hugo | files ready, not started |
-| `scheduling` | appointments, group workshops | Victoria | files ready, not started |
+| `scheduling` | appointments and their status | Victoria | book, cancel, schedules, status lifecycle |
 | `reception` | check-in, waiting room | Victoria | files ready, not started |
 | `questionnaires` | questionnaires and answers | Téo | files ready, not started |
 | `analytics` | de-identified indicators | — | files ready, not started |
