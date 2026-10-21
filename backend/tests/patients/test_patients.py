@@ -3,6 +3,7 @@
 import uuid
 from datetime import date
 
+import pytest
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -207,3 +208,42 @@ def test_search_matches_the_start_of_a_name_and_listing_is_audited(db, client_as
     assert len(found) == 1
     assert wildcard == []
     assert db.scalar(select(AuditEvent.action).where(AuditEvent.action == "patient.list"))
+
+
+# --- update ---------------------------------------------------------------
+
+
+def test_admin_links_a_login_and_updates_contact_details(db, client_as):
+    patient = add_patient(db)
+    account = add_account(db, Role.PATIENT)
+
+    response = client_as(Role.ADMIN).patch(
+        f"/api/v1/patients/{patient.id}",
+        json={"user_id": str(account.id), "phone": "01 00 00 00 00"},
+    )
+
+    assert response.status_code == 200
+    assert response.json()["has_account"] is True
+    assert response.json()["phone"] == "01 00 00 00 00"
+    assert db.scalar(select(AuditEvent.action).where(AuditEvent.action == "patient.update"))
+
+
+def test_staff_login_cannot_be_linked_on_update(db, client_as):
+    patient = add_patient(db)
+    staff = add_account(db, Role.PROFESSIONAL)
+
+    response = client_as(Role.SECRETARY).patch(
+        f"/api/v1/patients/{patient.id}", json={"user_id": str(staff.id)}
+    )
+
+    assert response.status_code == 404
+
+
+@pytest.mark.parametrize("role", [Role.PATIENT, Role.PROFESSIONAL, Role.COORDINATOR])
+def test_care_roles_and_patients_cannot_update_and_it_is_audited(db, client_as, role):
+    patient = add_patient(db)
+
+    response = client_as(role).patch(f"/api/v1/patients/{patient.id}", json={"phone": "x"})
+
+    assert response.status_code == 403
+    assert db.scalar(select(AuditEvent.action)) == "patient.update.denied"

@@ -441,7 +441,8 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        patch?: never;
+        /** Update Patient */
+        patch: operations["update_patient_api_v1_patients__patient_id__patch"];
         trace?: never;
     };
     "/api/v1/questionnaires/due": {
@@ -1110,6 +1111,13 @@ export interface components {
             email: string | null;
             /** Phone */
             phone: string | null;
+            /** User Id */
+            user_id?: string | null;
+            /**
+             * Has Account
+             * @description Whether the patient can log in to the patient portal.
+             */
+            readonly has_account: boolean;
         };
         /** PatientCreate */
         PatientCreate: {
@@ -1152,8 +1160,15 @@ export interface components {
             email: string | null;
             /** Phone */
             phone: string | null;
+            /** User Id */
+            user_id?: string | null;
             /** Medical Summary */
             medical_summary: string | null;
+            /**
+             * Has Account
+             * @description Whether the patient can log in to the patient portal.
+             */
+            readonly has_account: boolean;
         };
         /**
          * PatientMilestone
@@ -1205,6 +1220,18 @@ export interface components {
             closed_at: string | null;
             /** Milestones */
             milestones: components["schemas"]["PatientMilestone"][];
+        };
+        /**
+         * PatientUpdate
+         * @description Contact details, or the patient's login once an admin has created it. All optional.
+         */
+        PatientUpdate: {
+            /** Email */
+            email?: string | null;
+            /** Phone */
+            phone?: string | null;
+            /** User Id */
+            user_id?: string | null;
         };
         /**
          * PublicCategory
@@ -2249,6 +2276,41 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PatientDetail"] | components["schemas"]["PatientAdministrative"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_patient_api_v1_patients__patient_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                patient_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PatientUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PatientAdministrative"];
                 };
             };
             /** @description Validation Error */

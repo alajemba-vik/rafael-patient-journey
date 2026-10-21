@@ -1,7 +1,7 @@
 import uuid
 from datetime import date
 
-from pydantic import BaseModel, ConfigDict, EmailStr
+from pydantic import BaseModel, ConfigDict, EmailStr, computed_field
 
 
 class PatientCreate(BaseModel):
@@ -25,6 +25,21 @@ class PatientAdministrative(BaseModel):
     birth_date: date
     email: str | None
     phone: str | None
+    user_id: uuid.UUID | None = None
+
+    @computed_field
+    @property
+    def has_account(self) -> bool:
+        """Whether the patient can log in to the patient portal."""
+        return self.user_id is not None
+
+
+class PatientUpdate(BaseModel):
+    """Contact details, or the patient's login once an admin has created it. All optional."""
+
+    email: EmailStr | None = None
+    phone: str | None = None
+    user_id: uuid.UUID | None = None
 
 
 class PatientDetail(PatientAdministrative):

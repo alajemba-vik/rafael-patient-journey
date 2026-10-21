@@ -113,6 +113,26 @@ export const router = createBrowserRouter([
           },
         ],
       },
+      {
+        path: "/admin",
+        element: <RequireAuth roles={["admin"]} />,
+        children: [
+          {
+            index: true,
+            lazy: () => import("./pages/admin/users/AccountsPage").then((m) => ({ Component: m.AccountsPage })),
+          },
+          {
+            path: "faq",
+            lazy: () => import("./pages/admin/faq/FaqAdminPage").then((m) => ({ Component: m.FaqAdminPage })),
+          },
+          {
+            // The same de-identified dashboard care staff see.
+            path: "tableau-de-bord",
+            lazy: () =>
+              import("./pages/professional/dashboard/DashboardPage").then((m) => ({ Component: m.DashboardPage })),
+          },
+        ],
+      },
       { path: "*", element: <NotFoundPage /> },
     ],
   },
