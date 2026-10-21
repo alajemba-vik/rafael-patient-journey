@@ -9,7 +9,7 @@ The full design system (brand book, usage rules, live previews) is the [Institut
 | File | What |
 |---|---|
 | `tokens.css` | CSS variables (`--ink`, `--accent`, `--space-5`, `--radius-xs`…) and `rf-` type classes (`rf-display-xl`, `rf-body`…). Load first. |
-| `components.css` | Component classes: `rf-btn`, `rf-navlink`, `rf-tag`, `rf-card`, `rf-stat`, `rf-media`, `rf-quote`, `rf-page`. |
+| `components.css` | Component classes: `rf-btn` (buttons), `rf-navlink` (navigation), `rf-tag` (FAQ categories), `rf-stat` (dashboard figures), `rf-page` (pagination). |
 
 ## Use
 
@@ -17,7 +17,7 @@ The full design system (brand book, usage rules, live previews) is the [Institut
 - Wrap the app in an element with class `rf-root` to get the background, text color, body font and focus ring.
 - Light ("Clair") is the default. Set `data-theme="dark"` on `<html>` for the dark theme ("Nuit").
 - Use the variables, never raw hex values or pixel sizes, in page styles.
-- If we pick NiceGUI, map `--ink`, `--accent` and the surfaces into the Quasar brand colors too, so its built-in components match.
+- Only what the platform uses lives here. The website's other pieces (article cards, video tiles, quote banners) stay in the design system artifact until a page needs them.
 
 ## Rules that matter most
 
@@ -29,4 +29,4 @@ The full design system (brand book, usage rules, live previews) is the [Institut
 
 - The official logo: get the files from the Institute. Never redraw it.
 - Pilat Extended, the site's licensed font. Krona One stands in until we have a license that covers the app.
-- Form fields, tables, calendar, alerts: to add in `components/forms`, `components/tables` and `components/feedback`, built on these tokens.
+- Form fields, tables, calendar, alerts, and the loading, empty and error states every page needs: to add in `components/forms`, `components/tables` and `components/feedback` with the first page that uses them, built on these tokens.
