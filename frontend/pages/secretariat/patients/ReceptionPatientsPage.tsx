@@ -8,7 +8,7 @@ import { useDebouncedValue } from "../../../components/forms/useDebouncedValue";
 import { formatDate } from "../../../components/format";
 import { PageHeader } from "../../../components/layout/PageHeader";
 import { RegisterPatientForm } from "./RegisterPatientForm";
-import { paths } from "../../../paths";
+import { paths } from "../../../app/paths";
 
 export function ReceptionPatientsPage() {
   const [search, setSearch] = useState("");

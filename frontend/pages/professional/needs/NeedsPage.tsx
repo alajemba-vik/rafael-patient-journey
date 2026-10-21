@@ -5,7 +5,7 @@ import { QueryState } from "../../../components/feedback/QueryState";
 import { Button } from "../../../components/forms/Button";
 import { formatDate } from "../../../components/format";
 import { PageHeader } from "../../../components/layout/PageHeader";
-import { paths } from "../../../paths";
+import { paths } from "../../../app/paths";
 
 export function NeedsPage() {
   const needs = useOpenNeeds();

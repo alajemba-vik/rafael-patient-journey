@@ -2,7 +2,7 @@ import createClient, { type Middleware } from "openapi-fetch";
 
 import type { components, paths as ApiPaths } from "./schema";
 import { session } from "./session";
-import { paths } from "../paths";
+import { paths } from "../app/paths";
 
 export type Schemas = components["schemas"];
 

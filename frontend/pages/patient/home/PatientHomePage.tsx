@@ -7,7 +7,7 @@ import { useMyAppointments } from "../../../api/scheduling";
 import { QueryState } from "../../../components/feedback/QueryState";
 import { formatChange, formatDate, formatNumber, formatTime, formatWeekday } from "../../../components/format";
 import { PageHeader } from "../../../components/layout/PageHeader";
-import { paths } from "../../../paths";
+import { paths } from "../../../app/paths";
 
 const UPCOMING_SHOWN = 3;
 

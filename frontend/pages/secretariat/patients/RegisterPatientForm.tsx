@@ -4,7 +4,7 @@ import { useNavigate } from "react-router";
 import { useRegisterPatient } from "../../../api/patients";
 import { Button } from "../../../components/forms/Button";
 import { TextField } from "../../../components/forms/TextField";
-import { paths } from "../../../paths";
+import { paths } from "../../../app/paths";
 
 const EMPTY = { first_name: "", last_name: "", birth_date: "", email: "", phone: "" };
 

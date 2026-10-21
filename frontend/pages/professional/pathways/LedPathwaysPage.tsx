@@ -6,7 +6,7 @@ import { formatDate } from "../../../components/format";
 import { MILESTONE_LABELS } from "../../../components/labels";
 import { PageHeader } from "../../../components/layout/PageHeader";
 import { instituteToday } from "../../../components/time";
-import { paths } from "../../../paths";
+import { paths } from "../../../app/paths";
 
 export function LedPathwaysPage() {
   const pathways = useLedPathways();

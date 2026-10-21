@@ -7,7 +7,7 @@ import { StatusBadge } from "../../../components/feedback/StatusBadge";
 import { formatTime, formatWeekday } from "../../../components/format";
 import { PageHeader } from "../../../components/layout/PageHeader";
 import { addDays, instituteDateTime, instituteToday } from "../../../components/time";
-import { paths } from "../../../paths";
+import { paths } from "../../../app/paths";
 
 const DAYS_SHOWN = 7;
 // Reception marks arrivals: check for them every minute while the page is open.

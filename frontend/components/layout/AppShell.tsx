@@ -4,8 +4,8 @@ import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router";
 
 import { useMe } from "../../api/me";
 import { session } from "../../api/session";
-import { NAV_BY_ROLE } from "./navigation";
-import { paths } from "../../paths";
+import { NAV_BY_ROLE } from "../../app/navigation";
+import { paths } from "../../app/paths";
 
 export function AppShell() {
   const { data: me } = useMe();

@@ -8,7 +8,7 @@ import { TextField } from "../../../components/forms/TextField";
 import { useDebouncedValue } from "../../../components/forms/useDebouncedValue";
 import { formatDate } from "../../../components/format";
 import { PageHeader } from "../../../components/layout/PageHeader";
-import { paths } from "../../../paths";
+import { paths } from "../../../app/paths";
 
 export function PatientsPage() {
   const [search, setSearch] = useState("");

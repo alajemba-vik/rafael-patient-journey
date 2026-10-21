@@ -7,7 +7,7 @@ import { session } from "../../../api/session";
 import { Button } from "../../../components/forms/Button";
 import { TextField } from "../../../components/forms/TextField";
 import { PageHeader } from "../../../components/layout/PageHeader";
-import { paths } from "../../../paths";
+import { paths } from "../../../app/paths";
 
 export function LoginPage() {
   const [params] = useSearchParams();

@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 
 import { PageHeader } from "../../../components/layout/PageHeader";
-import { paths } from "../../../paths";
+import { paths } from "../../../app/paths";
 
 export function NotFoundPage() {
   return (

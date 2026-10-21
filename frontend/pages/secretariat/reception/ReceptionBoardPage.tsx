@@ -7,7 +7,7 @@ import { StatusBadge } from "../../../components/feedback/StatusBadge";
 import { Button } from "../../../components/forms/Button";
 import { formatTime, formatWeekday } from "../../../components/format";
 import { PageHeader } from "../../../components/layout/PageHeader";
-import { paths } from "../../../paths";
+import { paths } from "../../../app/paths";
 
 /** What reception can do next from each status, with an undo for a mistaken click. */
 const ACTIONS: Record<BoardStatus, { status: BoardStatus; label: string; primary?: boolean }[]> = {
