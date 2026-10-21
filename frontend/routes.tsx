@@ -1,0 +1,50 @@
+import { createBrowserRouter } from "react-router";
+
+import { AppShell } from "./components/layout/AppShell";
+import { RequireAuth, RoleHome } from "./components/layout/RequireAuth";
+import { FaqPage } from "./pages/public/faq/FaqPage";
+import { LoginPage } from "./pages/public/login/LoginPage";
+import { NotFoundPage } from "./pages/public/not_found/NotFoundPage";
+
+// Each role's pages are separate downloads, fetched the first time that person opens them.
+export const router = createBrowserRouter([
+  {
+    element: <AppShell />,
+    children: [
+      { path: "/connexion", element: <LoginPage /> },
+      { path: "/faq", element: <FaqPage /> },
+      { element: <RequireAuth />, children: [{ index: true, element: <RoleHome /> }] },
+      {
+        path: "/patient",
+        element: <RequireAuth roles={["patient"]} />,
+        children: [
+          {
+            index: true,
+            lazy: () =>
+              import("./pages/patient/home/PatientHomePage").then((m) => ({ Component: m.PatientHomePage })),
+          },
+          {
+            path: "rendez-vous",
+            lazy: () =>
+              import("./pages/patient/appointments/PatientAppointmentsPage").then((m) => ({
+                Component: m.PatientAppointmentsPage,
+              })),
+          },
+          {
+            path: "parcours",
+            lazy: () =>
+              import("./pages/patient/pathway/PatientPathwayPage").then((m) => ({ Component: m.PatientPathwayPage })),
+          },
+          {
+            path: "questionnaires",
+            lazy: () =>
+              import("./pages/patient/questionnaires/PatientQuestionnairesPage").then((m) => ({
+                Component: m.PatientQuestionnairesPage,
+              })),
+          },
+        ],
+      },
+      { path: "*", element: <NotFoundPage /> },
+    ],
+  },
+]);

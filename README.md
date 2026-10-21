@@ -42,7 +42,7 @@ backend/
                         patients/ is the reference
   migrations/           Alembic schema history
   tests/
-frontend/               pages per role + shared components (framework TBD)
+frontend/               React app: pages per role + shared components (see frontend/README.md)
 AGENTS.md               code guidelines and rules for people and AI agents
 ```
 
