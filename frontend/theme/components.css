@@ -213,3 +213,20 @@
   .rf-shell__user { display: none; }
   .rf-shell__main { padding: var(--space-5) var(--space-4); }
 }
+
+/* Toolbars and segmented choices */
+.rf-toolbar { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--space-4) var(--space-5); margin-bottom: var(--space-5); }
+.rf-toolbar .rf-field { width: auto; min-width: min(100%, 280px); }
+.rf-segmented { display: inline-flex; border: 1px solid var(--ink); border-radius: var(--radius-xs); }
+.rf-segmented button {
+  font: inherit; font-weight: 600; min-height: 44px; padding: 0 var(--space-4); cursor: pointer;
+  background: var(--surface-raised); color: var(--ink); border: 0;
+}
+.rf-segmented button + button { border-left: 1px solid var(--ink); }
+.rf-segmented button[aria-pressed="true"] { background: var(--ink); color: var(--surface); }
+
+/* Bars behind a value: the number stays readable, the bar adds a glance */
+.rf-bar { position: relative; display: block; min-width: 160px; padding: 0 var(--space-2); z-index: 0; font-variant-numeric: tabular-nums; }
+.rf-bar__fill { position: absolute; inset: 0 auto 0 0; background: var(--surface-tint); border-left: 3px solid var(--ink); z-index: -1; }
+.rf-stack { display: flex; flex-direction: column; gap: var(--space-5); }
+.rf-stack > p { margin: 0; }

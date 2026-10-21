@@ -14,3 +14,11 @@ export const DIMENSIONS = [
   ["sexual", "Sexuel"],
   ["socio_professional", "Socio-professionnel"],
 ] as const;
+
+export const ROLE_LABELS: Record<Schemas["Role"], string> = {
+  patient: "Patient·e",
+  secretary: "Accueil",
+  professional: "Praticien·ne",
+  coordinator: "Coordination",
+  admin: "Administration",
+};

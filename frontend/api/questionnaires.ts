@@ -34,3 +34,17 @@ export function useSubmitQuestionnaire() {
     onSuccess: () => void queryClient.invalidateQueries({ queryKey: QUESTIONNAIRES }),
   });
 }
+
+/** A patient's quality-of-life scores, for their care team. */
+export function usePatientScores(patientId: string, enabled = true) {
+  return useQuery({
+    queryKey: [...QUESTIONNAIRES, "scores", patientId],
+    queryFn: () =>
+      unwrap(
+        api.GET("/api/v1/questionnaires/patients/{patient_id}/scores", {
+          params: { path: { patient_id: patientId } },
+        }),
+      ),
+    enabled,
+  });
+}

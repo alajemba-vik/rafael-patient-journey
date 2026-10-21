@@ -14,8 +14,18 @@ export const NAV_BY_ROLE: Record<Role, NavItem[]> = {
     FAQ,
   ],
   secretary: [FAQ],
-  professional: [FAQ],
-  coordinator: [FAQ],
+  professional: [
+    { to: "/pro", label: "Mon planning" },
+    { to: "/pro/patients", label: "Mes patients" },
+    { to: "/pro/tableau-de-bord", label: "Tableau de bord" },
+    FAQ,
+  ],
+  coordinator: [
+    { to: "/pro", label: "Mon planning" },
+    { to: "/pro/patients", label: "Patients" },
+    { to: "/pro/tableau-de-bord", label: "Tableau de bord" },
+    FAQ,
+  ],
   admin: [FAQ],
 };
 

@@ -44,6 +44,32 @@ export const router = createBrowserRouter([
           },
         ],
       },
+      {
+        path: "/pro",
+        element: <RequireAuth roles={["professional", "coordinator"]} />,
+        children: [
+          {
+            index: true,
+            lazy: () =>
+              import("./pages/professional/schedule/SchedulePage").then((m) => ({ Component: m.SchedulePage })),
+          },
+          {
+            path: "patients",
+            lazy: () =>
+              import("./pages/professional/patients/PatientsPage").then((m) => ({ Component: m.PatientsPage })),
+          },
+          {
+            path: "patients/:patientId",
+            lazy: () =>
+              import("./pages/professional/patients/PatientFilePage").then((m) => ({ Component: m.PatientFilePage })),
+          },
+          {
+            path: "tableau-de-bord",
+            lazy: () =>
+              import("./pages/professional/dashboard/DashboardPage").then((m) => ({ Component: m.DashboardPage })),
+          },
+        ],
+      },
       { path: "*", element: <NotFoundPage /> },
     ],
   },

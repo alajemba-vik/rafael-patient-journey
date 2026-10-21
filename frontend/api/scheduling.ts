@@ -8,10 +8,11 @@ export type Appointment = Schemas["AppointmentOut"];
 export const APPOINTMENTS = ["appointments"] as const;
 
 /** A patient's own appointments, or a practitioner's or coordinator's schedule. */
-export function useMyAppointments(range?: { start: string; end: string }) {
+export function useMyAppointments(range?: { start: string; end: string }, refreshEveryMs?: number) {
   return useQuery({
     queryKey: [...APPOINTMENTS, "mine", range],
     queryFn: () => unwrap(api.GET("/api/v1/scheduling/appointments/mine", { params: { query: range } })),
+    refetchInterval: refreshEveryMs,
   });
 }
 
