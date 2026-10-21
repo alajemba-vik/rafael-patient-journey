@@ -39,3 +39,6 @@ export function ReceptionPatientPage() {
     </QueryState>
   );
 }
+
+// React Router loads a lazy route's component from this export.
+export { ReceptionPatientPage as Component };

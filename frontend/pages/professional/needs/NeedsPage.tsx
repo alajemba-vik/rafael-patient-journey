@@ -52,3 +52,6 @@ export function NeedsPage() {
     </div>
   );
 }
+
+// React Router loads a lazy route's component from this export.
+export { NeedsPage as Component };

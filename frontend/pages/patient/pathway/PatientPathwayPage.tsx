@@ -81,3 +81,6 @@ export function PatientPathwayPage() {
     </div>
   );
 }
+
+// React Router loads a lazy route's component from this export.
+export { PatientPathwayPage as Component };

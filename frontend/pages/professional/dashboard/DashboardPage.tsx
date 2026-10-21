@@ -150,3 +150,6 @@ export function DashboardPage() {
     </>
   );
 }
+
+// React Router loads a lazy route's component from this export.
+export { DashboardPage as Component };

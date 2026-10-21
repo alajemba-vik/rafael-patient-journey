@@ -105,3 +105,6 @@ export function ReceptionBoardPage() {
     </>
   );
 }
+
+// React Router loads a lazy route's component from this export.
+export { ReceptionBoardPage as Component };

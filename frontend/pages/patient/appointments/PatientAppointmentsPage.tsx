@@ -51,3 +51,6 @@ export function PatientAppointmentsPage() {
     </>
   );
 }
+
+// React Router loads a lazy route's component from this export.
+export { PatientAppointmentsPage as Component };

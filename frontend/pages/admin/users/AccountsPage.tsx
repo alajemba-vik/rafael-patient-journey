@@ -45,3 +45,6 @@ export function AccountsPage() {
     </>
   );
 }
+
+// React Router loads a lazy route's component from this export.
+export { AccountsPage as Component };

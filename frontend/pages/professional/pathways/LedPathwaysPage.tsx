@@ -65,3 +65,6 @@ export function LedPathwaysPage() {
     </>
   );
 }
+
+// React Router loads a lazy route's component from this export.
+export { LedPathwaysPage as Component };

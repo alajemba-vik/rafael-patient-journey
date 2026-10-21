@@ -73,3 +73,6 @@ export function PatientFilePage() {
     </QueryState>
   );
 }
+
+// React Router loads a lazy route's component from this export.
+export { PatientFilePage as Component };

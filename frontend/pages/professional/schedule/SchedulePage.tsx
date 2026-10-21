@@ -67,3 +67,6 @@ export function SchedulePage() {
     </>
   );
 }
+
+// React Router loads a lazy route's component from this export.
+export { SchedulePage as Component };

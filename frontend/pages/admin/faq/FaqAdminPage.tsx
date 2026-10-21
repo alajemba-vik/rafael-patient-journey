@@ -221,3 +221,6 @@ function EntryRow({ entry, categories }: { entry: FaqEntry; categories: FaqCateg
     </li>
   );
 }
+
+// React Router loads a lazy route's component from this export.
+export { FaqAdminPage as Component };
