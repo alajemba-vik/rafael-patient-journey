@@ -237,6 +237,25 @@ def _needs_out(db: Session, rows: list[tuple[PathwayNeed, CarePathway]]) -> list
     ]
 
 
+def get_open_pathway_id(db: Session, patient_id: uuid.UUID) -> uuid.UUID | None:
+    """For other modules: the patient's open pathway, if any. No access check."""
+    query = select(CarePathway.id).where(
+        CarePathway.patient_id == patient_id, CarePathway.status == PathwayStatus.OPEN
+    )
+    return db.scalar(query)
+
+
+def get_last_closed_pathway_id(db: Session, patient_id: uuid.UUID) -> uuid.UUID | None:
+    """For other modules: the patient's most recently closed pathway. No access check."""
+    query = (
+        select(CarePathway.id)
+        .where(CarePathway.patient_id == patient_id, CarePathway.status == PathwayStatus.CLOSED)
+        .order_by(CarePathway.closed_at.desc())
+        .limit(1)
+    )
+    return db.scalar(query)
+
+
 def _summary(
     pathway: CarePathway, milestones: list[PathwayMilestone], patient_name: str
 ) -> PathwaySummary:

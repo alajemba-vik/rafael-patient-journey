@@ -54,7 +54,7 @@ AGENTS.md               code guidelines and rules for people and AI agents
 | `pathways` | ~6-month care pathway, reviews | Hugo | open, milestones, close, patient and coordinator views |
 | `scheduling` | appointments and their status | Victoria | book, cancel, schedules, status lifecycle |
 | `reception` | check-in, waiting room | Victoria | today's board, arrivals, no-shows |
-| `questionnaires` | questionnaires and answers | Téo | files ready, not started |
+| `questionnaires` | questionnaires and answers | Téo | monthly quality of life, end-of-pathway satisfaction, scores |
 | `analytics` | de-identified indicators | — | files ready, not started |
 | `faq` | FAQ content | Louis | public read, admin editing |
 | `notifications` | reminders, emails | — | files ready, not started |
