@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { useMe } from "../../../api/me";
+import { usePermissions } from "../../../api/permissions";
 import { useClosePathway, useOpenPathway, usePatientPathways, type Pathway } from "../../../api/pathways";
 import { QueryState } from "../../../components/feedback/QueryState";
 import { Button } from "../../../components/forms/Button";
@@ -15,7 +15,7 @@ const MILESTONE_ORDER = ["intake", "review", "final"] as const;
 
 export function PathwaySection({ patientId }: { patientId: string }) {
   const pathways = usePatientPathways(patientId);
-  const isCoordinator = useMe().data?.role === "coordinator";
+  const canLead = usePermissions().leadPathways;
   const open = useOpenPathway();
 
   return (
@@ -34,7 +34,7 @@ export function PathwaySection({ patientId }: { patientId: string }) {
                     ? `Dernier parcours terminé le ${formatDate(current.closed_at ?? "")}.`
                     : "Aucun parcours ouvert."}
                 </p>
-                {isCoordinator && (
+                {canLead && (
                   <div>
                     <Button onClick={() => open.mutate(patientId)} pending={open.isPending}>
                       Ouvrir un parcours
@@ -48,7 +48,7 @@ export function PathwaySection({ patientId }: { patientId: string }) {
           return (
             <div className="rf-stack">
               <PathwayDetails pathway={current} />
-              {isCoordinator && <CoordinatorActions pathway={current} />}
+              {canLead && <CoordinatorActions pathway={current} />}
               <div className="rf-narrow">
                 <NeedForm pathwayId={current.id} coordinatorName={current.coordinator_name} />
               </div>

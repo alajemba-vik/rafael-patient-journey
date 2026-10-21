@@ -1,36 +1,29 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";
 import { Navigate, useLocation, useNavigate, useSearchParams } from "react-router";
 
-import { api, ApiError, unwrap } from "../../../api/client";
+import { useLogin } from "../../../api/auth";
+import { ApiError } from "../../../api/client";
 import { session } from "../../../api/session";
 import { Button } from "../../../components/forms/Button";
 import { TextField } from "../../../components/forms/TextField";
 import { PageHeader } from "../../../components/layout/PageHeader";
+import { paths } from "../../../paths";
 
 export function LoginPage() {
   const [params] = useSearchParams();
   const location = useLocation();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const from = (location.state as { from?: string } | null)?.from ?? "/";
-  const login = useMutation({
-    mutationFn: () => unwrap(api.POST("/api/v1/auth/login", { body: { email, password } })),
-    onSuccess: ({ access_token }) => {
-      session.start(access_token);
-      queryClient.removeQueries({ queryKey: ["me"] });
-      navigate(from, { replace: true });
-    },
-  });
+  const from = (location.state as { from?: string } | null)?.from ?? paths.home;
+  const login = useLogin();
 
-  if (session.getToken()) return <Navigate to="/" replace />;
+  if (session.getToken()) return <Navigate to={paths.home} replace />;
 
   function submit(event: FormEvent) {
     event.preventDefault();
-    login.mutate();
+    login.mutate({ email, password }, { onSuccess: () => navigate(from, { replace: true }) });
   }
 
   const error =

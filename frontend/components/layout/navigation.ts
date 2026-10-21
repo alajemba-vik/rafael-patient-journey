@@ -1,35 +1,40 @@
 import type { Role } from "../../api/me";
+import { paths } from "../../paths";
 
 type NavItem = { to: string; label: string };
 
-const FAQ: NavItem = { to: "/faq", label: "Questions fréquentes" };
+const FAQ: NavItem = { to: paths.faq, label: "Questions fréquentes" };
 
-/** Menu per role. Each role's pages are added here as they're built. */
+/** Menu per role. */
 export const NAV_BY_ROLE: Record<Role, NavItem[]> = {
   patient: [
-    { to: "/patient", label: "Accueil" },
-    { to: "/patient/rendez-vous", label: "Rendez-vous" },
-    { to: "/patient/parcours", label: "Mon parcours" },
-    { to: "/patient/questionnaires", label: "Questionnaires" },
+    { to: paths.patient.home, label: "Accueil" },
+    { to: paths.patient.appointments, label: "Rendez-vous" },
+    { to: paths.patient.pathway, label: "Mon parcours" },
+    { to: paths.patient.questionnaires, label: "Questionnaires" },
     FAQ,
   ],
-  secretary: [{ to: "/accueil", label: "Accueil du jour" }, { to: "/accueil/patients", label: "Patients" }, FAQ],
+  secretary: [
+    { to: paths.reception.board, label: "Accueil du jour" },
+    { to: paths.reception.patients, label: "Patients" },
+    FAQ,
+  ],
   professional: [
-    { to: "/pro", label: "Mon planning" },
-    { to: "/pro/patients", label: "Mes patients" },
-    { to: "/pro/tableau-de-bord", label: "Tableau de bord" },
+    { to: paths.pro.schedule, label: "Mon planning" },
+    { to: paths.pro.patients, label: "Mes patients" },
+    { to: paths.pro.dashboard, label: "Tableau de bord" },
   ],
   coordinator: [
-    { to: "/pro", label: "Mon planning" },
-    { to: "/pro/patients", label: "Patients" },
-    { to: "/pro/parcours", label: "Mes parcours" },
-    { to: "/pro/besoins", label: "Besoins signalés" },
-    { to: "/pro/tableau-de-bord", label: "Tableau de bord" },
+    { to: paths.pro.schedule, label: "Mon planning" },
+    { to: paths.pro.patients, label: "Patients" },
+    { to: paths.pro.pathways, label: "Mes parcours" },
+    { to: paths.pro.needs, label: "Besoins signalés" },
+    { to: paths.pro.dashboard, label: "Tableau de bord" },
   ],
   admin: [
-    { to: "/admin", label: "Comptes" },
-    { to: "/admin/faq", label: "Gérer la FAQ" },
-    { to: "/admin/tableau-de-bord", label: "Tableau de bord" },
+    { to: paths.admin.accounts, label: "Comptes" },
+    { to: paths.admin.faq, label: "Gérer la FAQ" },
+    { to: paths.admin.dashboard, label: "Tableau de bord" },
     FAQ,
   ],
 };

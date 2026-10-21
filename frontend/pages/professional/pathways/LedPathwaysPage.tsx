@@ -5,11 +5,12 @@ import { QueryState } from "../../../components/feedback/QueryState";
 import { formatDate } from "../../../components/format";
 import { MILESTONE_LABELS } from "../../../components/labels";
 import { PageHeader } from "../../../components/layout/PageHeader";
-
-const today = () => new Date().toISOString().slice(0, 10);
+import { instituteToday } from "../../../components/time";
+import { paths } from "../../../paths";
 
 export function LedPathwaysPage() {
   const pathways = useLedPathways();
+  const today = instituteToday();
 
   return (
     <>
@@ -20,7 +21,7 @@ export function LedPathwaysPage() {
           isEmpty: (list) => list.length === 0,
           title: "Vous ne coordonnez aucun parcours en cours.",
           children: (
-            <Link className="rf-link" to="/pro/patients">
+            <Link className="rf-link" to={paths.pro.patients}>
               Voir les patients sans coordination
             </Link>
           ),
@@ -39,11 +40,11 @@ export function LedPathwaysPage() {
               </thead>
               <tbody>
                 {list.map((p) => {
-                  const late = p.next_due_on !== null && p.next_due_on < today();
+                  const late = p.next_due_on !== null && p.next_due_on < today;
                   return (
                     <tr key={p.id}>
                       <td>
-                        <Link className="rf-link" to={`/pro/patients/${p.patient_id}`}>
+                        <Link className="rf-link" to={paths.pro.patient(p.patient_id)}>
                           {p.patient_name}
                         </Link>
                       </td>

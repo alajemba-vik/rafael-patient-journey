@@ -8,10 +8,10 @@ Needs Node 24. Start the backend first (see the root README), then:
 
 ```bash
 npm install
-npm run dev          # http://localhost:5173, calls the API at http://localhost:8000
+npm run dev          # http://localhost:5173, calls the API set in .env.development
 ```
 
-Point it at another API with `VITE_API_URL=https://… npm run dev`.
+Point it at another API with `VITE_API_URL=https://… npm run dev`. A deployed build without `VITE_API_URL` calls the API on its own domain.
 
 | Command                                                             | Does                                                                                                                             |
 | ------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
@@ -24,7 +24,10 @@ Point it at another API with `VITE_API_URL=https://… npm run dev`.
 - The API client in `api/` is **generated** from the backend's OpenAPI spec (`GET /openapi.json`). Never edit it by hand; regenerate it when the backend changes.
 - No business rules or permission checks here. The backend decides who sees what; pages only display and submit.
 - Every page starts with `PageHeader` (title and browser tab) and shows its data through `QueryState`, which gives it the loading, empty, error and "not allowed" states for free.
-- UI text is in French; code and comments in English.
+- Page addresses live in `paths.ts` only: routes, menus and links all use it. Never type a path in a page.
+- Which buttons a role sees is decided in `api/permissions.ts` only. The API still decides and enforces every permission.
+- Dates and times entered or compared go through `components/time.ts`, which uses the Institute's clock (Paris), whatever the browser's time zone.
+- UI text is in French, written where it's used; repeated vocabulary (statuses, roles, milestones) lives in `components/labels.ts`. Code and comments are in English.
 - Synthetic data only.
 
 ## Layout

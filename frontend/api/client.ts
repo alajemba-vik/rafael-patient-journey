@@ -1,11 +1,14 @@
 import createClient, { type Middleware } from "openapi-fetch";
 
-import type { components, paths } from "./schema";
+import type { components, paths as ApiPaths } from "./schema";
 import { session } from "./session";
+import { paths } from "../paths";
 
 export type Schemas = components["schemas"];
 
-const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
+// Set per environment (.env.development for local work). Without it, the API is expected on the
+// same domain as the app, never on localhost.
+const API_URL = import.meta.env.VITE_API_URL ?? window.location.origin;
 
 /** An API error with the backend's own message (`detail`). */
 export class ApiError extends Error {
@@ -27,14 +30,14 @@ const authMiddleware: Middleware = {
     // An expired or revoked token: drop it and send the person back to the login page.
     if (response.status === 401 && session.getToken()) {
       session.end();
-      window.location.assign("/connexion?session=expiree");
+      window.location.assign(`${paths.login}?session=expiree`);
     }
     return response;
   },
 };
 
 // `fetch` is looked up on each call (not captured once), so tests can replace it.
-export const api = createClient<paths>({ baseUrl: API_URL, fetch: (request) => fetch(request) });
+export const api = createClient<ApiPaths>({ baseUrl: API_URL, fetch: (request) => fetch(request) });
 api.use(authMiddleware);
 
 /** Return the response data, or throw an ApiError carrying the backend's message. */

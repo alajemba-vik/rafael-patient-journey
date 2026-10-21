@@ -5,6 +5,7 @@ import { session } from "../../api/session";
 import { QueryState } from "../feedback/QueryState";
 import { NotAllowedState } from "../feedback/states";
 import { homeFor } from "./navigation";
+import { paths } from "../../paths";
 
 /**
  * Pages behind a login. `roles` only decides what the menu leads to: the API still checks
@@ -15,7 +16,7 @@ export function RequireAuth({ roles }: { roles?: Role[] }) {
   const me = useMe();
 
   if (!session.getToken()) {
-    return <Navigate to="/connexion" replace state={{ from: location.pathname }} />;
+    return <Navigate to={paths.login} replace state={{ from: location.pathname }} />;
   }
   return (
     <QueryState query={me}>

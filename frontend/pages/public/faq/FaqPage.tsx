@@ -1,11 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
-
-import { api, unwrap } from "../../../api/client";
+import { usePublishedFaq } from "../../../api/faq";
 import { QueryState } from "../../../components/feedback/QueryState";
 import { PageHeader } from "../../../components/layout/PageHeader";
 
 export function FaqPage() {
-  const faq = useQuery({ queryKey: ["faq"], queryFn: () => unwrap(api.GET("/api/v1/faq")) });
+  const faq = usePublishedFaq();
 
   return (
     <div className="rf-narrow">

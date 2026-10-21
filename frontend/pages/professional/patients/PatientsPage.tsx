@@ -1,26 +1,26 @@
 import { useState } from "react";
 import { Link } from "react-router";
 
-import { useMe } from "../../../api/me";
+import { usePermissions } from "../../../api/permissions";
 import { usePatients } from "../../../api/patients";
 import { QueryState } from "../../../components/feedback/QueryState";
 import { TextField } from "../../../components/forms/TextField";
 import { useDebouncedValue } from "../../../components/forms/useDebouncedValue";
 import { formatDate } from "../../../components/format";
 import { PageHeader } from "../../../components/layout/PageHeader";
+import { paths } from "../../../paths";
 
 export function PatientsPage() {
-  const me = useMe();
   const [search, setSearch] = useState("");
   const [unassigned, setUnassigned] = useState(false);
   const patients = usePatients(useDebouncedValue(search), unassigned);
-  const isCoordinator = me.data?.role === "coordinator";
+  const canTakeOn = usePermissions().takeOnPatients;
 
   return (
     <>
       <PageHeader title={unassigned ? "Nouveaux patients" : "Mes patients"} />
       <div className="rf-toolbar">
-        {isCoordinator && (
+        {canTakeOn && (
           <div className="rf-segmented" role="group" aria-label="Quels patients afficher">
             <button type="button" aria-pressed={!unassigned} onClick={() => setUnassigned(false)}>
               Mes patients
@@ -62,7 +62,7 @@ export function PatientsPage() {
                 {list.map((p) => (
                   <tr key={p.id}>
                     <td>
-                      <Link className="rf-link" to={`/pro/patients/${p.id}`}>
+                      <Link className="rf-link" to={paths.pro.patient(p.id)}>
                         {p.last_name.toUpperCase()} {p.first_name}
                       </Link>
                     </td>

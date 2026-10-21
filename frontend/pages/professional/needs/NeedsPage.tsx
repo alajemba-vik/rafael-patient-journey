@@ -5,6 +5,7 @@ import { QueryState } from "../../../components/feedback/QueryState";
 import { Button } from "../../../components/forms/Button";
 import { formatDate } from "../../../components/format";
 import { PageHeader } from "../../../components/layout/PageHeader";
+import { paths } from "../../../paths";
 
 export function NeedsPage() {
   const needs = useOpenNeeds();
@@ -27,7 +28,7 @@ export function NeedsPage() {
               <li key={need.id}>
                 <div className="rf-stack">
                   <p>
-                    <Link className="rf-link" to={`/pro/patients/${need.patient_id}`}>
+                    <Link className="rf-link" to={paths.pro.patient(need.patient_id)}>
                       {need.patient_name}
                     </Link>{" "}
                     <span className="rf-muted">

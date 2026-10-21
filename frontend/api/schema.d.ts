@@ -729,9 +729,9 @@ export interface components {
              */
             since: string;
             /** Done */
-            done: number;
+            done: number | null;
             /** No Show */
-            no_show: number;
+            no_show: number | null;
             /** No Show Rate */
             no_show_rate: number | null;
         };
@@ -976,7 +976,7 @@ export interface components {
             /** Period */
             period: string;
             /** Respondents */
-            respondents: number;
+            respondents: number | null;
             /** Average */
             average: number | null;
         };
@@ -1304,7 +1304,7 @@ export interface components {
         /** Satisfaction */
         Satisfaction: {
             /** Respondents */
-            respondents: number;
+            respondents: number | null;
             /** Average */
             average: number | null;
             /** By Question */
@@ -1333,7 +1333,7 @@ export interface components {
          */
         SelfAssessment: {
             /** Pathways */
-            pathways: number;
+            pathways: number | null;
             /** By Dimension */
             by_dimension: components["schemas"]["DimensionChange"][];
         };
