@@ -51,7 +51,7 @@ AGENTS.md               code guidelines and rules for people and AI agents
 | `identity_access` | users, roles, login | Louis | login, admin account creation |
 | `patients` | patient profiles | Victoria | reference module |
 | `care_team` | who cares for which patient | Hugo | assign, remove, list team |
-| `pathways` | ~6-month care pathway, reviews | Hugo | files ready, not started |
+| `pathways` | ~6-month care pathway, reviews | Hugo | open, milestones, close, patient and coordinator views |
 | `scheduling` | appointments and their status | Victoria | book, cancel, schedules, status lifecycle |
 | `reception` | check-in, waiting room | Victoria | today's board, arrivals, no-shows |
 | `questionnaires` | questionnaires and answers | Téo | files ready, not started |
