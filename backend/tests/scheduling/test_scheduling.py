@@ -5,6 +5,7 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.audit import AuditEvent
@@ -168,6 +169,33 @@ def test_appointment_must_end_after_it_starts(db, client_as, team):
     response = client_as(Role.COORDINATOR).post("/api/v1/scheduling/appointments", json=body)
 
     assert response.status_code == 422
+
+
+def test_unknown_patient_cannot_be_booked(db, client_as, team):
+    _, professional = team
+    ghost = uuid.uuid4()
+    assign(db, professional.id, ghost)
+    body = {**booking(*team), "patient_id": str(ghost)}
+
+    response = client_as(Role.COORDINATOR).post("/api/v1/scheduling/appointments", json=body)
+
+    assert response.status_code == 404
+
+
+def test_database_refuses_an_appointment_ending_before_it_starts(db, team):
+    patient, professional = team
+    db.add(
+        Appointment(
+            patient_id=patient.id,
+            professional_id=professional.id,
+            starts_at=NINE,
+            ends_at=NINE - HOUR,
+            created_by=uuid.uuid4(),
+        )
+    )
+
+    with pytest.raises(IntegrityError):
+        db.commit()
 
 
 # --- cancel ---------------------------------------------------------------

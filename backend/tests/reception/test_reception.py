@@ -1,7 +1,8 @@
 """Reception board rules: secretaries see today's appointments and record arrivals."""
 
 import uuid
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
+from zoneinfo import ZoneInfo
 
 import pytest
 from sqlalchemy import select
@@ -10,6 +11,7 @@ from sqlalchemy.orm import Session
 from app.audit import AuditEvent
 from app.modules.identity_access.service import Role
 from app.modules.patients.models import Patient
+from app.modules.reception.service import day_window
 from app.modules.scheduling.models import Appointment, AppointmentStatus
 
 OTHER_ROLES = [Role.PATIENT, Role.PROFESSIONAL, Role.COORDINATOR, Role.ADMIN]
@@ -116,3 +118,20 @@ def test_other_roles_cannot_record_arrivals(db, client_as, role):
 
     assert response.status_code == 403
     assert db.get(Appointment, appointment.id).status == AppointmentStatus.SCHEDULED
+
+
+# --- the Institute's day --------------------------------------------------
+
+PARIS = ZoneInfo("Europe/Paris")
+
+
+@pytest.mark.parametrize(
+    ("day", "hours"),
+    [(date(2026, 10, 21), 24), (date(2026, 10, 25), 25), (date(2027, 3, 28), 23)],
+)
+def test_the_day_runs_from_local_midnight_to_local_midnight(day, hours):
+    start, end = day_window(day, PARIS)
+
+    assert start.astimezone(PARIS).hour == 0
+    assert end.astimezone(PARIS).hour == 0
+    assert end - start == timedelta(hours=hours)

@@ -101,7 +101,7 @@ def test_patients_and_reception_do_not(db, client_as, role):
     assert response.status_code == 403
 
 
-def test_small_groups_are_counted_but_their_averages_hidden(db, client_as):
+def test_small_groups_hide_their_counts_and_averages(db, client_as):
     add_quality_of_life(db, 4, 80.0)
     add_satisfaction(db, 4)
     add_finished_pathways(db, 4)
@@ -109,9 +109,12 @@ def test_small_groups_are_counted_but_their_averages_hidden(db, client_as):
 
     body = client_as(Role.ADMIN).get("/api/v1/analytics/dashboard").json()
 
-    assert body["quality_of_life"] == [{"period": THIS_MONTH, "respondents": 4, "average": None}]
+    assert body["quality_of_life"] == [{"period": THIS_MONTH, "respondents": None, "average": None}]
+    assert body["satisfaction"]["respondents"] is None
     assert body["satisfaction"]["average"] is None
+    assert body["self_assessment"]["pathways"] is None
     assert {d["average_change"] for d in body["self_assessment"]["by_dimension"]} == {None}
+    assert body["attendance"]["no_show"] is None
     assert body["attendance"]["no_show_rate"] is None
 
 

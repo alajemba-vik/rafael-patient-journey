@@ -1,7 +1,8 @@
 """De-identified indicators for the patient-experience dashboard.
 
 Built only from other modules' totals (through their service.py); nothing here can point to
-one patient. Any average over fewer than MIN_GROUP_SIZE patients is hidden.
+one patient. Any count or average over fewer than MIN_GROUP_SIZE patients is hidden: in a small
+team, "one absence" or "one respondent" can be enough to tell who.
 """
 
 from datetime import UTC, datetime, timedelta
@@ -56,9 +57,9 @@ def _attendance(db: Session, now: datetime) -> Attendance:
     seen = done + no_show
     return Attendance(
         since=since.date(),
-        done=done,
-        no_show=no_show,
-        no_show_rate=round(no_show / seen * 100, 1) if seen >= MIN_GROUP_SIZE else None,
+        done=_count(seen, done),
+        no_show=_count(seen, no_show),
+        no_show_rate=_shown(seen, no_show / seen * 100 if seen else None),
     )
 
 
@@ -67,7 +68,9 @@ def _quality_of_life(db: Session, now: datetime) -> list[MonthlyScore]:
     months_back = now.year * 12 + now.month - QUALITY_OF_LIFE_MONTHS
     first_month = f"{months_back // 12:04d}-{months_back % 12 + 1:02d}"
     return [
-        MonthlyScore(period=period, respondents=count, average=_shown(count, average))
+        MonthlyScore(
+            period=period, respondents=_count(count, count), average=_shown(count, average)
+        )
         for period, count, average in questionnaires.monthly_quality_of_life(db, first_month)
     ]
 
@@ -84,13 +87,15 @@ def _satisfaction(db: Session) -> Satisfaction:
         for question in questions
     ]
     overall = _out_of_100([value for a in answers for value in a.values()])
-    return Satisfaction(respondents=count, average=_shown(count, overall), by_question=by_question)
+    return Satisfaction(
+        respondents=_count(count, count), average=_shown(count, overall), by_question=by_question
+    )
 
 
 def _self_assessment(db: Session) -> SelfAssessment:
     count, changes = pathways.average_self_assessment_change(db)
     return SelfAssessment(
-        pathways=count,
+        pathways=_count(count, count),
         by_dimension=[
             DimensionChange(dimension=dimension, average_change=_shown(count, change))
             for dimension, change in changes.items()
@@ -101,6 +106,11 @@ def _self_assessment(db: Session) -> SelfAssessment:
 def _out_of_100(values: list[int]) -> float | None:
     """0–4 answers as a 0–100 score, like the questionnaires' own scores."""
     return mean(values) / 4 * 100 if values else None
+
+
+def _count(group_size: int, value: int) -> int | None:
+    """The count, or None when the group is too small to stay anonymous."""
+    return value if group_size >= MIN_GROUP_SIZE else None
 
 
 def _shown(group_size: int, value: float | None) -> float | None:

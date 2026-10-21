@@ -96,11 +96,14 @@ QUESTIONNAIRES = {
 def list_due(db: Session, user: CurrentUser) -> list[Questionnaire]:
     """What the patient should answer now, ready to display."""
     patient_id = _own_patient_id(db, user)
-    return [
+    due = [
         questionnaire
         for instrument, questionnaire in QUESTIONNAIRES.items()
         if _due_period(db, patient_id, instrument) is not None
     ]
+    audit.record(db, user.id, "questionnaire.due.read", patient_id)
+    db.commit()
+    return due
 
 
 def submit_response(

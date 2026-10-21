@@ -85,13 +85,16 @@ def audit_actions(db: Session) -> list[str]:
 # --- what is due ----------------------------------------------------------
 
 
-def test_quality_of_life_is_due_while_pathway_is_open(db, client_as, patient):
+def test_quality_of_life_is_due_while_pathway_is_open_and_the_read_is_audited(
+    db, client_as, patient
+):
     _, account = patient
 
     body = client_as(Role.PATIENT, account.id).get("/api/v1/questionnaires/due").json()
 
     assert [q["instrument"] for q in body] == ["quality_of_life"]
     assert len(body[0]["questions"]) == len(QOL_ANSWERS)
+    assert audit_actions(db) == ["questionnaire.due.read"]
 
 
 def test_satisfaction_is_due_once_pathway_is_closed(db, client_as, patient):
@@ -134,7 +137,7 @@ def test_patient_answers_and_gets_a_score_out_of_one_hundred(db, client_as, pati
     assert response.status_code == 201
     assert response.json()["score"] == 66.7
     assert client.get("/api/v1/questionnaires/due").json() == []
-    assert audit_actions(db) == ["questionnaire.quality_of_life"]
+    assert "questionnaire.quality_of_life" in audit_actions(db)
 
 
 def test_same_questionnaire_cannot_be_answered_twice_in_a_month(db, client_as, patient):

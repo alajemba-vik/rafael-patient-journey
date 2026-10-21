@@ -56,6 +56,13 @@ def test_secretary_registers_patient_and_it_is_audited(db, client_as):
     assert db.scalar(select(AuditEvent.action)) == "patient.create"
 
 
+@pytest.mark.parametrize("field", ["first_name", "last_name"])
+def test_blank_names_are_refused(db, client_as, field):
+    response = client_as(Role.SECRETARY).post("/api/v1/patients", json={**NEW_PATIENT, field: "  "})
+
+    assert response.status_code == 422
+
+
 def test_professional_cannot_register_patient(db, client_as):
     response = client_as(Role.PROFESSIONAL).post("/api/v1/patients", json=NEW_PATIENT)
 

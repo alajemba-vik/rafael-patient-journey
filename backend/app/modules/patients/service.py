@@ -132,6 +132,11 @@ def get_names(db: Session, patient_ids: set[uuid.UUID]) -> dict[uuid.UUID, str]:
     return {row.id: f"{row.first_name} {row.last_name}" for row in rows}
 
 
+def patient_exists(db: Session, patient_id: uuid.UUID) -> bool:
+    """For other modules that take a patient id: make sure it points to a real record."""
+    return db.scalar(select(Patient.id).where(Patient.id == patient_id)) is not None
+
+
 def get_patient_id_for_user(db: Session, user_id: uuid.UUID) -> uuid.UUID | None:
     """The patient record behind a patient's login, if any."""
     return db.scalar(select(Patient.id).where(Patient.user_id == user_id))
