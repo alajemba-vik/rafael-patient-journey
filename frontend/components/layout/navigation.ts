@@ -30,7 +30,12 @@ export const NAV_BY_ROLE: Record<Role, NavItem[]> = {
     { to: "/pro/besoins", label: "Besoins signalés" },
     { to: "/pro/tableau-de-bord", label: "Tableau de bord" },
   ],
-  admin: [FAQ],
+  admin: [
+    { to: "/admin", label: "Comptes" },
+    { to: "/admin/faq", label: "Gérer la FAQ" },
+    { to: "/admin/tableau-de-bord", label: "Tableau de bord" },
+    FAQ,
+  ],
 };
 
 /** Where each role lands after logging in: the first item of its menu. */
