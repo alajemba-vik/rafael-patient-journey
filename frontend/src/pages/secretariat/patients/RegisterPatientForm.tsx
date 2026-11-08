@@ -45,7 +45,6 @@ export function RegisterPatientForm() {
 
   return (
     <form className="rf-form rf-narrow" onSubmit={submit}>
-      {/* TODO(validate): when does a person get a patient record, and who creates it? (V-06) */}
       <p className="rf-muted">Pour une personne dont l’admission à l’Institut est confirmée.</p>
       <div className="rf-row">
         <TextField

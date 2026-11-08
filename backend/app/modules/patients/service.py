@@ -31,8 +31,8 @@ from app.modules.patients.schemas import (
 
 CARE_ROLES = {Role.PROFESSIONAL, Role.COORDINATOR}
 OFFICE_ROLES = {Role.SECRETARY, Role.ADMIN}
-# TODO(validate): how are new patients given a coordinator, and what may coordinators see
-# before that? For now they see unassigned patients' administrative data. (V-06, V-07)
+# Coordinators also see the administrative data of patients who have no coordinator yet,
+# so one of them can take the patient on.
 LIST_LIMIT = 100
 PHONE_SEARCH_DIGITS = 3
 # Sent as null, these are cleared: no email, no phone, or the login unlinked.

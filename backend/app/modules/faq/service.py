@@ -114,8 +114,6 @@ def delete_entry(db: Session, user: CurrentUser, entry_id: uuid.UUID) -> None:
 
 
 def _require_editor(user: CurrentUser) -> None:
-    # TODO(validate): who maintains the FAQ at the Institute: admins only, or also
-    # coordinators or reception? (V-13)
     if user.role != Role.ADMIN:
         raise ForbiddenError("Only admins can manage the FAQ")
 

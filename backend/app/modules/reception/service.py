@@ -15,7 +15,6 @@ from app.modules.identity_access.service import CurrentUser, Role
 from app.modules.scheduling import service as scheduling
 from app.modules.scheduling.service import AppointmentOut, AppointmentStatus, day_window
 
-# TODO(validate): what does reception do on arrival, and are no-shows recorded? (V-04, V-05)
 RECEPTION_ROLES = {Role.SECRETARY}
 
 

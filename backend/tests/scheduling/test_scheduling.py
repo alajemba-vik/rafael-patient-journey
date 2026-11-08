@@ -670,7 +670,7 @@ def test_a_day_outside_the_agenda_is_refused_not_a_crash(db, client_as, team):
     assert response.status_code == 400
 
 
-# --- a practitioner's own agenda (working assumption A-01) -----------------
+# --- a practitioner's own agenda -------------------------------------------
 
 
 def test_a_practitioner_books_a_follow_up_with_their_own_patient(db, client_as, team):

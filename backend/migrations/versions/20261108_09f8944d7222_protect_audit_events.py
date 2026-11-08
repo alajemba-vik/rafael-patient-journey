@@ -12,9 +12,8 @@ editing or deleting rows. A trigger now refuses:
 Older events can be deleted (a purge job, when the Institute sets the rule). The trigger
 applies to every role, the table owner included; only a superuser can switch it off.
 
-TODO(validate): the retention period. One year is a working assumption, in line with the
-CNIL's usual guidance for access logs (six months to a year); the Institute's data protection
-officer may require longer for health data.
+Retention: one year, in line with the CNIL's usual guidance for access logs (six months to
+a year). To change it, add a migration that recreates the function with a new interval.
 
 Revision ID: 09f8944d7222
 Revises: 9c41d2e7f0ab

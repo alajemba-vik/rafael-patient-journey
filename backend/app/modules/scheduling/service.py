@@ -40,22 +40,18 @@ from app.modules.scheduling.schemas import (
     TimeSlot,
 )
 
-# Who books (working assumption A-01 in the team knowledge base, open-questions.md):
+# Who books:
 # - coordinators book the first session with each practitioner, reception books for patients
 #   who phone or ask at the desk: both for anyone in the patient's care team;
 # - patients book their follow-ups directly with their practitioner, so a practitioner
 #   books, moves, cancels and annotates their **own** sessions with their own patients.
-# TODO(validate): confirm with the Institute (V-03, V-24).
 BOOKING_ROLES = {Role.COORDINATOR, Role.SECRETARY}
 OWN_AGENDA_ROLES = {Role.PROFESSIONAL}
 CARE_ROLES = {Role.PROFESSIONAL, Role.COORDINATOR}
 UPCOMING_WINDOW = timedelta(days=90)
 
-# Opening hours (working assumption A-02): sessions on weekdays, 9:00 to 19:00, the same for
-# every practitioner. The Institute's site publishes no hours; a directory listing gives
-# weekdays 9:00-13:00, probably the reception desk or phone line rather than sessions.
+# Opening hours: sessions on weekdays, 9:00 to 19:00, the same for every practitioner.
 # Only free-slot suggestions follow these hours: staff can still book any time by hand.
-# TODO(validate): real hours, Saturday activities, per-practitioner days (V-27).
 OPENING_TIME = time(9, 0)
 CLOSING_TIME = time(19, 0)
 OPEN_WEEKDAYS = frozenset(range(5))  # Monday (0) to Friday (4)
@@ -308,7 +304,6 @@ def count_by_status(db: Session, start: datetime, end: datetime) -> dict[Appoint
 
 
 def institute_time_zone() -> ZoneInfo:
-    # TODO(validate): does Hartmann share this platform, and in which time zone? (V-02)
     return ZoneInfo(get_settings().institute_time_zone)
 
 

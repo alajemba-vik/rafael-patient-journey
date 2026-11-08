@@ -108,8 +108,3 @@ Full details are in [AGENTS.md](AGENTS.md).
 4. Reading or changing patient data is recorded with `audit.record`.
 5. Tables change only through Alembic migrations; Louis reviews them.
 6. **Synthetic data only.** No real patient data until HDS-certified hosting, a DPIA (data protection impact assessment) and access rules are approved.
-
-## Open decisions
-
-- **Rafaël / Hartmann:** do they share data or keep it separate?
-- **Institute workflows to confirm:** who enters appointments, what reception does, what clinical data each role may see, when a patient record is created, how new patients get a coordinator. Each is marked `TODO(validate)` in the code, with its question number.

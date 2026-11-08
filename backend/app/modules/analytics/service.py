@@ -28,7 +28,7 @@ from app.modules.scheduling.service import AppointmentStatus
 
 # The brief asks for dashboards for professionals; admins see the same de-identified view.
 DASHBOARD_ROLES = {Role.PROFESSIONAL, Role.COORDINATOR, Role.ADMIN}
-# TODO(validate): the smallest group the Institute is comfortable showing an average for.
+# The smallest group an average is shown for (see the module docstring).
 MIN_GROUP_SIZE = 5
 ATTENDANCE_WINDOW = timedelta(days=90)
 QUALITY_OF_LIFE_MONTHS = 12

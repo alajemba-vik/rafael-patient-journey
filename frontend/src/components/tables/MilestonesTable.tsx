@@ -8,7 +8,6 @@ export function MilestonesTable({ milestones }: { milestones: Milestone[] }) {
   return (
     <div className="rf-table-wrap rf-narrow">
       <table className="rf-table">
-        {/* TODO(validate): what 0 and 4 mean on the Institute's self-assessment scale. */}
         <caption className="rf-muted">Auto-évaluation, de 0 à 4</caption>
         <thead>
           <tr>

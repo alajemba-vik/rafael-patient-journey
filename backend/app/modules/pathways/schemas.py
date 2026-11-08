@@ -13,7 +13,7 @@ Score = Annotated[int, Field(ge=0, le=4)]
 
 class Symptom(BaseModel):
     name: str = Field(min_length=1, max_length=120)
-    # TODO(validate): which intensity scale does the Institute use? (V-11)
+    # Intensity from 0 (none) to 10 (worst imaginable), the usual symptom scale.
     intensity: int = Field(ge=0, le=10)
 
 

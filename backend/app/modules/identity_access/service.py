@@ -48,9 +48,7 @@ def get_user(db: Session, user_id: uuid.UUID) -> User:
 
 
 def create_user(db: Session, user: CurrentUser, data: UserCreate) -> UserOut:
-    """Admins create every account, staff and patients alike."""
-    # TODO(validate): should patients get an invitation email to set their own password
-    # instead of an initial password chosen by staff?
+    """Admins create every account, staff and patients alike, with an initial password."""
     if user.role != Role.ADMIN:
         raise ForbiddenError("Only admins can create accounts")
     email = data.email.lower()

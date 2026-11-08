@@ -74,7 +74,7 @@ Ruff enforces formatting and lint (`uv run ruff format .` and `uv run ruff check
 - Keep functions short; extract a private `_helper` when a function passes ~30 lines.
 
 **Errors.**
-- Services raise `NotFoundError`, `ForbiddenError` or `UnauthorizedError` from `app/errors.py`, never `HTTPException`.
+- Services raise the errors in `app/errors.py` (`NotFoundError`, `ForbiddenError`, `ConflictError`, …), never `HTTPException`.
 - Don't catch exceptions you can't handle: an unexpected error becomes a logged 500 with a request id.
 - Log with `logging.getLogger(__name__)`, never `print`. Never log patient data (names, emails, phone numbers, free text).
 
@@ -82,9 +82,11 @@ Ruff enforces formatting and lint (`uv run ruff format .` and `uv run ruff check
 - SQLAlchemy 2.0 style only: `Mapped[...]`, `mapped_column`, `select(...)`. No legacy `session.query`.
 - No raw SQL strings.
 - The service commits once at the end of a write.
+- A write that checks the current state first (a status change, a move) reads the row with `.with_for_update()`, so two people clicking at once can't both apply a change.
 
 **Comments.**
 - A docstring on each module and on any non-obvious function, saying *why*, not *what*.
+- Comments describe what the code does now. No open questions, `TODO`s or question numbers in code (see rule 5 below).
 - No commented-out code, and no `print`.
 
 **Dependencies.** Don't add a package without saying why in the PR. Prefer the standard library and what's already installed.
@@ -92,9 +94,11 @@ Ruff enforces formatting and lint (`uv run ruff format .` and `uv run ruff check
 ## Tests
 
 - Every service function gets tests for the allowed case **and** each denied role.
-- Tests live in `backend/tests/<module>/test_<module>.py`. Name them as sentences: `test_professional_outside_care_team_is_denied`.
+- Backend tests live in `backend/tests/<module>/test_<module>.py`. Name them as sentences: `test_professional_outside_care_team_is_denied`.
 - Use the `db` and `client_as(Role.X, user_id)` fixtures from `tests/conftest.py`. They need no Supabase.
 - Arrange / act / assert, separated by blank lines. Synthetic names only (e.g. "Alex Synthetic").
+- Frontend tests sit next to the file they test (`board.ts` → `board.test.ts`). A new or changed page gets a test.
+- Whole journeys across screens (book, check in…) are Playwright tests in `frontend/e2e/`, run against the real API on a throwaway database (`backend/tests/e2e/server.py`).
 
 ## Migrations
 
@@ -113,11 +117,15 @@ New modules need no registration: any `app/modules/<name>/models.py` is picked u
 ## Frontend style (framework-neutral)
 
 - One folder per page under `pages/<role>/`. Shared pieces go in `components/` once two pages use them.
+- `components/` holds UI only. Helpers that aren't components (formatting, dates, labels) go in `lib/`, shared hooks in `lib/hooks/`.
+- Dates and times go through `lib/time.ts`: the Institute's clock (Paris), whatever the browser's time zone.
 - Data comes only from the generated client in `api/`. Never hard-code URLs or call `fetch` ad hoc.
 - `api/` mirrors the backend: one file per module, named like it (`modules/care_team/` → `api/care_team.ts`). Shared plumbing lives in `api/core/`. `frontend/README.md` maps each module to the pages that use it; update it when you add a page or module.
 - No permission logic. If the API returns 403, show a "not allowed" state.
 - Every page handles loading, empty and error states.
 - UI text is in French; code and comments are in English.
+- The look is our own design: don't copy the Institute's website (its fonts, colours or layouts). Colours, fonts and spacing come from `theme/tokens.css`, never raw values in a page.
+- Accessible by default: every input has a label, buttons say what they do (to whom, when there are several), touch targets are at least 44px.
 
 ## Git workflow
 
@@ -137,13 +145,13 @@ New modules need no registration: any `app/modules/<name>/models.py` is picked u
    - Don't reformat or "improve" unrelated code.
    - Don't rename things you didn't need to.
    - Don't delete code you don't understand.
-5. **Don't invent Institute workflows.** If behaviour depends on how Institut Rafaël works and you don't know, implement the simplest version, mark it `# TODO(validate): <question>`, and list it in your summary.
+5. **Don't invent Institute workflows.** If behaviour depends on how Institut Rafaël works and you don't know, implement the simplest version and write the question and your assumption in your summary and PR description. The team records them in its knowledge base (`open-questions.md` in the Claude Project). Don't put questions or `TODO`s about them in the code.
 6. **Never:**
    - touch `.env` or secrets;
    - weaken or skip a permission check, an audit call or a test to make something pass;
    - edit a merged migration;
    - add real data.
-7. **Finish with the checks below passing**, then summarise what changed, what you assumed, and any `TODO(validate)` items.
+7. **Finish with the checks below passing**, then summarise what changed, what you assumed, and any questions for the Institute.
 
 ## Definition of done
 
@@ -152,6 +160,10 @@ cd backend
 uv run ruff format .
 uv run ruff check .
 uv run pytest
+
+cd ../frontend            # when the frontend changed
+npm run format:check && npm run lint && npm run typecheck && npm test && npm run build
+npm run e2e               # when a journey (booking, reception…) changed
 ```
 
-All three pass, new behaviour has allowed and denied tests, and patient data access is audited.
+All pass, new behaviour has allowed and denied tests, and patient data access is audited.
