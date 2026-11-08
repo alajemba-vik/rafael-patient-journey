@@ -2,6 +2,9 @@ name: CI
 
 on:
   pull_request:
+  # Also after merging, so anything that reached main without a PR is checked too.
+  push:
+    branches: [main]
 
 permissions:
   contents: read

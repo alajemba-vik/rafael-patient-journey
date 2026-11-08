@@ -26,12 +26,15 @@ export function LoginPage() {
     login.mutate({ email, password }, { onSuccess: () => navigate(from, { replace: true }) });
   }
 
+  const status = login.error instanceof ApiError ? login.error.status : undefined;
   const error =
-    login.error instanceof ApiError && login.error.status === 401
+    status === 401
       ? "E-mail ou mot de passe incorrect."
-      : login.isError
-        ? "Connexion impossible pour le moment. Réessayez dans un instant."
-        : undefined;
+      : status === 429
+        ? "Trop de tentatives. Patientez une minute, puis réessayez."
+        : login.isError
+          ? "Connexion impossible pour le moment. Réessayez dans un instant."
+          : undefined;
 
   return (
     <div className="rf-narrow">
