@@ -1,7 +1,7 @@
 import { useId, useState } from "react";
 import { Link } from "react-router";
 
-import { ApiError } from "../../../api/client";
+import { ApiError } from "../../../api/core/client";
 import { useChangeStatus } from "../../../api/reception";
 import type { Appointment } from "../../../api/scheduling";
 import { ManageAppointment } from "../../../components/appointments/ManageAppointment";

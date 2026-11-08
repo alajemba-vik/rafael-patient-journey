@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { api, unwrap, type Schemas } from "./client";
+import { api, unwrap, type Schemas } from "./core/client";
 import { PATIENTS } from "./patients";
 
 const CARE_TEAM = ["care-team"] as const;

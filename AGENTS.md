@@ -112,6 +112,7 @@ New modules need no registration: any `app/modules/<name>/models.py` is picked u
 
 - One folder per page under `pages/<role>/`. Shared pieces go in `components/` once two pages use them.
 - Data comes only from the generated client in `api/`. Never hard-code URLs or call `fetch` ad hoc.
+- `api/` mirrors the backend: one file per module, named like it (`modules/care_team/` → `api/care_team.ts`). Shared plumbing lives in `api/core/`. `frontend/README.md` maps each module to the pages that use it; update it when you add a page or module.
 - No permission logic. If the API returns 403, show a "not allowed" state.
 - Every page handles loading, empty and error states.
 - UI text is in French; code and comments are in English.

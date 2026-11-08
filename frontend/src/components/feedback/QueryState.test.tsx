@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
-import { ApiError } from "../../api/client";
+import { ApiError } from "../../api/core/client";
 import { QueryState } from "./QueryState";
 
 function query<T>(state: Partial<UseQueryResult<T>>): UseQueryResult<T> {

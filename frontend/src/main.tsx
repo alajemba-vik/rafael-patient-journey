@@ -6,7 +6,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { RouterProvider } from "react-router";
 
-import { queryClient } from "./api/queryClient";
+import { queryClient } from "./api/core/queryClient";
 import { router } from "./app/routes";
 
 createRoot(document.getElementById("root")!).render(

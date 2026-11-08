@@ -1,7 +1,7 @@
 import { Navigate, Outlet, useLocation } from "react-router";
 
-import { useMe, type Role } from "../../api/me";
-import { session } from "../../api/session";
+import { useMe, type Role } from "../../api/identity_access";
+import { session } from "../../api/core/session";
 import { QueryState } from "../feedback/QueryState";
 import { NotAllowedState } from "../feedback/states";
 import { homeFor } from "../../app/navigation";

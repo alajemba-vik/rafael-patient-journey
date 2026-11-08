@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { api, unwrap, type Schemas } from "./client";
+import { api, unwrap, type Schemas } from "./core/client";
 
 export type FaqCategory = Schemas["CategoryOut"];
 export type FaqEntry = Schemas["EntryOut"];

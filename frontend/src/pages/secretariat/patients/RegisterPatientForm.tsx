@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router";
 
-import { ApiError } from "../../../api/client";
+import { ApiError } from "../../../api/core/client";
 import { usePatients, useRegisterPatient } from "../../../api/patients";
 import { Button } from "../../../components/forms/Button";
 import { TextField } from "../../../components/forms/TextField";

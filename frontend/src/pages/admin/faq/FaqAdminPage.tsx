@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from "react";
 
-import { ApiError } from "../../../api/client";
+import { ApiError } from "../../../api/core/client";
 import {
   useCreateCategory,
   useCreateEntry,

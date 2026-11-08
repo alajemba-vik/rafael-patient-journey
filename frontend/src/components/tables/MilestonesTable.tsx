@@ -1,4 +1,4 @@
-import type { Schemas } from "../../api/client";
+import type { Schemas } from "../../api/core/client";
 import { DIMENSIONS, MILESTONE_LABELS } from "../labels";
 
 type Milestone = Schemas["PatientMilestone"];

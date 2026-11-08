@@ -1,4 +1,4 @@
-import type { Role } from "../api/me";
+import type { Role } from "../api/identity_access";
 import { paths } from "./paths";
 
 type NavItem = { to: string; label: string };

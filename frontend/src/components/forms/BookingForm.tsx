@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from "react";
 
-import { ApiError } from "../../api/client";
-import { useCareTeam } from "../../api/careTeam";
+import { ApiError } from "../../api/core/client";
+import { useCareTeam } from "../../api/care_team";
 import { NOTE_MAX_LENGTH, useBookAppointment } from "../../api/scheduling";
 import { SlotPicker } from "../appointments/SlotPicker";
 import { ROLE_LABELS } from "../labels";
