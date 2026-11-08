@@ -114,7 +114,8 @@ jobs:
   e2e:
     # Whole journeys in a real browser: the real API on a throwaway SQLite database
     # (backend/tests/e2e/server.py) and the real frontend.
-    runs-on: ubuntu-latest
+    # Pinned: Playwright 1.56 can't install its browser on ubuntu-latest (26.04) yet.
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: frontend
