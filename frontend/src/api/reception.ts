@@ -8,10 +8,11 @@ export type BoardStatus = Schemas["AppointmentStatus"];
 // Arrivals happen all day: keep the board fresh without anyone pressing reload.
 const REFRESH_MS = 30_000;
 
-export function useTodayBoard() {
+/** A day's appointments, cancelled ones included. Refreshed on its own: arrivals happen all day. */
+export function useDayBoard(day: string) {
   return useQuery({
-    queryKey: [...APPOINTMENTS, "today"],
-    queryFn: () => unwrap(api.GET("/api/v1/reception/today")),
+    queryKey: [...APPOINTMENTS, "day", day],
+    queryFn: () => unwrap(api.GET("/api/v1/reception/day", { params: { query: { day } } })),
     refetchInterval: REFRESH_MS,
   });
 }
@@ -26,6 +27,7 @@ export function useChangeStatus() {
           body: { status },
         }),
       ),
-    onSuccess: () => void queryClient.invalidateQueries({ queryKey: APPOINTMENTS }),
+    // Refreshed whatever the outcome: a refusal usually means someone else changed it first.
+    onSettled: () => queryClient.invalidateQueries({ queryKey: APPOINTMENTS }),
   });
 }
