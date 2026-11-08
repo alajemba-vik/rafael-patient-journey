@@ -6,7 +6,7 @@ import { usePermissions } from "../../../api/identity_access";
 import { isDetail, usePatient } from "../../../api/patients";
 import { Button } from "../../../components/forms/Button";
 import { QueryState } from "../../../components/feedback/QueryState";
-import { formatDate } from "../../../components/format";
+import { formatDate } from "../../../lib/format";
 import { PageHeader } from "../../../components/layout/PageHeader";
 import { AppointmentsSection } from "../../../components/patient/AppointmentsSection";
 import { CareTeamSection } from "../../../components/patient/CareTeamSection";

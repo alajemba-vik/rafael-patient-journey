@@ -4,8 +4,8 @@ import { ApiError, type Schemas } from "../../../api/core/client";
 import { useUpdatePatient } from "../../../api/patients";
 import { Button } from "../../../components/forms/Button";
 import { TextField } from "../../../components/forms/TextField";
-import { formatDate, formatPhone } from "../../../components/format";
-import { instituteToday } from "../../../components/time";
+import { formatDate, formatPhone } from "../../../lib/format";
+import { instituteToday } from "../../../lib/time";
 import { PHONE_HINT } from "./RegisterPatientForm";
 
 type Patient = Schemas["PatientAdministrative"];

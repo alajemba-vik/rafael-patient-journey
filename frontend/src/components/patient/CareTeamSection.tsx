@@ -6,7 +6,7 @@ import { QueryState } from "../feedback/QueryState";
 import { Button } from "../forms/Button";
 import { ConfirmButton } from "../forms/ConfirmButton";
 import { SelectField } from "../forms/SelectField";
-import { ROLE_LABELS } from "../labels";
+import { ROLE_LABELS } from "../../lib/labels";
 
 export function CareTeamSection({ patientId }: { patientId: string }) {
   const team = useCareTeam(patientId);

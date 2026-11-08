@@ -1,7 +1,7 @@
 import { useDashboard } from "../../../api/analytics";
 import { QueryState } from "../../../components/feedback/QueryState";
-import { formatChange, formatDate, formatMonth, formatNumber } from "../../../components/format";
-import { DIMENSIONS } from "../../../components/labels";
+import { formatChange, formatDate, formatMonth, formatNumber } from "../../../lib/format";
+import { DIMENSIONS } from "../../../lib/labels";
 import { PageHeader } from "../../../components/layout/PageHeader";
 
 const HIDDEN = "Masqué";

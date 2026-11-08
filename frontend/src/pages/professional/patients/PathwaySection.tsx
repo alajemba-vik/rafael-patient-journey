@@ -5,8 +5,8 @@ import { useClosePathway, useOpenPathway, usePatientPathways, type Pathway } fro
 import { QueryState } from "../../../components/feedback/QueryState";
 import { Button } from "../../../components/forms/Button";
 import { ConfirmButton } from "../../../components/forms/ConfirmButton";
-import { formatDate } from "../../../components/format";
-import { MILESTONE_LABELS } from "../../../components/labels";
+import { formatDate } from "../../../lib/format";
+import { MILESTONE_LABELS } from "../../../lib/labels";
 import { MilestonesTable } from "../../../components/tables/MilestonesTable";
 import { MilestoneForm } from "./MilestoneForm";
 import { NeedForm } from "./NeedForm";

@@ -1,6 +1,6 @@
 import { usePatientScores } from "../../../api/questionnaires";
 import { QueryState } from "../../../components/feedback/QueryState";
-import { formatChange, formatMonth, formatNumber } from "../../../components/format";
+import { formatChange, formatMonth, formatNumber } from "../../../lib/format";
 
 const MONTHS_SHOWN = 4;
 

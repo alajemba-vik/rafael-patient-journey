@@ -1,6 +1,6 @@
 import type { BoardStatus } from "../../../api/reception";
 import type { Appointment } from "../../../api/scheduling";
-import { minutesBetween } from "../../../components/time";
+import { minutesBetween } from "../../../lib/time";
 
 // Waiting this long, or this late without arriving, puts a card in front of reception.
 export const LONG_WAIT_MINUTES = 15;

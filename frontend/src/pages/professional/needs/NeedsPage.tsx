@@ -3,7 +3,7 @@ import { Link } from "react-router";
 import { useOpenNeeds, useResolveNeed } from "../../../api/pathways";
 import { QueryState } from "../../../components/feedback/QueryState";
 import { Button } from "../../../components/forms/Button";
-import { formatDate } from "../../../components/format";
+import { formatDate } from "../../../lib/format";
 import { PageHeader } from "../../../components/layout/PageHeader";
 import { paths } from "../../../app/paths";
 
