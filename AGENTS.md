@@ -4,7 +4,7 @@ Rules for everyone working in this repo: people and AI coding agents (Claude Cod
 
 ## Project
 
-Patient journey and management platform for Institut Rafaël (integrative post-cancer care) and Institut Hartmann. Users: patients, healthcare professionals, care coordinators, reception (secretariat), admins.
+Patient journey and management platform for Institut Rafaël (integrative post-cancer care). The brief plans shared use with Institut Hartmann; nothing in the code separates the two institutes yet. Users: patients, healthcare professionals, care coordinators, reception, admins. In the code, reception's role is `secretary`; on screen it's "accueil".
 
 - **Backend:** FastAPI, SQLAlchemy 2.0, Alembic, Postgres (Supabase). Python 3.12+, managed with `uv`.
 - **Frontend:** React and TypeScript (Vite, TanStack Query, a client generated from the API); see `frontend/README.md`.
@@ -23,13 +23,17 @@ backend/app/
   observability.py logging, request ids, the last-resort 500 handler (don't edit)
   modules/<name>/  one business area each (see below)
 backend/migrations/  Alembic: the only way to change tables
+backend/scripts/   operations scripts run by hand (demo data). They may write to several
+                   modules' tables and print to the terminal; app code may not.
 backend/tests/<name>/  tests per module
 frontend/          pages per role + shared components
 ```
 
-Modules: `identity_access` (Louis), `patients` (Victoria), `care_team` (Hugo), `pathways` (Hugo), `scheduling` (Victoria), `reception` (Victoria), `questionnaires` (Téo), `analytics`, `faq` (Louis), `notifications`.
+Modules: `identity_access` (Louis), `patients` (Victoria), `care_team` (Hugo), `pathways` (Hugo), `scheduling` (Victoria), `reception` (Victoria), `questionnaires` (Téo), `analytics` (no owner yet), `faq` (Louis), `notifications` (no owner yet).
 
-Every module already has `router.py`, `schemas.py`, `service.py` and `models.py`. In the modules not started yet, each file's docstring says what belongs there: read it and write the code in that file. Don't create other files or folders for a module's code, and put its tests in `backend/tests/<module>/`.
+**Database admin: Victoria.** Migrations, the Supabase project, the data rules in the database (constraints, row-level security, audit protection) and the demo data.
+
+Every module already has `router.py`, `schemas.py`, `service.py` and `models.py`. In `notifications`, the one module not started yet, each file's docstring says what belongs there: read it and write the code in that file. Don't create other files or folders for a module's code, and put its tests in `backend/tests/<module>/`.
 
 **Work only in the module or folder your task is about.** Need a change in someone else's module? Say so in the PR or ask; don't edit it in passing.
 
@@ -63,8 +67,8 @@ Ruff enforces formatting and lint (`uv run ruff format .` and `uv run ruff check
 - Audit actions: `"<thing>.<verb>"`, e.g. `"patient.read"`, `"appointment.cancel"`.
 
 **Endpoints.**
-- Base `/api/v1/<module>`, plural nouns: `GET /patients`, `GET /patients/{id}`, `POST /patients`, `PATCH /patients/{id}`.
-- Actions that aren't plain CRUD use a verb sub-path: `POST /appointments/{id}/check-in`.
+- Base `/api/v1/<module>`, plural nouns: `GET /patients`, `GET /patients/{id}`, `POST /patients`, `PATCH /patients/{id}`. The prefix is the module's name, except `identity_access` (`/auth`) and `care_team` (`/care-team`, URLs use hyphens).
+- Actions that aren't plain CRUD use a sub-path: `POST /reception/appointments/{id}/status`, `POST /pathways/{id}/close`.
 - Return types are declared on the function (`-> PatientDetail`); no `response_model=` duplication.
 - Status codes: `201` create, `200` read/update, `204` delete, and errors from `app.errors`.
 
@@ -86,7 +90,7 @@ Ruff enforces formatting and lint (`uv run ruff format .` and `uv run ruff check
 
 **Comments.**
 - A docstring on each module and on any non-obvious function, saying *why*, not *what*.
-- Comments describe what the code does now. No open questions, `TODO`s or question numbers in code (see rule 5 below).
+- Comments describe what the code does now. No open questions, `TODO`s or question numbers in code (see rule 5 in "How agents must work").
 - No commented-out code, and no `print`.
 
 **Dependencies.** Don't add a package without saying why in the PR. Prefer the standard library and what's already installed.
@@ -109,7 +113,7 @@ uv run alembic revision --autogenerate -m "add appointments"   # after changing 
 uv run alembic upgrade head
 ```
 
-New modules need no registration: any `app/modules/<name>/models.py` is picked up automatically. Louis reviews every migration.
+New modules need no registration: any `app/modules/<name>/models.py` is picked up automatically. The database admin (Victoria) reviews every migration; a teammate reviews hers.
 
 - **A migration that creates a table also enables row-level security on it** (`op.execute("ALTER TABLE <name> ENABLE ROW LEVEL SECURITY")`, inside `if op.get_bind().dialect.name == "postgresql":` so tests on SQLite still run). Migration `9c41d2e7f0ab` turned it on for every table that existed then. Supabase exposes every `public` table through its own REST API; with RLS on and no policies, that door is closed and only our backend (the table owner) can read the table.
 - Rules the data must always follow (no overlapping appointments, valid statuses) go in the database as constraints too, not only in `service.py`: two requests at the same moment can both pass a check in Python.
@@ -131,7 +135,8 @@ New modules need no registration: any `app/modules/<name>/models.py` is picked u
 
 - **Branches:** `feat/<module>-<short-name>`, `fix/<module>-<short-name>`, `chore/<short-name>`.
 - **Commits** (Conventional Commits): `feat(patients): add patient search`, `fix(auth): handle expired token`, `test(...)`, `docs(...)`, `refactor(...)`, `chore(...)`.
-- **Authorship:** commits are authored and signed by the person who opens the PR (`main` only accepts signed commits). AI tools are never credited: no `Co-Authored-By:` an AI, no "Generated with…" line, in commit messages or PR descriptions. CI rejects them. If your tool adds such lines by itself, turn that off in its own settings.
+- **Merging:** always **Squash and merge** on GitHub. `main` only accepts signed commits, and GitHub signs the squashed commit, so nobody needs to sign locally. The squashed commit's message is the PR title and description.
+- **Authorship:** commits are authored by the person who opens the PR. AI tools are never credited: no `Co-Authored-By:` an AI, no "Generated with…" line, in commit messages, PR titles or PR descriptions. CI rejects them. If your tool adds such lines by itself, turn that off in its own settings.
 - **PRs:**
   - One feature per PR, ideally under ~400 changed lines.
   - The description says what changed, why, and how it was tested.
@@ -146,7 +151,7 @@ New modules need no registration: any `app/modules/<name>/models.py` is picked u
    - Don't reformat or "improve" unrelated code.
    - Don't rename things you didn't need to.
    - Don't delete code you don't understand.
-5. **Don't invent Institute workflows.** If behaviour depends on how Institut Rafaël works and you don't know, implement the simplest version and write the question and your assumption in your summary and PR description. The team records them in its knowledge base (`open-questions.md` in the Claude Project). Don't put questions or `TODO`s about them in the code.
+5. **Don't invent Institute workflows.** If behaviour depends on how Institut Rafaël works and you don't know, implement the simplest version and write the question and your assumption in your summary and in a PR comment (not the description: it becomes the commit message on `main`). The team records them in its knowledge base (`open-questions.md` in the Claude Project). Don't put questions or `TODO`s about them in the code.
 6. **Never:**
    - touch `.env` or secrets;
    - weaken or skip a permission check, an audit call or a test to make something pass;

@@ -1,4 +1,4 @@
-"""Questionnaires (quality of life, self-assessment, practitioner grids) and answers.
+"""Patient questionnaires (monthly quality of life, end-of-pathway satisfaction) and answers.
 
-Owner: Téo. Not started.
+Owner: Téo.
 """

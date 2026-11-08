@@ -70,12 +70,14 @@ def add_finished_pathways(db: Session, count: int) -> None:
     db.commit()
 
 
-def add_appointments(db: Session, status: AppointmentStatus, count: int) -> None:
+def add_appointments(
+    db: Session, status: AppointmentStatus, count: int, patient_id: uuid.UUID | None = None
+) -> None:
     for i in range(count):
         starts_at = datetime.now(UTC) - timedelta(days=1, hours=i)
         db.add(
             Appointment(
-                patient_id=uuid.uuid4(),
+                patient_id=patient_id or uuid.uuid4(),
                 professional_id=uuid.uuid4(),
                 starts_at=starts_at,
                 ends_at=starts_at + timedelta(minutes=45),
@@ -161,3 +163,13 @@ def test_active_pathways_are_counted(db, client_as):
     body = client_as(Role.ADMIN).get("/api/v1/analytics/dashboard").json()
 
     assert body["active_pathways"] == 1
+
+
+def test_attendance_of_fewer_than_five_patients_is_hidden_however_many_appointments(db, client_as):
+    one_patient = uuid.uuid4()
+    add_appointments(db, AppointmentStatus.NO_SHOW, 6, patient_id=one_patient)
+
+    body = client_as(Role.ADMIN).get("/api/v1/analytics/dashboard").json()
+
+    assert body["attendance"]["no_show"] is None
+    assert body["attendance"]["no_show_rate"] is None

@@ -55,11 +55,16 @@ def _attendance(db: Session, now: datetime) -> Attendance:
     done = counts.get(AppointmentStatus.DONE, 0)
     no_show = counts.get(AppointmentStatus.NO_SHOW, 0)
     seen = done + no_show
+    # The group is the patients, not the appointments: five no-shows by one patient are
+    # still one patient.
+    patients = scheduling.count_patients_with_status(
+        db, since, now, {AppointmentStatus.DONE, AppointmentStatus.NO_SHOW}
+    )
     return Attendance(
         since=since.date(),
-        done=_count(seen, done),
-        no_show=_count(seen, no_show),
-        no_show_rate=_shown(seen, no_show / seen * 100 if seen else None),
+        done=_count(patients, done),
+        no_show=_count(patients, no_show),
+        no_show_rate=_shown(patients, no_show / seen * 100 if seen else None),
     )
 
 

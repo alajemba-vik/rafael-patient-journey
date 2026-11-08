@@ -21,7 +21,7 @@ export function PatientHomePage() {
 
   return (
     <>
-      <PageHeader title="Accueil" />
+      <PageHeader title="Mon espace" />
       {firstName && <p className="rf-lead">Bonjour {firstName}.</p>}
 
       <div className="rf-grid">

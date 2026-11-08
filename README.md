@@ -1,6 +1,6 @@
 # Rafaël Patient Journey
 
-Digital patient journey and management platform for Institut Rafaël and Institut Hartmann: patient, professional, secretariat and admin interfaces on one shared backend.
+Digital patient journey and management platform for Institut Rafaël: patient, practitioner, coordinator, reception and admin interfaces on one shared backend. The brief plans shared use with Institut Hartmann; the code doesn't separate the two institutes yet.
 
 ```
 Browser → frontend (pages per role) → backend API /api/v1 → Postgres (Supabase)
@@ -24,7 +24,7 @@ uv run fastapi dev app/main.py # http://localhost:8000/docs
 
 Run checks: `uv run ruff format . && uv run ruff check . && uv run pytest`. Tests need no Supabase or `.env`.
 
-CI (`.github/workflows/ci.yml`) runs the same checks on every pull request, and also applies the migrations to a fresh Postgres and fails if `models.py` changed without a migration (`alembic check`).
+CI (`.github/workflows/ci.yml`) runs the same checks on every pull request into `main` and on every push to `main`. It also applies the migrations to a fresh Postgres and fails if `models.py` changed without a migration (`alembic check`).
 
 ## Run the frontend
 
@@ -36,7 +36,7 @@ npm install
 npm run dev                    # http://localhost:5173
 ```
 
-Checks: `npm run format:check && npm run lint && npm run typecheck && npm test`. After any backend API change, `npm run api:generate` refreshes the typed client. More in `frontend/README.md`.
+Checks: `npm run format:check && npm run lint && npm run typecheck && npm test && npm run build`, and `npm run e2e` when a journey changed. After any backend API change, `npm run api:generate` refreshes the typed client. More in `frontend/README.md`.
 
 ### Demo data
 
@@ -94,9 +94,11 @@ AGENTS.md               code guidelines and rules for people and AI agents
 | `scheduling` | appointments and their status | Victoria | book from free slots, move, cancel with a reason, team notes, double-booking blocked in the database |
 | `reception` | check-in, waiting room | Victoria | any day's board, arrivals, waiting and session times, no-shows, undo |
 | `questionnaires` | questionnaires and answers | Téo | monthly quality of life, end-of-pathway satisfaction, scores |
-| `analytics` | de-identified indicators | — | patient-experience dashboard |
+| `analytics` | de-identified indicators | no owner yet | patient-experience dashboard |
 | `faq` | FAQ content | Louis | public read, admin editing |
-| `notifications` | reminders, emails | — | files ready, not started |
+| `notifications` | reminders, emails | no owner yet | files ready, not started |
+
+**Database admin: Victoria** (migrations, Supabase, data rules in the database, demo data).
 
 ## Team rules
 
@@ -106,5 +108,5 @@ Full details are in [AGENTS.md](AGENTS.md).
 2. Rules and permission checks live in the backend service, never the frontend.
 3. Permissions combine **role + care relationship**, with tests for the denied cases.
 4. Reading or changing patient data is recorded with `audit.record`.
-5. Tables change only through Alembic migrations; Louis reviews them.
+5. Tables change only through Alembic migrations; the database admin (Victoria) reviews them.
 6. **Synthetic data only.** No real patient data until HDS-certified hosting, a DPIA (data protection impact assessment) and access rules are approved.

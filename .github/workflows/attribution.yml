@@ -1,0 +1,58 @@
+name: Attribution
+
+# Work is credited to people only (AGENTS.md, Git workflow): no AI co-author or "Generated
+# with" lines, whatever tool wrote the code. Checked in commit messages and in the PR title
+# and description, which become the squashed commit's message on main.
+on:
+  pull_request:
+    branches: [main]
+    # "edited": a description changed after opening is checked again.
+    types: [opened, edited, synchronize, reopened]
+  push:
+    branches: [main]
+
+concurrency:
+  group: attribution-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  # One list of tools for both kinds of line.
+  PATTERN: '^(co-authored-by:.*|.*generated (with|by) \[?)(claude|anthropic|copilot|cursor|codex|openai|chatgpt|gemini|devin|aider)'
+
+jobs:
+  no-ai-attribution:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Commit messages
+        env:
+          BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+          HEAD: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+        run: |
+          # A new branch pushed to main has no "before" commit: check the last commit only.
+          if [ -z "$BASE" ] || [ "$BASE" = "0000000000000000000000000000000000000000" ]; then
+            RANGE="-1 $HEAD"
+          else
+            RANGE="$BASE..$HEAD"
+          fi
+          if git log --format='%h %B' $RANGE | grep -inE "$PATTERN"; then
+            echo "::error::Remove AI attribution from these commit messages (AGENTS.md, Git workflow)."
+            exit 1
+          fi
+
+      - name: PR title and description
+        if: github.event_name == 'pull_request'
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+          BODY: ${{ github.event.pull_request.body }}
+        run: |
+          if printf '%s\n%s\n' "$TITLE" "$BODY" | grep -inE "$PATTERN"; then
+            echo "::error::Remove AI attribution from the PR title or description (AGENTS.md, Git workflow)."
+            exit 1
+          fi

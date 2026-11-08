@@ -1,1 +1,4 @@
-"""Appointments, availability, group workshops with capacity. Owner: Victoria. Not started."""
+"""Appointments: booking from free slots, moves, cancellations, notes, status rules.
+
+Owner: Victoria.
+"""

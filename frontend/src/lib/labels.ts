@@ -15,12 +15,13 @@ export const DIMENSIONS = [
   ["socio_professional", "Socio-professionnel"],
 ] as const;
 
+/** What each role's people are called. The `secretary` role is the reception desk. */
 export const ROLE_LABELS: Record<Schemas["Role"], string> = {
   patient: "Patient·e",
-  secretary: "Accueil",
+  secretary: "Chargé·e d’accueil",
   professional: "Praticien·ne",
-  coordinator: "Coordination",
-  admin: "Administration",
+  coordinator: "Coordinateur·rice",
+  admin: "Administrateur·rice",
 };
 
 export const STATUS_LABELS: Record<Schemas["AppointmentStatus"], string> = {

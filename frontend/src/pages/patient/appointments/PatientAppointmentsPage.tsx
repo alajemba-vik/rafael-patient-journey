@@ -9,13 +9,18 @@ export function PatientAppointmentsPage() {
 
   return (
     <>
-      <PageHeader title="Vos rendez-vous" />
+      <PageHeader title="Mes rendez-vous" />
       <QueryState
         query={appointments}
         empty={{
           isEmpty: (list) => list.length === 0,
           title: "Aucun rendez-vous prévu.",
-          children: <p>Votre coordinatrice ou coordinateur organise vos rendez-vous avec vous.</p>,
+          children: (
+            <p>
+              Votre coordinatrice ou coordinateur fixe vos premiers rendez-vous ; ensuite, vous convenez des suivants
+              avec vos praticiens ou avec l’accueil.
+            </p>
+          ),
         }}
       >
         {(list) => (
