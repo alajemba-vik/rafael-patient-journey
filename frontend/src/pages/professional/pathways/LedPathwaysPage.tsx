@@ -2,10 +2,10 @@ import { Link } from "react-router";
 
 import { useLedPathways } from "../../../api/pathways";
 import { QueryState } from "../../../components/feedback/QueryState";
-import { formatDate } from "../../../components/format";
-import { MILESTONE_LABELS } from "../../../components/labels";
+import { formatDate } from "../../../lib/format";
+import { MILESTONE_LABELS } from "../../../lib/labels";
 import { PageHeader } from "../../../components/layout/PageHeader";
-import { instituteToday } from "../../../components/time";
+import { instituteToday } from "../../../lib/time";
 import { paths } from "../../../app/paths";
 
 export function LedPathwaysPage() {

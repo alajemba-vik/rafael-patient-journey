@@ -27,8 +27,8 @@ Point it at another API with `VITE_API_URL=https://… npm run dev`. A deployed 
 - Every page starts with `PageHeader` (title and browser tab) and shows its data through `QueryState`, which gives it the loading, empty, error and "not allowed" states for free.
 - Page addresses live in `src/app/paths.ts` only: routes, menus and links all use it. Never type a path in a page.
 - Which buttons a role sees is decided in `usePermissions` (`src/api/identity_access.ts`) only. The API still decides and enforces every permission.
-- Dates and times entered or compared go through `src/components/time.ts`, which uses the Institute's clock (Paris), whatever the browser's time zone.
-- UI text is in French, written where it's used; repeated vocabulary (statuses, roles, milestones) lives in `src/components/labels.ts`. Code and comments are in English.
+- Dates and times entered or compared go through `src/lib/time.ts`, which uses the Institute's clock (Paris), whatever the browser's time zone.
+- UI text is in French, written where it's used; repeated vocabulary (statuses, roles, milestones) lives in `src/lib/labels.ts`. Code and comments are in English.
 - Synthetic data only.
 
 ## Layout
@@ -42,6 +42,8 @@ src/
   theme/                   design tokens and shared styles
   api/                     data hooks, one file per backend module (same names)
     core/                  generated API types (schema.d.ts), HTTP client, session, query cache
+  lib/                     non-UI helpers: formatting, Paris time, French labels
+    hooks/                 shared React hooks (clock, debounce, page title)
   components/
     layout/                app shell, header, login guard
     forms/                 inputs, buttons, booking form
@@ -78,10 +80,10 @@ URLs are per role), and most pages draw on several modules, so this table is the
 
 ## Ownership
 
-| Folder                                    | Owner                                                |
-| ----------------------------------------- | ---------------------------------------------------- |
-| `src/pages/patient/`                      | Téo                                                  |
-| `src/pages/professional/`                 | Hugo                                                 |
-| `src/pages/secretariat/`                  | Victoria                                             |
-| `src/pages/admin/`, `src/pages/public/`   | Louis                                                |
-| `src/components/`, `src/api/`, `src/app/` | shared: changes need one reviewer from another owner |
+| Folder                                                | Owner                                                |
+| ----------------------------------------------------- | ---------------------------------------------------- |
+| `src/pages/patient/`                                  | Téo                                                  |
+| `src/pages/professional/`                             | Hugo                                                 |
+| `src/pages/secretariat/`                              | Victoria                                             |
+| `src/pages/admin/`, `src/pages/public/`               | Louis                                                |
+| `src/components/`, `src/lib/`, `src/api/`, `src/app/` | shared: changes need one reviewer from another owner |

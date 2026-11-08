@@ -12,8 +12,8 @@ import {
 import { Button } from "../forms/Button";
 import { TextArea } from "../forms/TextArea";
 import { TextField } from "../forms/TextField";
-import { CANCEL_REASON_LABELS } from "../labels";
-import { instituteClock, instituteDate, instituteDateTime, instituteToday, minutesBetween } from "../time";
+import { CANCEL_REASON_LABELS } from "../../lib/labels";
+import { instituteClock, instituteDate, instituteDateTime, instituteToday, minutesBetween } from "../../lib/time";
 import { SlotPicker } from "./SlotPicker";
 
 type Panel = "move" | "cancel" | "note";

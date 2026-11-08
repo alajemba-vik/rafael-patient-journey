@@ -1,6 +1,6 @@
 import { Button } from "../../../components/forms/Button";
 import { TextField } from "../../../components/forms/TextField";
-import { addDays } from "../../../components/time";
+import { addDays } from "../../../lib/time";
 
 // The agenda's range, as the API accepts it.
 const FIRST_DAY = "2000-01-01";

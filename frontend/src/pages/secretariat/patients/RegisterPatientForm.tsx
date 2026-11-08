@@ -5,8 +5,8 @@ import { ApiError } from "../../../api/core/client";
 import { usePatients, useRegisterPatient } from "../../../api/patients";
 import { Button } from "../../../components/forms/Button";
 import { TextField } from "../../../components/forms/TextField";
-import { formatDate } from "../../../components/format";
-import { instituteToday } from "../../../components/time";
+import { formatDate } from "../../../lib/format";
+import { instituteToday } from "../../../lib/time";
 import { paths } from "../../../app/paths";
 
 const EMPTY = { first_name: "", last_name: "", birth_date: "", email: "", phone: "" };

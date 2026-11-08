@@ -5,7 +5,7 @@ import { useMyPathways } from "../../../api/pathways";
 import { useDueQuestionnaires, useMyScores } from "../../../api/questionnaires";
 import { useMyAppointments } from "../../../api/scheduling";
 import { QueryState } from "../../../components/feedback/QueryState";
-import { formatChange, formatDate, formatNumber, formatTime, formatWeekday } from "../../../components/format";
+import { formatChange, formatDate, formatNumber, formatTime, formatWeekday } from "../../../lib/format";
 import { PageHeader } from "../../../components/layout/PageHeader";
 import { paths } from "../../../app/paths";
 

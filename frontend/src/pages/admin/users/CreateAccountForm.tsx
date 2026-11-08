@@ -6,7 +6,7 @@ import { usePatients } from "../../../api/patients";
 import { Button } from "../../../components/forms/Button";
 import { SelectField } from "../../../components/forms/SelectField";
 import { TextField } from "../../../components/forms/TextField";
-import { ROLE_LABELS } from "../../../components/labels";
+import { ROLE_LABELS } from "../../../lib/labels";
 
 type Role = AccountCreate["role"];
 const ROLES: Role[] = ["patient", "secretary", "professional", "coordinator", "admin"];
