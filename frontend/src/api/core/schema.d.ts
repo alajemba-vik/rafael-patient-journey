@@ -11,7 +11,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Health */
+        /**
+         * Health
+         * @description For the host and uptime checks: up only if the database answers too.
+         */
         get: operations["health_api_v1_health_get"];
         put?: never;
         post?: never;
@@ -1609,6 +1612,13 @@ export interface operations {
                         [key: string]: string;
                     };
                 };
+            };
+            /** @description The API is up but can't reach the database */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
