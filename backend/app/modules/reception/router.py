@@ -1,4 +1,5 @@
 import uuid
+from datetime import date
 
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
@@ -17,6 +18,16 @@ def list_today(
     user: CurrentUser = Depends(get_current_user), db: Session = Depends(get_db)
 ) -> list[AppointmentOut]:
     return service.list_today(db, user)
+
+
+@router.get("/day")
+def list_day(
+    day: date | None = None,
+    user: CurrentUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> list[AppointmentOut]:
+    """A day's board, cancelled appointments included. Defaults to today at the Institute."""
+    return service.list_day(db, user, day)
 
 
 @router.post("/appointments/{appointment_id}/status")

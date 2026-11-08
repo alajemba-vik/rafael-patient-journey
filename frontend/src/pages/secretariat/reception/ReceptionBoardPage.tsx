@@ -19,6 +19,7 @@ const ACTIONS: Record<BoardStatus, { status: BoardStatus; label: string; primary
     { status: "done", label: "Terminé" },
     { status: "scheduled", label: "Annuler l’arrivée" },
   ],
+  in_session: [{ status: "done", label: "Terminer" }],
   no_show: [{ status: "scheduled", label: "Annuler l’absence" }],
   done: [],
   cancelled: [],

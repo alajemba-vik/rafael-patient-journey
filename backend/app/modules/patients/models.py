@@ -1,7 +1,7 @@
 import uuid
 from datetime import date
 
-from sqlalchemy import Date, String, Text, Uuid
+from sqlalchemy import CheckConstraint, Date, String, Text, Uuid
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db import Base
@@ -9,6 +9,9 @@ from app.db import Base
 
 class Patient(Base):
     __tablename__ = "patients"
+    __table_args__ = (
+        CheckConstraint("birth_date >= '1900-01-01'", name="ck_patients_birth_date_after_1900"),
+    )
 
     id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
     # The patient's own login account, if they have one.

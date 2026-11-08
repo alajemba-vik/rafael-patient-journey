@@ -20,7 +20,7 @@ export function RegisterPatientForm() {
   function submit(event: FormEvent) {
     event.preventDefault();
     register.mutate(
-      { ...fields, email: fields.email || null, phone: fields.phone || null },
+      { ...fields, email: fields.email || null, phone: fields.phone || null, allow_duplicate: false },
       { onSuccess: (patient) => navigate(paths.reception.patient(patient.id)) },
     );
   }
