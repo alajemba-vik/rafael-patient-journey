@@ -533,6 +533,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/reception/day": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Day
+         * @description A day's board, cancelled appointments included. Defaults to today at the Institute.
+         */
+        get: operations["list_day_api_v1_reception_day_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/reception/appointments/{appointment_id}/status": {
         parameters: {
             query?: never;
@@ -567,6 +587,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/scheduling/appointments/{appointment_id}/reschedule": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reschedule Appointment */
+        post: operations["reschedule_appointment_api_v1_scheduling_appointments__appointment_id__reschedule_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/scheduling/appointments/{appointment_id}/cancel": {
         parameters: {
             query?: never;
@@ -576,12 +613,32 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Cancel Appointment */
+        /**
+         * Cancel Appointment
+         * @description The reason is optional; without one it is recorded as "other".
+         */
         post: operations["cancel_appointment_api_v1_scheduling_appointments__appointment_id__cancel_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/api/v1/scheduling/appointments/{appointment_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Appointment */
+        patch: operations["update_appointment_api_v1_scheduling_appointments__appointment_id__patch"];
         trace?: never;
     };
     "/api/v1/scheduling/appointments/mine": {
@@ -621,12 +678,44 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/scheduling/professionals/{professional_id}/availability": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Availability */
+        get: operations["get_availability_api_v1_scheduling_professionals__professional_id__availability_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AppointmentCancel */
+        AppointmentCancel: {
+            /** @default other */
+            reason: components["schemas"]["CancelReason"];
+        };
         /** AppointmentCreate */
         AppointmentCreate: {
+            /**
+             * Starts At
+             * Format: date-time
+             */
+            starts_at: string;
+            /**
+             * Ends At
+             * Format: date-time
+             */
+            ends_at: string;
             /**
              * Patient Id
              * Format: uuid
@@ -638,15 +727,10 @@ export interface components {
              */
             professional_id: string;
             /**
-             * Starts At
-             * Format: date-time
+             * Note
+             * @default
              */
-            starts_at: string;
-            /**
-             * Ends At
-             * Format: date-time
-             */
-            ends_at: string;
+            note: string;
         };
         /**
          * AppointmentOut
@@ -683,13 +767,44 @@ export interface components {
              */
             ends_at: string;
             status: components["schemas"]["AppointmentStatus"];
+            /** Arrived At */
+            arrived_at?: string | null;
+            /** Called In At */
+            called_in_at?: string | null;
+            cancel_reason?: components["schemas"]["CancelReason"] | null;
+            /** Note */
+            note?: string | null;
+        };
+        /**
+         * AppointmentReschedule
+         * @description A new time with the same practitioner, e.g. when the patient phones to move it.
+         */
+        AppointmentReschedule: {
+            /**
+             * Starts At
+             * Format: date-time
+             */
+            starts_at: string;
+            /**
+             * Ends At
+             * Format: date-time
+             */
+            ends_at: string;
         };
         /**
          * AppointmentStatus
          * @description The one lifecycle every module reads: reception moves it, analytics counts it.
          * @enum {string}
          */
-        AppointmentStatus: "scheduled" | "arrived" | "done" | "no_show" | "cancelled";
+        AppointmentStatus: "scheduled" | "arrived" | "in_session" | "done" | "no_show" | "cancelled";
+        /**
+         * AppointmentUpdate
+         * @description The staff note on an appointment. An empty string clears it.
+         */
+        AppointmentUpdate: {
+            /** Note */
+            note: string;
+        };
         /** AssignmentCreate */
         AssignmentCreate: {
             /**
@@ -735,6 +850,34 @@ export interface components {
             /** No Show Rate */
             no_show_rate: number | null;
         };
+        /**
+         * Availability
+         * @description One practitioner's day: when they are taken, and where a session of the asked length fits.
+         *
+         *     Busy slots carry no patient names, so anyone booking sees only what booking needs.
+         */
+        Availability: {
+            /**
+             * Day
+             * Format: date
+             */
+            day: string;
+            /**
+             * Minutes
+             * @description Length of the session the free slots were computed for
+             */
+            minutes: number;
+            /** Busy */
+            busy: components["schemas"]["TimeSlot"][];
+            /** Free */
+            free: components["schemas"]["TimeSlot"][];
+        };
+        /**
+         * CancelReason
+         * @description Why an appointment was cancelled: tells patient no-notice absences from schedule changes.
+         * @enum {string}
+         */
+        CancelReason: "patient_request" | "practitioner_unavailable" | "other";
         /** CareTeamMember */
         CareTeamMember: {
             /**
@@ -1136,6 +1279,11 @@ export interface components {
             phone?: string | null;
             /** User Id */
             user_id?: string | null;
+            /**
+             * Allow Duplicate
+             * @default false
+             */
+            allow_duplicate: boolean;
         };
         /**
          * PatientDetail
@@ -1223,9 +1371,16 @@ export interface components {
         };
         /**
          * PatientUpdate
-         * @description Contact details, or the patient's login once an admin has created it. All optional.
+         * @description Corrections to the administrative record, or the patient's login once an admin has
+         *     created it. Only the fields sent change.
          */
         PatientUpdate: {
+            /** First Name */
+            first_name?: string | null;
+            /** Last Name */
+            last_name?: string | null;
+            /** Birth Date */
+            birth_date?: string | null;
             /** Email */
             email?: string | null;
             /** Phone */
@@ -1339,7 +1494,7 @@ export interface components {
         };
         /**
          * StatusChange
-         * @description arrived, no_show, done, or back to scheduled to undo a mistake.
+         * @description arrived, in_session, done, no_show, or one step back to undo a mistake.
          */
         StatusChange: {
             status: components["schemas"]["AppointmentStatus"];
@@ -1366,6 +1521,19 @@ export interface components {
             name: string;
             /** Intensity */
             intensity: number;
+        };
+        /** TimeSlot */
+        TimeSlot: {
+            /**
+             * Starts At
+             * Format: date-time
+             */
+            starts_at: string;
+            /**
+             * Ends At
+             * Format: date-time
+             */
+            ends_at: string;
         };
         /**
          * UserCreate
@@ -2450,6 +2618,37 @@ export interface operations {
             };
         };
     };
+    list_day_api_v1_reception_day_get: {
+        parameters: {
+            query?: {
+                day?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AppointmentOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     change_status_api_v1_reception_appointments__appointment_id__status_post: {
         parameters: {
             query?: never;
@@ -2518,6 +2717,41 @@ export interface operations {
             };
         };
     };
+    reschedule_appointment_api_v1_scheduling_appointments__appointment_id__reschedule_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                appointment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AppointmentReschedule"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AppointmentOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     cancel_appointment_api_v1_scheduling_appointments__appointment_id__cancel_post: {
         parameters: {
             query?: never;
@@ -2527,7 +2761,46 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["AppointmentCancel"] | null;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AppointmentOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_appointment_api_v1_scheduling_appointments__appointment_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                appointment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AppointmentUpdate"];
+            };
+        };
         responses: {
             /** @description Successful Response */
             200: {
@@ -2599,6 +2872,42 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AppointmentOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_availability_api_v1_scheduling_professionals__professional_id__availability_get: {
+        parameters: {
+            query: {
+                day: string;
+                minutes?: number;
+                patient_id?: string | null;
+                ignore_id?: string | null;
+            };
+            header?: never;
+            path: {
+                professional_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Availability"];
                 };
             };
             /** @description Validation Error */

@@ -6,6 +6,6 @@ from app.modules.scheduling.service import AppointmentStatus
 
 
 class StatusChange(BaseModel):
-    """arrived, no_show, done, or back to scheduled to undo a mistake."""
+    """arrived, in_session, done, no_show, or one step back to undo a mistake."""
 
     status: AppointmentStatus

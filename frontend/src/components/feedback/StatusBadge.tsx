@@ -5,6 +5,7 @@ type Status = Schemas["AppointmentStatus"];
 const LABELS: Record<Status, string> = {
   scheduled: "Prévu",
   arrived: "Arrivé·e",
+  in_session: "En séance",
   done: "Terminé",
   no_show: "Absent·e",
   cancelled: "Annulé",

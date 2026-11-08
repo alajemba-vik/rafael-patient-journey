@@ -11,8 +11,8 @@ from sqlalchemy.orm import Session
 from app.audit import AuditEvent
 from app.modules.identity_access.service import Role
 from app.modules.patients.models import Patient
-from app.modules.reception.service import day_window
 from app.modules.scheduling.models import Appointment, AppointmentStatus
+from app.modules.scheduling.service import day_window
 
 OTHER_ROLES = [Role.PATIENT, Role.PROFESSIONAL, Role.COORDINATOR, Role.ADMIN]
 
@@ -135,3 +135,146 @@ def test_the_day_runs_from_local_midnight_to_local_midnight(day, hours):
     assert start.astimezone(PARIS).hour == 0
     assert end.astimezone(PARIS).hour == 0
     assert end - start == timedelta(hours=hours)
+
+
+# --- any day's board ------------------------------------------------------
+
+
+def test_secretary_sees_a_days_board_with_cancelled_appointments(db, client_as):
+    tomorrow = datetime.now(PARIS).date() + timedelta(days=1)
+    noon = datetime.combine(tomorrow, datetime.min.time(), tzinfo=PARIS) + timedelta(hours=12)
+    kept = add_appointment(db, noon.astimezone(UTC))
+    cancelled = add_appointment(db, noon.astimezone(UTC), AppointmentStatus.CANCELLED)
+    add_appointment(db, datetime.now(UTC))
+
+    response = client_as(Role.SECRETARY).get(
+        "/api/v1/reception/day", params={"day": tomorrow.isoformat()}
+    )
+
+    assert {a["id"] for a in response.json()} == {str(kept.id), str(cancelled.id)}
+    assert audit_actions(db) == ["reception.read", "reception.read"]
+
+
+def test_the_days_board_defaults_to_today(db, client_as):
+    today = add_appointment(db, datetime.now(UTC))
+
+    body = client_as(Role.SECRETARY).get("/api/v1/reception/day").json()
+
+    assert [a["id"] for a in body] == [str(today.id)]
+
+
+@pytest.mark.parametrize("role", OTHER_ROLES)
+def test_other_roles_cannot_see_a_days_board(db, client_as, role):
+    response = client_as(role).get("/api/v1/reception/day")
+
+    assert response.status_code == 403
+    assert audit_actions(db) == ["reception.denied"]
+
+
+# --- the waiting room -----------------------------------------------------
+
+
+def test_the_waiting_room_records_arrival_and_call_in_times(db, client_as):
+    appointment = add_appointment(db, datetime.now(UTC))
+    client = client_as(Role.SECRETARY)
+    url = f"/api/v1/reception/appointments/{appointment.id}/status"
+
+    arrived = client.post(url, json={"status": "arrived"}).json()
+    called_in = client.post(url, json={"status": "in_session"}).json()
+    done = client.post(url, json={"status": "done"}).json()
+
+    assert arrived["arrived_at"] is not None and arrived["called_in_at"] is None
+    assert called_in["status"] == "in_session"
+    assert called_in["called_in_at"] is not None
+    assert called_in["arrived_at"] == arrived["arrived_at"]
+    assert done["status"] == "done"
+    assert audit_actions(db) == [
+        "appointment.arrived",
+        "appointment.in_session",
+        "appointment.done",
+    ]
+
+
+def test_sending_a_patient_back_to_the_waiting_room_keeps_their_arrival_time(db, client_as):
+    appointment = add_appointment(db, datetime.now(UTC))
+    client = client_as(Role.SECRETARY)
+    url = f"/api/v1/reception/appointments/{appointment.id}/status"
+    arrived = client.post(url, json={"status": "arrived"}).json()
+    client.post(url, json={"status": "in_session"})
+
+    back = client.post(url, json={"status": "arrived"}).json()
+
+    assert back["status"] == "arrived"
+    assert back["arrived_at"] == arrived["arrived_at"]
+    assert back["called_in_at"] is None
+
+
+def test_undoing_an_arrival_clears_the_waiting_room_times(db, client_as):
+    appointment = add_appointment(db, datetime.now(UTC))
+    client = client_as(Role.SECRETARY)
+    url = f"/api/v1/reception/appointments/{appointment.id}/status"
+    client.post(url, json={"status": "arrived"})
+
+    undone = client.post(url, json={"status": "scheduled"}).json()
+
+    assert undone["status"] == "scheduled"
+    assert undone["arrived_at"] is None
+
+
+def test_a_patient_must_be_in_the_waiting_room_before_being_called_in(db, client_as):
+    appointment = add_appointment(db, datetime.now(UTC))
+
+    response = client_as(Role.SECRETARY).post(
+        f"/api/v1/reception/appointments/{appointment.id}/status", json={"status": "in_session"}
+    )
+
+    assert response.status_code == 409
+
+
+def test_nothing_is_recorded_for_a_later_day(db, client_as):
+    appointment = add_appointment(db, datetime.now(UTC) + timedelta(days=2))
+
+    response = client_as(Role.SECRETARY).post(
+        f"/api/v1/reception/appointments/{appointment.id}/status", json={"status": "arrived"}
+    )
+
+    assert response.status_code == 409
+
+
+def test_a_forgotten_no_show_can_be_recorded_the_next_day(db, client_as):
+    appointment = add_appointment(db, datetime.now(UTC) - timedelta(days=1))
+
+    response = client_as(Role.SECRETARY).post(
+        f"/api/v1/reception/appointments/{appointment.id}/status", json={"status": "no_show"}
+    )
+
+    assert response.json()["status"] == "no_show"
+
+
+def test_a_forgotten_session_is_closed_as_done_the_next_day(db, client_as):
+    appointment = add_appointment(db, datetime.now(UTC) - timedelta(days=1))
+
+    body = (
+        client_as(Role.SECRETARY)
+        .post(f"/api/v1/reception/appointments/{appointment.id}/status", json={"status": "done"})
+        .json()
+    )
+
+    assert body["status"] == "done"
+    assert body["arrived_at"] is None
+
+
+def test_a_past_day_cannot_record_an_arrival(db, client_as):
+    appointment = add_appointment(db, datetime.now(UTC) - timedelta(days=1))
+
+    response = client_as(Role.SECRETARY).post(
+        f"/api/v1/reception/appointments/{appointment.id}/status", json={"status": "arrived"}
+    )
+
+    assert response.status_code == 409
+
+
+def test_a_board_for_a_day_outside_the_agenda_is_refused(db, client_as):
+    response = client_as(Role.SECRETARY).get("/api/v1/reception/day", params={"day": "0001-01-01"})
+
+    assert response.status_code == 400

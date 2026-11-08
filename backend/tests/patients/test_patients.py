@@ -4,7 +4,7 @@ import uuid
 from datetime import date
 
 import pytest
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.audit import AuditEvent
@@ -231,7 +231,8 @@ def test_admin_links_a_login_and_updates_contact_details(db, client_as):
 
     assert response.status_code == 200
     assert response.json()["has_account"] is True
-    assert response.json()["phone"] == "01 00 00 00 00"
+    # Stored without spaces, so a phone search finds it however it was typed.
+    assert response.json()["phone"] == "0100000000"
     assert db.scalar(select(AuditEvent.action).where(AuditEvent.action == "patient.update"))
 
 
@@ -250,7 +251,132 @@ def test_staff_login_cannot_be_linked_on_update(db, client_as):
 def test_care_roles_and_patients_cannot_update_and_it_is_audited(db, client_as, role):
     patient = add_patient(db)
 
-    response = client_as(role).patch(f"/api/v1/patients/{patient.id}", json={"phone": "x"})
+    response = client_as(role).patch(f"/api/v1/patients/{patient.id}", json={"phone": "0100000000"})
 
     assert response.status_code == 403
     assert db.scalar(select(AuditEvent.action)) == "patient.update.denied"
+
+
+# --- registration safeguards ----------------------------------------------
+
+
+def test_registering_the_same_person_twice_is_refused(db, client_as):
+    client = client_as(Role.SECRETARY)
+    client.post("/api/v1/patients", json=NEW_PATIENT)
+
+    same_person = {**NEW_PATIENT, "first_name": " camille ", "last_name": "TEST"}
+    response = client.post("/api/v1/patients", json=same_person)
+
+    assert response.status_code == 409
+    assert db.scalar(select(func.count()).select_from(Patient)) == 1
+
+
+def test_a_namesake_can_be_registered_once_reception_has_checked(db, client_as):
+    client = client_as(Role.SECRETARY)
+    client.post("/api/v1/patients", json=NEW_PATIENT)
+
+    response = client.post("/api/v1/patients", json={**NEW_PATIENT, "allow_duplicate": True})
+
+    assert response.status_code == 201
+
+
+@pytest.mark.parametrize("birth_date", ["1899-12-31", "2999-01-01"])
+def test_impossible_birth_dates_are_refused(db, client_as, birth_date):
+    response = client_as(Role.SECRETARY).post(
+        "/api/v1/patients", json={**NEW_PATIENT, "birth_date": birth_date}
+    )
+
+    assert response.status_code == 422
+
+
+@pytest.mark.parametrize("phone", ["12", "call me", "0" * 16])
+def test_impossible_phone_numbers_are_refused(db, client_as, phone):
+    response = client_as(Role.SECRETARY).post(
+        "/api/v1/patients", json={**NEW_PATIENT, "phone": phone}
+    )
+
+    assert response.status_code == 422
+
+
+@pytest.mark.parametrize(
+    ("typed", "stored"),
+    [
+        ("06 12 34 56 78", "0612345678"),
+        ("+33 6.12.34.56.78", "0612345678"),
+        ("0033 6 12 34 56 78", "0612345678"),
+        ("+41 22 123 45 67", "+41221234567"),
+        ("", None),
+    ],
+)
+def test_phone_numbers_are_stored_in_one_form(db, client_as, typed, stored):
+    response = client_as(Role.SECRETARY).post(
+        "/api/v1/patients", json={**NEW_PATIENT, "phone": typed}
+    )
+
+    assert response.json()["phone"] == stored
+
+
+def test_reception_finds_a_caller_by_part_of_their_phone_number(db, client_as):
+    client = client_as(Role.SECRETARY)
+    client.post("/api/v1/patients", json={**NEW_PATIENT, "phone": "06 12 34 56 78"})
+    add_patient(db)
+
+    by_digits = client.get("/api/v1/patients", params={"search": "34 56"}).json()
+    by_name = client.get("/api/v1/patients", params={"search": "Cam"}).json()
+
+    assert [p["first_name"] for p in by_digits] == ["Camille"]
+    assert [p["first_name"] for p in by_name] == ["Camille"]
+
+
+def test_reception_corrects_a_misspelt_name_and_birth_date(db, client_as):
+    patient = add_patient(db)
+
+    response = client_as(Role.SECRETARY).patch(
+        f"/api/v1/patients/{patient.id}",
+        json={"last_name": "Synthétique", "birth_date": "1975-05-06"},
+    )
+
+    assert response.json()["last_name"] == "Synthétique"
+    assert response.json()["birth_date"] == "1975-05-06"
+    assert response.json()["first_name"] == "Alex"
+
+
+def test_a_name_cannot_be_erased(db, client_as):
+    patient = add_patient(db)
+
+    response = client_as(Role.SECRETARY).patch(
+        f"/api/v1/patients/{patient.id}", json={"last_name": None, "phone": None}
+    )
+
+    assert response.json()["last_name"] == "Synthetic"
+    assert response.json()["phone"] is None
+
+
+@pytest.mark.parametrize("search", ["06 12", "+33 6 12", "0033612"])
+def test_a_french_number_is_found_however_it_is_typed(db, client_as, search):
+    client = client_as(Role.SECRETARY)
+    client.post("/api/v1/patients", json={**NEW_PATIENT, "phone": "+33 6 12 34 56 78"})
+
+    body = client.get("/api/v1/patients", params={"search": search}).json()
+
+    assert [p["phone"] for p in body] == ["0612345678"]
+
+
+def test_a_namesake_is_caught_whatever_the_accents_and_case(db, client_as):
+    client = client_as(Role.SECRETARY)
+    client.post("/api/v1/patients", json={**NEW_PATIENT, "first_name": "Élodie"})
+
+    response = client.post("/api/v1/patients", json={**NEW_PATIENT, "first_name": "ELODIE"})
+
+    assert response.status_code == 409
+
+
+def test_sending_no_login_unlinks_the_patients_account(db, client_as):
+    account = add_account(db, Role.PATIENT)
+    patient = add_patient(db, user_id=account.id)
+
+    response = client_as(Role.SECRETARY).patch(
+        f"/api/v1/patients/{patient.id}", json={"user_id": None}
+    )
+
+    assert response.json()["user_id"] is None

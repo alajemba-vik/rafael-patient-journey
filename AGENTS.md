@@ -105,6 +105,9 @@ uv run alembic upgrade head
 
 New modules need no registration: any `app/modules/<name>/models.py` is picked up automatically. Louis reviews every migration.
 
+- **A migration that creates a table also enables row-level security on it** (`op.execute("ALTER TABLE <name> ENABLE ROW LEVEL SECURITY")`, inside `if op.get_bind().dialect.name == "postgresql":` so tests on SQLite still run). Migration `9c41d2e7f0ab` turned it on for every table that existed then. Supabase exposes every `public` table through its own REST API; with RLS on and no policies, that door is closed and only our backend (the table owner) can read the table.
+- Rules the data must always follow (no overlapping appointments, valid statuses) go in the database as constraints too, not only in `service.py`: two requests at the same moment can both pass a check in Python.
+
 ## Frontend style (framework-neutral)
 
 - One folder per page under `pages/<role>/`. Shared pieces go in `components/` once two pages use them.
