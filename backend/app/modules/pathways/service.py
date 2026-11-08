@@ -46,7 +46,7 @@ CARE_ROLES = {Role.PROFESSIONAL, Role.COORDINATOR}
 # Every practitioner in the patient's care team sees all the scores.
 MILESTONE_ORDER = [MilestoneKind.INTAKE, MilestoneKind.REVIEW, MilestoneKind.FINAL]
 DIMENSIONS = ("physical", "psychological", "emotional", "sexual", "socio_professional")
-# As published by the Institute: a review around 3 months and a final review around 6.
+# As described by the coordinators: a review around 3 months and a final review around 6.
 DUE_AFTER_OPENING = {
     MilestoneKind.INTAKE: timedelta(0),
     MilestoneKind.REVIEW: timedelta(days=91),

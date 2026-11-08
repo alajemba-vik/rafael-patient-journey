@@ -23,16 +23,14 @@ dist/
 *.db
 *.sqlite3
 
-# Node (if the frontend uses it)
+# Node
 node_modules/
 .next/
 .vite/
 coverage/
 
-# Editors, AI tools and OS (personal settings, paths from one machine)
-# AI tool folders: personal, except the team's shared Claude Code settings.
-.claude/*
-!.claude/settings.json
+# Editors, AI tools and OS: personal settings, with paths from one machine
+.claude/
 .vscode/
 .idea/
 *.swp

@@ -10,7 +10,7 @@ export function PatientPathwayPage() {
 
   return (
     <div className="rf-narrow">
-      <PageHeader title="Votre parcours" />
+      <PageHeader title="Mon parcours" />
       <QueryState
         query={pathways}
         empty={{

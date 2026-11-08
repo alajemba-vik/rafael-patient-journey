@@ -9,7 +9,7 @@ export function NotFoundPage() {
       <PageHeader title="Page introuvable" />
       <p>Cette adresse ne correspond à aucune page.</p>
       <Link to={paths.home} className="rf-btn">
-        Retour à l’accueil
+        Retour à ma page de départ
       </Link>
     </div>
   );

@@ -8,8 +8,8 @@ const FAQ: NavItem = { to: paths.faq, label: "Questions fréquentes" };
 /** Menu per role. */
 export const NAV_BY_ROLE: Record<Role, NavItem[]> = {
   patient: [
-    { to: paths.patient.home, label: "Accueil" },
-    { to: paths.patient.appointments, label: "Rendez-vous" },
+    { to: paths.patient.home, label: "Mon espace" },
+    { to: paths.patient.appointments, label: "Mes rendez-vous" },
     { to: paths.patient.pathway, label: "Mon parcours" },
     { to: paths.patient.questionnaires, label: "Questionnaires" },
     FAQ,
@@ -23,13 +23,15 @@ export const NAV_BY_ROLE: Record<Role, NavItem[]> = {
     { to: paths.pro.schedule, label: "Mon planning" },
     { to: paths.pro.patients, label: "Mes patients" },
     { to: paths.pro.dashboard, label: "Tableau de bord" },
+    FAQ,
   ],
   coordinator: [
     { to: paths.pro.schedule, label: "Mon planning" },
-    { to: paths.pro.patients, label: "Patients" },
+    { to: paths.pro.patients, label: "Mes patients" },
     { to: paths.pro.pathways, label: "Mes parcours" },
     { to: paths.pro.needs, label: "Besoins signalés" },
     { to: paths.pro.dashboard, label: "Tableau de bord" },
+    FAQ,
   ],
   admin: [
     { to: paths.admin.accounts, label: "Comptes" },

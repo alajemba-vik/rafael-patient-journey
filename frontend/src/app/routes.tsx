@@ -51,11 +51,11 @@ export const router = createBrowserRouter([
       {
         element: <RequireAuth roles={["secretary"]} />,
         children: [
-          page(paths.reception.board, () => import("../pages/secretariat/reception/ReceptionBoardPage")),
-          page(paths.reception.patients, () => import("../pages/secretariat/patients/ReceptionPatientsPage")),
+          page(paths.reception.board, () => import("../pages/reception/board/ReceptionBoardPage")),
+          page(paths.reception.patients, () => import("../pages/reception/patients/ReceptionPatientsPage")),
           page(
             paths.reception.patient(PATIENT_ID_PARAM),
-            () => import("../pages/secretariat/patients/ReceptionPatientPage"),
+            () => import("../pages/reception/patients/ReceptionPatientPage"),
           ),
         ],
       },

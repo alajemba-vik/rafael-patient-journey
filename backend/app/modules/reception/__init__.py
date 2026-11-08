@@ -1,1 +1,1 @@
-"""Check-in and waiting-room status. Owner: Victoria. Not started."""
+"""The reception board: each day's arrivals, waiting room and session times. Owner: Victoria."""

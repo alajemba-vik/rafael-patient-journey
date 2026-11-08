@@ -303,6 +303,18 @@ def count_by_status(db: Session, start: datetime, end: datetime) -> dict[Appoint
     return {status: count for status, count in db.execute(query)}
 
 
+def count_patients_with_status(
+    db: Session, start: datetime, end: datetime, statuses: set[AppointmentStatus]
+) -> int:
+    """For analytics: how many different patients had an appointment in these statuses."""
+    query = select(func.count(func.distinct(Appointment.patient_id))).where(
+        Appointment.starts_at >= start,
+        Appointment.starts_at < end,
+        Appointment.status.in_(statuses),
+    )
+    return db.scalar(query) or 0
+
+
 def institute_time_zone() -> ZoneInfo:
     return ZoneInfo(get_settings().institute_time_zone)
 

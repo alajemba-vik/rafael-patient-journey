@@ -38,7 +38,7 @@ from app.modules.questionnaires.schemas import (
 CARE_ROLES = {Role.PROFESSIONAL, Role.COORDINATOR}
 
 # Short questionnaires written by the team, not validated instruments. The Institute uses the
-# licensed EORTC QLQ-C30, whose questions can't be copied without EORTC's permission.
+# EORTC QLQ-C30, whose questions can't be copied without EORTC's permission.
 QUESTIONNAIRES = {
     Instrument.QUALITY_OF_LIFE: Questionnaire(
         instrument=Instrument.QUALITY_OF_LIFE,

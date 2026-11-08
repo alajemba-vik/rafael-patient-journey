@@ -6,6 +6,8 @@ Every person and number here is invented. Run from backend/:
     uv run python -m scripts.seed_demo --remove   # remove the demo data only
     uv run python -m scripts.seed_demo --attach me@example.org
 
+It asks before writing; `--yes` skips the question.
+
 What it creates, around today in the Institute's time zone:
 - 6 practitioners and 2 coordinators that can't log in (no identity-provider account), so
   their names appear in lists and agendas;
@@ -48,7 +50,7 @@ STAFF = [
     ("Inès Moreau", Role.COORDINATOR, "Coordination"),
     ("Paul Garnier", Role.COORDINATOR, "Coordination"),
     ("Claire Lemoine", Role.PROFESSIONAL, "Sophrologie"),
-    ("Hugo Bertin", Role.PROFESSIONAL, "Activité physique adaptée"),
+    ("Malo Bertin", Role.PROFESSIONAL, "Activité physique adaptée"),
     ("Nadia Rahmani", Role.PROFESSIONAL, "Psychologie"),
     ("Julie Faure", Role.PROFESSIONAL, "Naturopathie"),
     ("Marc Dubreuil", Role.PROFESSIONAL, "Yoga"),
@@ -184,8 +186,8 @@ def _add_patients(db: Session, rng: random.Random) -> list[Patient]:
             last_name=last_name,
             birth_date=date(rng.randint(1950, 1995), rng.randint(1, 12), rng.randint(1, 28)),
             email=f"{_slug(f'{first_name} {last_name}')}@{DEMO_DOMAIN}",
-            # 06 00 00 01 xx: inside a range no real subscriber is given.
-            phone=f"06000001{index:02d}",
+            # 06 39 98 xx xx: a range ARCEP keeps for films and fiction, never given to anyone.
+            phone=f"063998{index:04d}",
         )
         db.add(patient)
         patients.append(patient)

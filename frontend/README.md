@@ -13,11 +13,11 @@ npm run dev          # http://localhost:5173, calls the API set in .env.developm
 
 Point it at another API with `VITE_API_URL=https://… npm run dev`. A deployed build without `VITE_API_URL` calls the API on its own domain.
 
-| Command                                                             | Does                                                                                                                                                               |
-| ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `npm run api:generate`                                              | Regenerate `src/api/core/schema.d.ts` from the backend. Run it after any backend endpoint or schema change; CI fails if it's out of date.                          |
-| `npm run lint` · `npm run typecheck` · `npm test` · `npm run build` | The checks CI runs.                                                                                                                                                |
-| `npm run e2e`                                                       | Browser tests of whole journeys (`e2e/`), against the real API on a throwaway database. Starts both servers itself. First time: `npx playwright install chromium`. |
+| Command                                                                                      | Does                                                                                                                                                               |
+| -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `npm run api:generate`                                                                       | Regenerate `src/api/core/schema.d.ts` from the backend. Run it after any backend endpoint or schema change; CI fails if it's out of date.                          |
+| `npm run format:check` · `npm run lint` · `npm run typecheck` · `npm test` · `npm run build` | The checks CI runs (plus `api:generate` being up to date).                                                                                                         |
+| `npm run e2e`                                                                                | Browser tests of whole journeys (`e2e/`), against the real API on a throwaway database. Starts both servers itself. First time: `npx playwright install chromium`. |
 
 ## Rules
 
@@ -49,6 +49,7 @@ src/
   components/
     layout/                app shell, header, login guard
     forms/                 inputs, buttons, booking form
+    appointments/          move, cancel and annotate an appointment; free-slot picker
     tables/                shared tables (milestones)
     feedback/              loading, empty, error and "not allowed" states, status badge
     patient/               patient-file sections shared by portals (care team, appointments)
@@ -56,7 +57,7 @@ src/
     public/                login · faq · not_found
     patient/               home · appointments · pathway · questionnaires
     professional/          schedule · patients (list and file) · pathways · needs · dashboard
-    secretariat/           reception · patients
+    reception/             board (arrivals, waiting room) · patients
     admin/                 users · faq
 ```
 
@@ -67,18 +68,18 @@ One folder per page. A component used by one page lives in that page's folder; m
 Where to look on this side for each backend module. Pages are grouped by who uses them (the
 URLs are per role), and most pages draw on several modules, so this table is the map.
 
-| Backend module (`backend/app/modules/`) | Data hooks (`src/api/`) | Used by                                                                                                                                                     |
-| --------------------------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `identity_access`                       | `identity_access.ts`    | `pages/public/login`, `pages/admin/users`, app shell and menus, `usePermissions` everywhere                                                                 |
-| `patients`                              | `patients.ts`           | `pages/secretariat/patients`, `pages/professional/patients`, `pages/admin/users`                                                                            |
-| `care_team`                             | `care_team.ts`          | `components/patient` (care team section), `pages/professional/patients`                                                                                     |
-| `pathways`                              | `pathways.ts`           | `pages/professional/patients`, `pathways`, `needs` · `pages/patient/home`, `pathway`                                                                        |
-| `scheduling`                            | `scheduling.ts`         | `components/appointments`, `components/forms` (booking), `pages/secretariat/reception`, `pages/professional/schedule`, `pages/patient/appointments`, `home` |
-| `reception`                             | `reception.ts`          | `pages/secretariat/reception`                                                                                                                               |
-| `questionnaires`                        | `questionnaires.ts`     | `pages/patient/questionnaires`, `home` · `pages/professional/patients`                                                                                      |
-| `analytics`                             | `analytics.ts`          | `pages/professional/dashboard`                                                                                                                              |
-| `faq`                                   | `faq.ts`                | `pages/public/faq`, `pages/admin/faq`                                                                                                                       |
-| `notifications`                         | none yet                | none yet                                                                                                                                                    |
+| Backend module (`backend/app/modules/`) | Data hooks (`src/api/`) | Used by                                                                                                                                               |
+| --------------------------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `identity_access`                       | `identity_access.ts`    | `pages/public/login`, `pages/admin/users`, app shell and menus, `usePermissions` everywhere                                                           |
+| `patients`                              | `patients.ts`           | `pages/reception/patients`, `pages/professional/patients`, `pages/admin/users`                                                                        |
+| `care_team`                             | `care_team.ts`          | `components/patient` (care team section), `pages/professional/patients`                                                                               |
+| `pathways`                              | `pathways.ts`           | `pages/professional/patients`, `pathways`, `needs` · `pages/patient/home`, `pathway`                                                                  |
+| `scheduling`                            | `scheduling.ts`         | `components/appointments`, `components/forms` (booking), `pages/reception/board`, `pages/professional/schedule`, `pages/patient/appointments`, `home` |
+| `reception`                             | `reception.ts`          | `pages/reception/board`                                                                                                                               |
+| `questionnaires`                        | `questionnaires.ts`     | `pages/patient/questionnaires`, `home` · `pages/professional/patients`                                                                                |
+| `analytics`                             | `analytics.ts`          | `pages/professional/dashboard` (also shown to admins at `/admin/tableau-de-bord`)                                                                     |
+| `faq`                                   | `faq.ts`                | `pages/public/faq`, `pages/admin/faq`                                                                                                                 |
+| `notifications`                         | none yet                | none yet                                                                                                                                              |
 
 ## Ownership
 
@@ -86,6 +87,6 @@ URLs are per role), and most pages draw on several modules, so this table is the
 | ----------------------------------------------------- | ---------------------------------------------------- |
 | `src/pages/patient/`                                  | Téo                                                  |
 | `src/pages/professional/`                             | Hugo                                                 |
-| `src/pages/secretariat/`                              | Victoria                                             |
+| `src/pages/reception/`                                | Victoria                                             |
 | `src/pages/admin/`, `src/pages/public/`               | Louis                                                |
 | `src/components/`, `src/lib/`, `src/api/`, `src/app/` | shared: changes need one reviewer from another owner |
