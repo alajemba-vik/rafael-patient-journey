@@ -40,15 +40,25 @@ from app.modules.scheduling.schemas import (
     TimeSlot,
 )
 
-# TODO(validate): who enters appointments in the system: coordinators, reception or both,
-# and who cancels when a patient phones? (V-03, V-24)
+# Who books (working assumption A-01 in the team knowledge base, open-questions.md):
+# - coordinators book the first session with each practitioner, reception books for patients
+#   who phone or ask at the desk: both for anyone in the patient's care team;
+# - patients book their follow-ups directly with their practitioner, so a practitioner
+#   books, moves, cancels and annotates their **own** sessions with their own patients.
+# TODO(validate): confirm with the Institute (V-03, V-24).
 BOOKING_ROLES = {Role.COORDINATOR, Role.SECRETARY}
+OWN_AGENDA_ROLES = {Role.PROFESSIONAL}
 CARE_ROLES = {Role.PROFESSIONAL, Role.COORDINATOR}
 UPCOMING_WINDOW = timedelta(days=90)
 
-# TODO(validate): the Institute's opening hours, and whether they differ per practitioner.
+# Opening hours (working assumption A-02): sessions on weekdays, 9:00 to 19:00, the same for
+# every practitioner. The Institute's site publishes no hours; a directory listing gives
+# weekdays 9:00-13:00, probably the reception desk or phone line rather than sessions.
+# Only free-slot suggestions follow these hours: staff can still book any time by hand.
+# TODO(validate): real hours, Saturday activities, per-practitioner days (V-27).
 OPENING_TIME = time(9, 0)
 CLOSING_TIME = time(19, 0)
+OPEN_WEEKDAYS = frozenset(range(5))  # Monday (0) to Friday (4)
 # The days anyone may look at: agendas don't go back before the platform or far ahead.
 FIRST_DAY = date(2000, 1, 1)
 LAST_DAY = date(2100, 12, 31)
@@ -85,11 +95,14 @@ class SlotTakenError(ConflictError):
 
 
 def create_appointment(db: Session, user: CurrentUser, data: AppointmentCreate) -> AppointmentOut:
-    if user.role not in BOOKING_ROLES:
+    own_session = user.role in OWN_AGENDA_ROLES and data.professional_id == user.id
+    if user.role not in BOOKING_ROLES and not own_session:
         _deny(db, user, "appointment.create.denied", data.patient_id)
     if not patients.patient_exists(db, data.patient_id):
         raise NotFoundError("Patient not found")
     if not care_team.is_in_care_team(db, data.professional_id, data.patient_id):
+        if own_session:  # a practitioner only books for their own patients
+            _deny(db, user, "appointment.create.denied", data.patient_id)
         raise ConflictError("This person isn't in the patient's care team")
     _check_not_before_today(data.starts_at)
     if _has_overlap(db, data.patient_id, data.professional_id, data.starts_at, data.ends_at):
@@ -108,7 +121,7 @@ def reschedule_appointment(
     db: Session, user: CurrentUser, appointment_id: uuid.UUID, data: AppointmentReschedule
 ) -> AppointmentOut:
     """Same patient and practitioner, new time. Only appointments still to come can move."""
-    _require_booking(db, user, "appointment.reschedule.denied", appointment_id)
+    _require_manage(db, user, "appointment.reschedule.denied", appointment_id)
     appointment = _get(db, appointment_id, for_update=True)
     if appointment.status != AppointmentStatus.SCHEDULED:
         raise ConflictError("Only a scheduled appointment can be moved")
@@ -137,7 +150,7 @@ def cancel_appointment(
     data: AppointmentCancel | None = None,
 ) -> AppointmentOut:
     """Called off ahead of time. A past day's appointment that didn't happen is a no-show."""
-    _require_booking(db, user, "appointment.cancel.denied", appointment_id)
+    _require_manage(db, user, "appointment.cancel.denied", appointment_id)
     appointment = _get(db, appointment_id, for_update=True)
     if appointment.status != AppointmentStatus.SCHEDULED:
         raise ConflictError("Only a scheduled appointment can be cancelled")
@@ -155,7 +168,7 @@ def update_appointment(
     db: Session, user: CurrentUser, appointment_id: uuid.UUID, data: AppointmentUpdate
 ) -> AppointmentOut:
     """Staff write down what used to go on a sticky note: "running 10 minutes late"."""
-    _require_booking(db, user, "appointment.note.denied", appointment_id)
+    _require_manage(db, user, "appointment.note.denied", appointment_id)
     appointment = _get(db, appointment_id, for_update=True)
 
     appointment.note = data.note or None
@@ -179,10 +192,13 @@ def get_availability(
     free slot can really be booked. `ignore_id` leaves out the appointment being moved.
     No patient names are returned.
     """
-    if user.role not in BOOKING_ROLES:
-        raise ForbiddenError("Only coordinators and reception can see availability")
+    own_agenda = user.role in OWN_AGENDA_ROLES and professional_id == user.id
+    if user.role not in BOOKING_ROLES and not own_agenda:
+        raise ForbiddenError("You can only see your own availability")
     if identity.get_role(db, professional_id) not in CARE_ROLES:
         raise NotFoundError("No professional or coordinator account with this id")
+    if own_agenda and patient_id and not care_team.is_in_care_team(db, user.id, patient_id):
+        _deny(db, user, "appointment.availability.denied", patient_id)
 
     start, end = day_window(day, institute_time_zone())
     people = [Appointment.professional_id == professional_id]
@@ -310,7 +326,10 @@ def day_window(day: date, time_zone: ZoneInfo) -> tuple[datetime, datetime]:
 
 
 def _free_slots(day: date, length: timedelta, busy: list[TimeSlot]) -> list[TimeSlot]:
-    """Every quarter-hour start between opening and closing where a session fits."""
+    """Every quarter-hour start between opening and closing where a session fits; none on a
+    day the Institute is closed."""
+    if day.weekday() not in OPEN_WEEKDAYS:
+        return []
     time_zone = institute_time_zone()
     candidate = datetime.combine(day, OPENING_TIME, tzinfo=time_zone).astimezone(UTC)
     closing = datetime.combine(day, CLOSING_TIME, tzinfo=time_zone).astimezone(UTC)
@@ -445,15 +464,22 @@ def _get(db: Session, appointment_id: uuid.UUID, for_update: bool = False) -> Ap
     return appointment
 
 
-def _require_booking(
-    db: Session, user: CurrentUser, action: str, appointment_id: uuid.UUID
-) -> None:
-    """Checked before anything else, so whether the appointment exists isn't revealed. The
-    refusal is audited against the patient when there is one."""
+def _require_manage(db: Session, user: CurrentUser, action: str, appointment_id: uuid.UUID) -> None:
+    """Coordinators and reception manage any appointment; a practitioner only their own.
+
+    Checked before anything else, so whether the appointment exists isn't revealed to
+    anyone else. The refusal is audited against the patient when there is one.
+    """
     if user.role in BOOKING_ROLES:
         return
-    patient_id = db.scalar(select(Appointment.patient_id).where(Appointment.id == appointment_id))
-    _deny(db, user, action, patient_id)
+    row = db.execute(
+        select(Appointment.patient_id, Appointment.professional_id).where(
+            Appointment.id == appointment_id
+        )
+    ).first()
+    if row is not None and user.role in OWN_AGENDA_ROLES and row.professional_id == user.id:
+        return
+    _deny(db, user, action, row.patient_id if row else None)
 
 
 def _deny(db: Session, user: CurrentUser, action: str, patient_id: uuid.UUID | None) -> NoReturn:
