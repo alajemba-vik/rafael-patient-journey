@@ -37,6 +37,11 @@ class Settings(BaseSettings):
     def is_production(self) -> bool:
         return self.app_env == "production" or bool(os.environ.get("VERCEL"))
 
+    @property
+    def is_serverless(self) -> bool:
+        """Short-lived function instances (Vercel): no connection pool kept between requests."""
+        return bool(os.environ.get("VERCEL"))
+
     @model_validator(mode="after")
     def _require_production_settings(self) -> "Settings":
         if not self.is_production:

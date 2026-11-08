@@ -12,13 +12,13 @@ from app.modules.identity_access.service import Role
 ORIGIN = get_settings().cors_origins[0]
 
 
-def test_every_response_gets_a_request_id():
+def test_every_response_gets_a_request_id(db):
     response = TestClient(app).get("/api/v1/health")
 
     assert len(response.headers["X-Request-ID"]) == 32
 
 
-def test_a_valid_incoming_request_id_is_kept_and_a_bogus_one_replaced():
+def test_a_valid_incoming_request_id_is_kept_and_a_bogus_one_replaced(db):
     client = TestClient(app)
 
     kept = client.get("/api/v1/health", headers={"X-Request-ID": "front-123"})
