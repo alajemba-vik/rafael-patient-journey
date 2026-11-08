@@ -1,4 +1,4 @@
-import { usePermissions } from "../../api/permissions";
+import { usePermissions } from "../../api/identity_access";
 import { usePatientAppointments, type Appointment } from "../../api/scheduling";
 import { ManageAppointment } from "../appointments/ManageAppointment";
 import { QueryState } from "../feedback/QueryState";

@@ -1,4 +1,4 @@
-import type { Schemas } from "../api/client";
+import type { Schemas } from "../api/core/client";
 
 /** French names for the pathway's milestones and self-assessment dimensions. */
 export const MILESTONE_LABELS: Record<Schemas["MilestoneKind"], string> = {

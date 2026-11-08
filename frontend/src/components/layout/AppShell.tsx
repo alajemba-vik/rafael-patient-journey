@@ -2,8 +2,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
 import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router";
 
-import { useMe } from "../../api/me";
-import { session } from "../../api/session";
+import { useMe } from "../../api/identity_access";
+import { session } from "../../api/core/session";
 import { NAV_BY_ROLE } from "../../app/navigation";
 import { paths } from "../../app/paths";
 

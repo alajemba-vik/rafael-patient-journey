@@ -1,8 +1,8 @@
 import { useParams } from "react-router";
 
-import { useAddToCareTeam } from "../../../api/careTeam";
-import { useMe } from "../../../api/me";
-import { usePermissions } from "../../../api/permissions";
+import { useAddToCareTeam } from "../../../api/care_team";
+import { useMe } from "../../../api/identity_access";
+import { usePermissions } from "../../../api/identity_access";
 import { isDetail, usePatient } from "../../../api/patients";
 import { Button } from "../../../components/forms/Button";
 import { QueryState } from "../../../components/feedback/QueryState";

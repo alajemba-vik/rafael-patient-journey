@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { createMemoryRouter, RouterProvider } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { session } from "../../../api/session";
+import { session } from "../../../api/core/session";
 import { LoginPage } from "./LoginPage";
 
 function renderLogin() {

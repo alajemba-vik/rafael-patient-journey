@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router";
 
-import { usePermissions } from "../../../api/permissions";
+import { usePermissions } from "../../../api/identity_access";
 import { usePatients } from "../../../api/patients";
 import { QueryState } from "../../../components/feedback/QueryState";
 import { TextField } from "../../../components/forms/TextField";

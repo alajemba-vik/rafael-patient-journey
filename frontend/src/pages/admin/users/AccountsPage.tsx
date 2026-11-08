@@ -1,4 +1,4 @@
-import { useAccounts } from "../../../api/accounts";
+import { useAccounts } from "../../../api/identity_access";
 import { QueryState } from "../../../components/feedback/QueryState";
 import { ROLE_LABELS } from "../../../components/labels";
 import { PageHeader } from "../../../components/layout/PageHeader";

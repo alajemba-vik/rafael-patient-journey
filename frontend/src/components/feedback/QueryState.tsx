@@ -1,7 +1,7 @@
 import type { UseQueryResult } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 
-import { ApiError } from "../../api/client";
+import { ApiError } from "../../api/core/client";
 import { EmptyState, ErrorState, LoadingState, NotAllowedState } from "./states";
 
 type Props<T> = {
