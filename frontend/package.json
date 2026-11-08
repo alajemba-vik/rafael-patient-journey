@@ -11,7 +11,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run",
-    "api:generate": "cd ../backend && uv run python -c \"import json; from app.main import app; print(json.dumps(app.openapi()))\" > ../frontend/node_modules/.openapi.json && cd ../frontend && openapi-typescript node_modules/.openapi.json -o src/api/core/schema.d.ts"
+    "api:generate": "cd ../backend && uv run python -c \"import json; from app.main import app; print(json.dumps(app.openapi()))\" > ../frontend/node_modules/.openapi.json && cd ../frontend && openapi-typescript node_modules/.openapi.json -o src/api/core/schema.d.ts",
+    "e2e": "playwright test"
   },
   "dependencies": {
     "@tanstack/react-query": "5.104.5",
@@ -22,6 +23,7 @@
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
+    "@playwright/test": "1.56.0",
     "@testing-library/jest-dom": "7.0.1",
     "@testing-library/react": "16.3.3",
     "@testing-library/user-event": "14.6.8",
