@@ -42,11 +42,8 @@ from app.modules.pathways.schemas import (
 )
 from app.modules.patients import service as patients
 
-# TODO(validate): may a patient follow a second pathway, or change coordinator? (V-16)
-# Do chronic-disease patients and caregivers follow the same pathway? (V-10)
 CARE_ROLES = {Role.PROFESSIONAL, Role.COORDINATOR}
-# TODO(validate): may every practitioner in the team see every score, including the
-# sexual-health dimension? (V-07)
+# Every practitioner in the patient's care team sees all the scores.
 MILESTONE_ORDER = [MilestoneKind.INTAKE, MilestoneKind.REVIEW, MilestoneKind.FINAL]
 DIMENSIONS = ("physical", "psychological", "emotional", "sexual", "socio_professional")
 # As published by the Institute: a review around 3 months and a final review around 6.

@@ -39,7 +39,6 @@ export function MilestoneForm({ pathwayId, kind, onDone }: { pathwayId: string; 
 
   return (
     <form className="rf-form" onSubmit={submit}>
-      {/* TODO(validate): what 0 and 4 mean on the Institute's self-assessment scale. */}
       <p className="rf-muted">Auto-évaluation du patient, de 0 à 4, sans justification.</p>
       {DIMENSIONS.map(([key, label]) => (
         <fieldset key={key} className="rf-question">

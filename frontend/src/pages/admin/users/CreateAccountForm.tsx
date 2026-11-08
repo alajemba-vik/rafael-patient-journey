@@ -100,7 +100,6 @@ export function CreateAccountForm() {
           onChange={(e) => setDiscipline(e.target.value)}
         />
       )}
-      {/* TODO(validate): invitation e-mails instead of an initial password set by an admin? */}
       <TextField
         label="Mot de passe initial"
         type="password"

@@ -20,8 +20,7 @@ from app.modules.care_team.schemas import AssignmentCreate, AssignmentOut, CareT
 from app.modules.identity_access import service as identity
 from app.modules.identity_access.service import CurrentUser, Role
 
-# TODO(validate): who records the care team in the system: coordinators only, or reception
-# too? And may any coordinator change any patient's team, or only their referent? (V-03, V-16)
+# Coordinators (and admins) record who is in a patient's care team, for any patient.
 MANAGER_ROLES = {Role.COORDINATOR, Role.ADMIN}
 CARE_ROLES = {Role.PROFESSIONAL, Role.COORDINATOR}
 
@@ -86,7 +85,7 @@ def delete_assignment(db: Session, user: CurrentUser, assignment_id: uuid.UUID) 
 
 
 def list_members(db: Session, user: CurrentUser, patient_id: uuid.UUID) -> list[CareTeamMember]:
-    # TODO(validate): may reception see who is in a patient's care team? Needed to book. (V-07)
+    # Reception sees the team too: booking means choosing one of its members.
     allowed = user.role in MANAGER_ROLES | {Role.SECRETARY} or (
         user.role == Role.PROFESSIONAL and is_in_care_team(db, user.id, patient_id)
     )
