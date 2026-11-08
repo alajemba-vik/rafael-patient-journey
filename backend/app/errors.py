@@ -26,3 +26,13 @@ class UnauthorizedError(AppError):
 
 class ConflictError(AppError):
     status_code = 409
+
+
+class TooManyRequestsError(AppError):
+    status_code = 429
+
+
+class ServiceUnavailableError(AppError):
+    """A service we depend on (the identity provider) failed or can't be reached."""
+
+    status_code = 503

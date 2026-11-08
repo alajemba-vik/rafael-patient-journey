@@ -19,7 +19,8 @@ backend/app/
   db.py            engine, session, Base: the only place with the connection string
   auth.py          the only code that talks to Supabase Auth
   audit.py         record(db, actor_id, action, patient_id)
-  errors.py        NotFoundError, ForbiddenError, UnauthorizedError
+  errors.py        NotFoundError, ForbiddenError, UnauthorizedError, ConflictError…
+  observability.py logging, request ids, the last-resort 500 handler (don't edit)
   modules/<name>/  one business area each (see below)
 backend/migrations/  Alembic: the only way to change tables
 backend/tests/<name>/  tests per module
@@ -74,7 +75,8 @@ Ruff enforces formatting and lint (`uv run ruff format .` and `uv run ruff check
 
 **Errors.**
 - Services raise `NotFoundError`, `ForbiddenError` or `UnauthorizedError` from `app/errors.py`, never `HTTPException`.
-- Don't catch exceptions you can't handle.
+- Don't catch exceptions you can't handle: an unexpected error becomes a logged 500 with a request id.
+- Log with `logging.getLogger(__name__)`, never `print`. Never log patient data (names, emails, phone numbers, free text).
 
 **Database.**
 - SQLAlchemy 2.0 style only: `Mapped[...]`, `mapped_column`, `select(...)`. No legacy `session.query`.

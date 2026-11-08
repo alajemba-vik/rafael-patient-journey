@@ -2,6 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+from app import observability
 from app.config import get_settings
 from app.errors import AppError
 from app.modules.analytics.router import router as analytics_router
@@ -15,14 +16,21 @@ from app.modules.questionnaires.router import router as questionnaires_router
 from app.modules.reception.router import router as reception_router
 from app.modules.scheduling.router import router as scheduling_router
 
+settings = get_settings()
+observability.configure_logging(settings.log_level)
+
 app = FastAPI(title="Institut Rafaël – Patient Journey API", version="0.1.0")
 
+# Order matters: the middleware added last runs first. Request ids and the error handler
+# sit inside CORS, so every response, a 500 included, gets CORS headers.
+observability.install(app)
 # The frontend sends a bearer token header, not cookies, so credentials stay off.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=get_settings().cors_origins,
+    allow_origins=settings.cors_origins,
     allow_methods=["GET", "POST", "PATCH", "DELETE"],
-    allow_headers=["Authorization", "Content-Type"],
+    allow_headers=["Authorization", "Content-Type", observability.REQUEST_ID_HEADER],
+    expose_headers=[observability.REQUEST_ID_HEADER],
 )
 
 

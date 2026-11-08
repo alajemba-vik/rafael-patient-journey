@@ -29,7 +29,8 @@ node_modules/
 .vite/
 coverage/
 
-# Editors and OS
+# Editors, AI tools and OS (personal settings, paths from one machine)
+.claude/
 .vscode/
 .idea/
 *.swp
