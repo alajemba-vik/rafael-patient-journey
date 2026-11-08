@@ -16,11 +16,17 @@ const DURATIONS = [30, 45, 60, 90];
 const COORDINATION_MINUTES = 60;
 const SESSION_MINUTES = 45;
 
+type Props = {
+  patientId: string;
+  /** Book only with this person: a practitioner booking a follow-up with themselves. */
+  practitioner?: { id: string; name: string };
+};
+
 /** Book an appointment with a member of the patient's care team, picking from their free times. */
-export function BookingForm({ patientId }: { patientId: string }) {
+export function BookingForm({ patientId, practitioner }: Props) {
   const team = useCareTeam(patientId);
   const book = useBookAppointment();
-  const [memberId, setMemberId] = useState("");
+  const [memberId, setMemberId] = useState(practitioner?.id ?? "");
   const [date, setDate] = useState(instituteToday);
   const [time, setTime] = useState("");
   const [minutes, setMinutes] = useState(SESSION_MINUTES);
@@ -69,20 +75,24 @@ export function BookingForm({ patientId }: { patientId: string }) {
 
   return (
     <form className="rf-form rf-narrow" onSubmit={submit}>
-      <SelectField
-        label="Avec"
-        required
-        value={memberId}
-        onChange={(event) => chooseMember(event.target.value)}
-        hint={team.data?.length === 0 ? "Ajoutez d’abord quelqu’un à l’équipe de soins." : undefined}
-      >
-        <option value="">Choisir dans l’équipe de soins</option>
-        {team.data?.map((m) => (
-          <option key={m.user_id} value={m.user_id}>
-            {m.full_name} · {m.discipline ?? ROLE_LABELS[m.role]}
-          </option>
-        ))}
-      </SelectField>
+      {practitioner ? (
+        <p className="rf-muted">Séance avec vous ({practitioner.name}).</p>
+      ) : (
+        <SelectField
+          label="Avec"
+          required
+          value={memberId}
+          onChange={(event) => chooseMember(event.target.value)}
+          hint={team.data?.length === 0 ? "Ajoutez d’abord quelqu’un à l’équipe de soins." : undefined}
+        >
+          <option value="">Choisir dans l’équipe de soins</option>
+          {team.data?.map((m) => (
+            <option key={m.user_id} value={m.user_id}>
+              {m.full_name} · {m.discipline ?? ROLE_LABELS[m.role]}
+            </option>
+          ))}
+        </SelectField>
+      )}
       <div className="rf-row">
         <TextField
           label="Date"

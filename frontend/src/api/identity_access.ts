@@ -39,10 +39,13 @@ export function useMe() {
 // Which actions each role sees in the screens. The API decides and enforces every permission;
 // this only chooses which buttons to show, and keeps that choice in one place so screens don't
 // drift apart. Keep it in step with the services' access policies.
-type Action = "bookAppointments" | "manageCareTeam" | "leadPathways" | "takeOnPatients";
+type Action = "bookAppointments" | "manageOwnSessions" | "manageCareTeam" | "leadPathways" | "takeOnPatients";
 
 const ACTIONS: Record<Action, Role[]> = {
+  // Book, move and cancel for anyone in the patient's care team.
   bookAppointments: ["coordinator", "secretary"],
+  // A practitioner books follow-ups with themselves and manages their own sessions.
+  manageOwnSessions: ["professional"],
   manageCareTeam: ["coordinator"],
   leadPathways: ["coordinator"],
   takeOnPatients: ["coordinator"],

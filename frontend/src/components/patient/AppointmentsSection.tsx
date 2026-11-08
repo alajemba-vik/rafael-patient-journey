@@ -1,4 +1,4 @@
-import { usePermissions } from "../../api/identity_access";
+import { useMe, usePermissions } from "../../api/identity_access";
 import { usePatientAppointments, type Appointment } from "../../api/scheduling";
 import { ManageAppointment } from "../appointments/ManageAppointment";
 import { QueryState } from "../feedback/QueryState";
@@ -20,10 +20,17 @@ export function splitAppointments(list: Appointment[], now: Date) {
   };
 }
 
-/** A patient's appointments. Coordinators and reception book, move, cancel and annotate here. */
+/**
+ * A patient's appointments. Coordinators and reception book, move, cancel and annotate any of
+ * them; a practitioner books follow-ups with themselves and manages their own sessions.
+ */
 export function AppointmentsSection({ patientId }: { patientId: string }) {
   const appointments = usePatientAppointments(patientId);
-  const canBook = usePermissions().bookAppointments;
+  const can = usePermissions();
+  const me = useMe().data;
+  const ownSessions = can.manageOwnSessions && me !== undefined;
+  const canBook = can.bookAppointments || ownSessions;
+  const canManage = (a: Appointment) => can.bookAppointments || (ownSessions && a.professional_id === me.id);
 
   return (
     <section className="rf-section" aria-labelledby="appointments-title">
@@ -34,7 +41,10 @@ export function AppointmentsSection({ patientId }: { patientId: string }) {
         <details className="rf-disclosure rf-section">
           <summary>Prendre un rendez-vous</summary>
           <div className="rf-disclosure__body">
-            <BookingForm patientId={patientId} />
+            <BookingForm
+              patientId={patientId}
+              practitioner={ownSessions && !can.bookAppointments ? { id: me.id, name: me.full_name } : undefined}
+            />
           </div>
         </details>
       )}
@@ -52,7 +62,7 @@ export function AppointmentsSection({ patientId }: { patientId: string }) {
               ) : (
                 <ul className="rf-cards rf-section">
                   {upcoming.map((a) => (
-                    <AppointmentItem key={a.id} appointment={a} manageable={canBook} />
+                    <AppointmentItem key={a.id} appointment={a} manageable={canManage(a)} />
                   ))}
                 </ul>
               )}

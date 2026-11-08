@@ -66,4 +66,29 @@ describe("BookingForm", () => {
     expect(screen.getByRole("group", { name: /Après-midi/ })).toBeInTheDocument();
     expect(screen.getByLabelText("Heure")).toHaveValue("14:00");
   });
+
+  it("books a practitioner's follow-up with themselves, with no one else to choose", async () => {
+    const bodies: unknown[] = [];
+    vi.spyOn(globalThis, "fetch").mockImplementation(async (input) => {
+      const request = input as Request;
+      if (request.url.includes("/availability")) return Response.json(AVAILABILITY);
+      if (request.method === "GET") return Response.json(TEAM);
+      bodies.push(await request.json());
+      return Response.json({}, { status: 201 });
+    });
+    render(
+      <QueryClientProvider client={new QueryClient()}>
+        <BookingForm patientId="p1" practitioner={{ id: "u1", name: "Jordan Praticien" }} />
+      </QueryClientProvider>,
+    );
+
+    expect(screen.queryByLabelText("Avec")).not.toBeInTheDocument();
+    await userEvent.clear(screen.getByLabelText("Date"));
+    await userEvent.type(screen.getByLabelText("Date"), "2030-01-10");
+    await userEvent.type(screen.getByLabelText("Heure"), "10:00");
+    await userEvent.click(screen.getByRole("button", { name: "Prendre le rendez-vous" }));
+
+    await screen.findByText("Rendez-vous enregistré.");
+    expect(bodies).toMatchObject([{ patient_id: "p1", professional_id: "u1" }]);
+  });
 });
