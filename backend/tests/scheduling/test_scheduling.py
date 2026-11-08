@@ -668,3 +668,99 @@ def test_a_day_outside_the_agenda_is_refused_not_a_crash(db, client_as, team):
     )
 
     assert response.status_code == 400
+
+
+# --- a practitioner's own agenda (working assumption A-01) -----------------
+
+
+def test_a_practitioner_books_a_follow_up_with_their_own_patient(db, client_as, team):
+    patient, professional = team
+
+    response = client_as(Role.PROFESSIONAL, professional.id).post(
+        "/api/v1/scheduling/appointments", json=booking(patient, professional)
+    )
+
+    assert response.status_code == 201
+    assert "appointment.create" in audit_actions(db)
+
+
+def test_a_practitioner_cannot_book_for_a_colleague(db, client_as, team):
+    patient, professional = team
+    colleague = add_account(db, Role.PROFESSIONAL, "Sam Collègue")
+    assign(db, colleague.id, patient.id)
+
+    response = client_as(Role.PROFESSIONAL, colleague.id).post(
+        "/api/v1/scheduling/appointments", json=booking(patient, professional)
+    )
+
+    assert response.status_code == 403
+    assert "appointment.create.denied" in audit_actions(db)
+
+
+def test_a_practitioner_cannot_book_a_patient_outside_their_care_team(db, client_as):
+    outsider = add_account(db, Role.PROFESSIONAL)
+    patient = add_patient(db)
+
+    response = client_as(Role.PROFESSIONAL, outsider.id).post(
+        "/api/v1/scheduling/appointments", json=booking(patient, outsider)
+    )
+
+    assert response.status_code == 403
+    assert "appointment.create.denied" in audit_actions(db)
+
+
+@pytest.mark.parametrize("action", ["cancel", "reschedule"])
+def test_a_practitioner_moves_or_cancels_their_own_session(db, client_as, team, action):
+    patient, professional = team
+    appointment = add_appointment(db, patient.id, professional.id)
+
+    response = client_as(Role.PROFESSIONAL, professional.id).post(
+        f"/api/v1/scheduling/appointments/{appointment.id}/{action}",
+        json=reschedule_to(NINE + 3 * HOUR) if action == "reschedule" else {},
+    )
+
+    assert response.status_code == 200
+
+
+@pytest.mark.parametrize("action", ["cancel", "reschedule"])
+def test_a_practitioner_cannot_touch_a_colleagues_session(db, client_as, team, action):
+    patient, professional = team
+    colleague = add_account(db, Role.PROFESSIONAL, "Sam Collègue")
+    appointment = add_appointment(db, patient.id, professional.id)
+
+    response = client_as(Role.PROFESSIONAL, colleague.id).post(
+        f"/api/v1/scheduling/appointments/{appointment.id}/{action}",
+        json=reschedule_to(NINE + 3 * HOUR) if action == "reschedule" else {},
+    )
+
+    assert response.status_code == 403
+    assert f"appointment.{action}.denied" in audit_actions(db)
+
+
+def test_a_practitioner_sees_their_own_free_slots_only(db, client_as, team):
+    _, professional = team
+    colleague = add_account(db, Role.PROFESSIONAL, "Sam Collègue")
+    client = client_as(Role.PROFESSIONAL, professional.id)
+    day = {"day": NINE.date().isoformat()}
+
+    own = client.get(f"/api/v1/scheduling/professionals/{professional.id}/availability", params=day)
+    other = client.get(f"/api/v1/scheduling/professionals/{colleague.id}/availability", params=day)
+
+    assert own.status_code == 200
+    assert other.status_code == 403
+
+
+def test_no_free_slots_are_suggested_at_the_weekend(db, client_as, team):
+    _, professional = team
+    saturday = "2030-01-12"
+
+    body = (
+        client_as(Role.SECRETARY)
+        .get(
+            f"/api/v1/scheduling/professionals/{professional.id}/availability",
+            params={"day": saturday},
+        )
+        .json()
+    )
+
+    assert body["free"] == []
