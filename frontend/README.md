@@ -13,10 +13,11 @@ npm run dev          # http://localhost:5173, calls the API set in .env.developm
 
 Point it at another API with `VITE_API_URL=https://… npm run dev`. A deployed build without `VITE_API_URL` calls the API on its own domain.
 
-| Command                                                             | Does                                                                                                                                      |
-| ------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| `npm run api:generate`                                              | Regenerate `src/api/core/schema.d.ts` from the backend. Run it after any backend endpoint or schema change; CI fails if it's out of date. |
-| `npm run lint` · `npm run typecheck` · `npm test` · `npm run build` | The checks CI runs.                                                                                                                       |
+| Command                                                             | Does                                                                                                                                                               |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `npm run api:generate`                                              | Regenerate `src/api/core/schema.d.ts` from the backend. Run it after any backend endpoint or schema change; CI fails if it's out of date.                          |
+| `npm run lint` · `npm run typecheck` · `npm test` · `npm run build` | The checks CI runs.                                                                                                                                                |
+| `npm run e2e`                                                       | Browser tests of whole journeys (`e2e/`), against the real API on a throwaway database. Starts both servers itself. First time: `npx playwright install chromium`. |
 
 ## Rules
 
@@ -36,6 +37,7 @@ Point it at another API with `VITE_API_URL=https://… npm run dev`. A deployed 
 All the source lives in `src/`. (Vercel would treat a top-level `api/` folder as serverless functions.)
 
 ```
+e2e/                       Playwright browser tests of whole journeys (reception so far)
 src/
   main.tsx                 entry point
   app/                     app wiring: routes, page addresses (paths.ts), menus per role
