@@ -1,9 +1,11 @@
-from fastapi import FastAPI, Request
+from fastapi import Depends, FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from sqlalchemy.orm import Session
 
 from app import observability
 from app.config import get_settings
+from app.db import get_db, is_database_reachable
 from app.errors import AppError
 from app.modules.analytics.router import router as analytics_router
 from app.modules.care_team.router import router as care_team_router
@@ -39,9 +41,17 @@ def handle_app_error(_: Request, error: AppError) -> JSONResponse:
     return JSONResponse(status_code=error.status_code, content={"detail": error.message})
 
 
-@app.get("/api/v1/health", tags=["health"])
-def health() -> dict[str, str]:
-    return {"status": "ok"}
+@app.get(
+    "/api/v1/health",
+    tags=["health"],
+    responses={503: {"description": "The API is up but can't reach the database"}},
+)
+def health(response: Response, db: Session = Depends(get_db)) -> dict[str, str]:
+    """For the host and uptime checks: up only if the database answers too."""
+    if not is_database_reachable(db):
+        response.status_code = 503
+        return {"status": "unavailable", "database": "unreachable"}
+    return {"status": "ok", "database": "ok"}
 
 
 # Every module's router is already registered: add endpoints in your module's router.py,
