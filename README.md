@@ -38,6 +38,22 @@ npm run dev                    # http://localhost:5173
 
 Checks: `npm run format:check && npm run lint && npm run typecheck && npm test`. After any backend API change, `npm run api:generate` refreshes the typed client. More in `frontend/README.md`.
 
+### Demo data
+
+Synthetic patients, practitioners, care teams and a week of appointments, with today's
+spread around the moment you run it (some finished, some in session, some waiting, some
+late, some still to come):
+
+```bash
+cd backend
+uv run python -m scripts.seed_demo --yes                       # replace the demo data
+uv run python -m scripts.seed_demo --yes --attach you@example.org  # also give your practitioner/coordinator login sessions today
+uv run python -m scripts.seed_demo --remove --yes              # remove the demo data only
+```
+
+Demo rows use `@demo.rafael.invalid` emails and staff accounts that cannot log in; nothing
+else is touched. Never run it against a database holding real patients.
+
 ### First login
 
 1. Create the first admin by hand: in Supabase → Authentication → Users, add the person, then add a matching row in `users` with their Supabase user id as `auth_subject` and the role `admin`.
@@ -75,8 +91,8 @@ AGENTS.md               code guidelines and rules for people and AI agents
 | `patients` | patient profiles | Victoria | reference module |
 | `care_team` | who cares for which patient | Hugo | assign, remove, list team |
 | `pathways` | ~6-month care pathway, reviews | Hugo | open, milestones, close, patient and coordinator views |
-| `scheduling` | appointments and their status | Victoria | book, cancel, schedules, status lifecycle |
-| `reception` | check-in, waiting room | Victoria | today's board, arrivals, no-shows |
+| `scheduling` | appointments and their status | Victoria | book from free slots, move, cancel with a reason, team notes, double-booking blocked in the database |
+| `reception` | check-in, waiting room | Victoria | any day's board, arrivals, waiting and session times, no-shows, undo |
 | `questionnaires` | questionnaires and answers | Téo | monthly quality of life, end-of-pathway satisfaction, scores |
 | `analytics` | de-identified indicators | — | patient-experience dashboard |
 | `faq` | FAQ content | Louis | public read, admin editing |
