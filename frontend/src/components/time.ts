@@ -41,3 +41,25 @@ export function addDays(date: string, days: number): string {
   noon.setUTCDate(noon.getUTCDate() + days);
   return noon.toISOString().slice(0, 10);
 }
+
+/** The Institute's date of an instant, "2026-10-21". */
+export function instituteDate(value: string): string {
+  return dayFormat.format(new Date(value));
+}
+
+/** Whole minutes from `from` to `to` (ISO strings or dates), never negative. */
+export function minutesBetween(from: string | Date, to: string | Date): number {
+  return Math.max(0, Math.floor((new Date(to).getTime() - new Date(from).getTime()) / 60_000));
+}
+
+const clockFormat = new Intl.DateTimeFormat("en-GB", {
+  timeZone: INSTITUTE_TIME_ZONE,
+  hour: "2-digit",
+  minute: "2-digit",
+  hourCycle: "h23",
+});
+
+/** The Institute's clock reading of an instant, "14:30", as a time input expects it. */
+export function instituteClock(value: string): string {
+  return clockFormat.format(new Date(value));
+}

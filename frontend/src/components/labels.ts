@@ -22,3 +22,18 @@ export const ROLE_LABELS: Record<Schemas["Role"], string> = {
   coordinator: "Coordination",
   admin: "Administration",
 };
+
+export const STATUS_LABELS: Record<Schemas["AppointmentStatus"], string> = {
+  scheduled: "Prévu",
+  arrived: "En salle d’attente",
+  in_session: "En séance",
+  done: "Terminé",
+  no_show: "Absent·e",
+  cancelled: "Annulé",
+};
+
+export const CANCEL_REASON_LABELS: Record<Schemas["CancelReason"], string> = {
+  patient_request: "Le patient a prévenu",
+  practitioner_unavailable: "Praticien·ne indisponible",
+  other: "Autre raison",
+};

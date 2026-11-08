@@ -2,11 +2,13 @@ import { useState, type FormEvent } from "react";
 
 import { ApiError } from "../../api/client";
 import { useCareTeam } from "../../api/careTeam";
-import { useBookAppointment } from "../../api/scheduling";
+import { NOTE_MAX_LENGTH, useBookAppointment } from "../../api/scheduling";
+import { SlotPicker } from "../appointments/SlotPicker";
 import { ROLE_LABELS } from "../labels";
-import { instituteDateTime } from "../time";
+import { instituteDateTime, instituteToday } from "../time";
 import { Button } from "./Button";
 import { SelectField } from "./SelectField";
+import { TextArea } from "./TextArea";
 import { TextField } from "./TextField";
 
 const DURATIONS = [30, 45, 60, 90];
@@ -14,18 +16,20 @@ const DURATIONS = [30, 45, 60, 90];
 const COORDINATION_MINUTES = 60;
 const SESSION_MINUTES = 45;
 
-/** Book an appointment with a member of the patient's care team. */
+/** Book an appointment with a member of the patient's care team, picking from their free times. */
 export function BookingForm({ patientId }: { patientId: string }) {
   const team = useCareTeam(patientId);
   const book = useBookAppointment();
   const [memberId, setMemberId] = useState("");
-  const [date, setDate] = useState("");
+  const [date, setDate] = useState(instituteToday);
   const [time, setTime] = useState("");
   const [minutes, setMinutes] = useState(SESSION_MINUTES);
+  const [note, setNote] = useState("");
   const [booked, setBooked] = useState(false);
 
   function chooseMember(id: string) {
     setMemberId(id);
+    setTime("");
     const member = team.data?.find((m) => m.user_id === id);
     setMinutes(member?.role === "coordinator" ? COORDINATION_MINUTES : SESSION_MINUTES);
   }
@@ -42,18 +46,26 @@ export function BookingForm({ patientId }: { patientId: string }) {
         professional_id: memberId,
         starts_at: start.toISOString(),
         ends_at: end.toISOString(),
-        note: "",
+        note,
       },
-      { onSuccess: () => setBooked(true) },
+      {
+        onSuccess: () => {
+          setBooked(true);
+          setTime("");
+          setNote("");
+        },
+      },
     );
   }
 
   const error =
     book.error instanceof ApiError && book.error.status === 409
       ? "Ce créneau n’est pas libre pour le patient ou pour la personne choisie."
-      : book.isError
-        ? "La prise de rendez-vous n’a pas abouti. Réessayez."
-        : undefined;
+      : book.error instanceof ApiError && book.error.status === 400
+        ? "Ce jour est déjà passé : choisissez aujourd’hui ou une date à venir."
+        : book.isError
+          ? "La prise de rendez-vous n’a pas abouti. Réessayez."
+          : undefined;
 
   return (
     <form className="rf-form rf-narrow" onSubmit={submit}>
@@ -72,15 +84,16 @@ export function BookingForm({ patientId }: { patientId: string }) {
         ))}
       </SelectField>
       <div className="rf-row">
-        <TextField label="Date" type="date" required value={date} onChange={(event) => setDate(event.target.value)} />
         <TextField
-          label="Heure"
-          type="time"
+          label="Date"
+          type="date"
           required
-          hint="Heure de Paris"
-          step={300}
-          value={time}
-          onChange={(event) => setTime(event.target.value)}
+          min={instituteToday()}
+          value={date}
+          onChange={(event) => {
+            setDate(event.target.value);
+            setTime("");
+          }}
         />
         <SelectField label="Durée" value={minutes} onChange={(event) => setMinutes(Number(event.target.value))}>
           {DURATIONS.map((d) => (
@@ -90,6 +103,31 @@ export function BookingForm({ patientId }: { patientId: string }) {
           ))}
         </SelectField>
       </div>
+      <SlotPicker
+        professionalId={memberId}
+        day={date}
+        minutes={minutes}
+        value={time}
+        onChange={setTime}
+        context={{ patientId }}
+      />
+      <TextField
+        label="Heure"
+        type="time"
+        required
+        hint="Heure de Paris. Choisissez un créneau ci-dessus ou saisissez une autre heure."
+        step={300}
+        value={time}
+        onChange={(event) => setTime(event.target.value)}
+      />
+      <TextArea
+        label="Note pour l’équipe (facultatif)"
+        rows={2}
+        maxLength={NOTE_MAX_LENGTH}
+        hint="Visible par l’équipe, pas par le patient. Aucune information médicale."
+        value={note}
+        onChange={(event) => setNote(event.target.value)}
+      />
       {error && (
         <p className="rf-field__error" role="alert">
           {error}

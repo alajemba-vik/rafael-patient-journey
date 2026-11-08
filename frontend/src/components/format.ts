@@ -41,3 +41,16 @@ export function formatNumber(value: number): string {
 export function formatChange(value: number): string {
   return `${value > 0 ? "+" : value < 0 ? "−" : ""}${numberFormat.format(Math.abs(value))}`;
 }
+
+/** "06 12 34 56 78", "+33 6 12 34 56 78": stored numbers, grouped the French way to read aloud. */
+export function formatPhone(value: string): string {
+  if (/^0\d{9}$/.test(value)) return value.replace(/(\d{2})(?=\d)/g, "$1 ");
+  if (/^\+33\d{9}$/.test(value)) return `+33 ${value.slice(3, 4)} ${value.slice(4).replace(/(\d{2})(?=\d)/g, "$1 ")}`;
+  return value;
+}
+
+/** "8 min", "1 h 05" */
+export function formatMinutes(minutes: number): string {
+  if (minutes < 60) return `${minutes} min`;
+  return `${Math.floor(minutes / 60)} h ${String(minutes % 60).padStart(2, "0")}`;
+}
