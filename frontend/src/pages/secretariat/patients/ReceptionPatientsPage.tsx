@@ -5,7 +5,7 @@ import { usePatients } from "../../../api/patients";
 import { QueryState } from "../../../components/feedback/QueryState";
 import { TextField } from "../../../components/forms/TextField";
 import { useDebouncedValue } from "../../../components/forms/useDebouncedValue";
-import { formatDate } from "../../../components/format";
+import { formatDate, formatPhone } from "../../../components/format";
 import { PageHeader } from "../../../components/layout/PageHeader";
 import { RegisterPatientForm } from "./RegisterPatientForm";
 import { paths } from "../../../app/paths";
@@ -25,7 +25,8 @@ export function ReceptionPatientsPage() {
       </details>
       <div className="rf-toolbar">
         <TextField
-          label="Rechercher par nom"
+          label="Rechercher par nom ou téléphone"
+          hint="Début du nom, ou au moins 3 chiffres du numéro."
           type="search"
           autoComplete="off"
           value={search}
@@ -40,30 +41,19 @@ export function ReceptionPatientsPage() {
         }}
       >
         {(list) => (
-          <div className="rf-table-wrap">
-            <table className="rf-table">
-              <thead>
-                <tr>
-                  <th scope="col">Nom</th>
-                  <th scope="col">Date de naissance</th>
-                  <th scope="col">Téléphone</th>
-                </tr>
-              </thead>
-              <tbody>
-                {list.map((p) => (
-                  <tr key={p.id}>
-                    <td>
-                      <Link className="rf-link" to={paths.reception.patient(p.id)}>
-                        {p.last_name.toUpperCase()} {p.first_name}
-                      </Link>
-                    </td>
-                    <td>{formatDate(p.birth_date)}</td>
-                    <td>{p.phone ?? "—"}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <ul className="rf-list" aria-label="Patients">
+            {list.map((p) => (
+              <li key={p.id}>
+                <div className="rf-stack">
+                  <Link className="rf-link" to={paths.reception.patient(p.id)}>
+                    {p.last_name.toUpperCase()} {p.first_name}
+                  </Link>
+                  <span className="rf-muted">né·e le {formatDate(p.birth_date)}</span>
+                </div>
+                <span className="rf-muted">{p.phone ? formatPhone(p.phone) : "Pas de téléphone"}</span>
+              </li>
+            ))}
+          </ul>
         )}
       </QueryState>
     </>

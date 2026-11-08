@@ -36,3 +36,13 @@ export function useRegisterPatient() {
     onSuccess: () => void queryClient.invalidateQueries({ queryKey: PATIENTS }),
   });
 }
+
+/** Corrections to the administrative record. Only the fields sent change. */
+export function useUpdatePatient(patientId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (body: Schemas["PatientUpdate"]) =>
+      unwrap(api.PATCH("/api/v1/patients/{patient_id}", { params: { path: { patient_id: patientId } }, body })),
+    onSuccess: () => void queryClient.invalidateQueries({ queryKey: PATIENTS }),
+  });
+}

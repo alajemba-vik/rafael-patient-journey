@@ -1,8 +1,6 @@
 /*
- * Institut Rafaël design tokens.
- * Source of truth: the "Institut Rafaël" design system artifact
- * (https://claude.ai/artifact/B58d9rTBaBKvZt6UQzzVGZ), built from institut-rafael.fr.
- * Change values there first, then mirror them here.
+ * Design tokens: colors, fonts, spacing and radii as CSS variables, plus the rf- type classes.
+ * Page styles use these variables, never raw values. Load before components.css.
  */
 
 /* Fonts (Archivo, Krona One) are loaded by index.html, so they download in parallel with the app. */
@@ -38,7 +36,6 @@
 
 /* Fonts, spacing, radii. */
 :root {
-  /* Pilat Extended Bold is the site's licensed face; Krona One is the free stand-in. */
   --font-display: "Pilat Extended Bold", "Krona One", Helvetica, Arial, sans-serif;
   --font-body: "Archivo", Helvetica, Arial, sans-serif;
 
