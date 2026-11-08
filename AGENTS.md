@@ -131,7 +131,7 @@ New modules need no registration: any `app/modules/<name>/models.py` is picked u
 
 - **Branches:** `feat/<module>-<short-name>`, `fix/<module>-<short-name>`, `chore/<short-name>`.
 - **Commits** (Conventional Commits): `feat(patients): add patient search`, `fix(auth): handle expired token`, `test(...)`, `docs(...)`, `refactor(...)`, `chore(...)`.
-- **Authorship:** commits are authored and signed by the person who opens the PR (`main` only accepts signed commits). AI tools are never credited: no `Co-Authored-By:` an AI, no "Generated with…" line, in commit messages or PR descriptions. CI rejects them. Claude Code is set up for this in `.claude/settings.json`; with other tools, turn their attribution off.
+- **Authorship:** commits are authored and signed by the person who opens the PR (`main` only accepts signed commits). AI tools are never credited: no `Co-Authored-By:` an AI, no "Generated with…" line, in commit messages or PR descriptions. CI rejects them. If your tool adds such lines by itself, turn that off in its own settings.
 - **PRs:**
   - One feature per PR, ideally under ~400 changed lines.
   - The description says what changed, why, and how it was tested.

@@ -30,9 +30,8 @@ node_modules/
 coverage/
 
 # Editors, AI tools and OS (personal settings, paths from one machine)
-# AI tool folders: personal, except the team's shared Claude Code settings.
-.claude/*
-!.claude/settings.json
+# AI tool settings: personal (paths from one machine).
+.claude/
 .vscode/
 .idea/
 *.swp
