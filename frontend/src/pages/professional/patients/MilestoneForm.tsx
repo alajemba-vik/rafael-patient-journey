@@ -4,7 +4,7 @@ import { useRecordMilestone, type MilestoneCreate } from "../../../api/pathways"
 import { Button } from "../../../components/forms/Button";
 import { TextArea } from "../../../components/forms/TextArea";
 import { TextField } from "../../../components/forms/TextField";
-import { DIMENSIONS } from "../../../components/labels";
+import { DIMENSIONS } from "../../../lib/labels";
 
 type Kind = MilestoneCreate["kind"];
 type Scores = Pick<MilestoneCreate, (typeof DIMENSIONS)[number][0]>;

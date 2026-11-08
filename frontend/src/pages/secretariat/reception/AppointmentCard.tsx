@@ -6,9 +6,9 @@ import { useChangeStatus } from "../../../api/reception";
 import type { Appointment } from "../../../api/scheduling";
 import { ManageAppointment } from "../../../components/appointments/ManageAppointment";
 import { Button } from "../../../components/forms/Button";
-import { formatMinutes, formatTime } from "../../../components/format";
-import { CANCEL_REASON_LABELS } from "../../../components/labels";
-import { minutesBetween } from "../../../components/time";
+import { formatMinutes, formatTime } from "../../../lib/format";
+import { CANCEL_REASON_LABELS } from "../../../lib/labels";
+import { minutesBetween } from "../../../lib/time";
 import { paths } from "../../../app/paths";
 import { LONG_WAIT_MINUTES, minutesLate, type StatusAction } from "./board";
 

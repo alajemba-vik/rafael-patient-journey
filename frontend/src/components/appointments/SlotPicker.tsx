@@ -1,8 +1,8 @@
 import { useId } from "react";
 
 import { useAvailability, type AvailabilityFor } from "../../api/scheduling";
-import { formatTime } from "../format";
-import { instituteClock } from "../time";
+import { formatTime } from "../../lib/format";
+import { instituteClock } from "../../lib/time";
 
 type Props = {
   professionalId: string;

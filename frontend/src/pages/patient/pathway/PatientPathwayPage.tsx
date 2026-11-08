@@ -1,7 +1,7 @@
 import { useMyPathways } from "../../../api/pathways";
 import { QueryState } from "../../../components/feedback/QueryState";
-import { formatDate } from "../../../components/format";
-import { MILESTONE_LABELS } from "../../../components/labels";
+import { formatDate } from "../../../lib/format";
+import { MILESTONE_LABELS } from "../../../lib/labels";
 import { PageHeader } from "../../../components/layout/PageHeader";
 import { MilestonesTable } from "../../../components/tables/MilestonesTable";
 

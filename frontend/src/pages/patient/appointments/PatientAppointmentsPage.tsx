@@ -1,7 +1,7 @@
 import { useMyAppointments } from "../../../api/scheduling";
 import { QueryState } from "../../../components/feedback/QueryState";
 import { StatusBadge } from "../../../components/feedback/StatusBadge";
-import { formatTime, formatWeekday } from "../../../components/format";
+import { formatTime, formatWeekday } from "../../../lib/format";
 import { PageHeader } from "../../../components/layout/PageHeader";
 
 export function PatientAppointmentsPage() {

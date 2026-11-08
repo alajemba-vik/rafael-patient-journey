@@ -5,8 +5,8 @@ import { usePermissions } from "../../../api/identity_access";
 import { usePatients } from "../../../api/patients";
 import { QueryState } from "../../../components/feedback/QueryState";
 import { TextField } from "../../../components/forms/TextField";
-import { useDebouncedValue } from "../../../components/forms/useDebouncedValue";
-import { formatDate } from "../../../components/format";
+import { useDebouncedValue } from "../../../lib/hooks/useDebouncedValue";
+import { formatDate } from "../../../lib/format";
 import { PageHeader } from "../../../components/layout/PageHeader";
 import { paths } from "../../../app/paths";
 

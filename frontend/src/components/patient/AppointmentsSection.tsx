@@ -4,8 +4,8 @@ import { ManageAppointment } from "../appointments/ManageAppointment";
 import { QueryState } from "../feedback/QueryState";
 import { StatusBadge } from "../feedback/StatusBadge";
 import { BookingForm } from "../forms/BookingForm";
-import { formatTime, formatWeekday } from "../format";
-import { CANCEL_REASON_LABELS } from "../labels";
+import { formatTime, formatWeekday } from "../../lib/format";
+import { CANCEL_REASON_LABELS } from "../../lib/labels";
 
 /** Split into what's still ahead (soonest first) and the history (latest first). */
 export function splitAppointments(list: Appointment[], now: Date) {

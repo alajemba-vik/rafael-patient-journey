@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import { useDueQuestionnaires, useMyScores } from "../../../api/questionnaires";
 import { QueryState } from "../../../components/feedback/QueryState";
-import { formatChange, formatMonth, formatNumber } from "../../../components/format";
+import { formatChange, formatMonth, formatNumber } from "../../../lib/format";
 import { PageHeader } from "../../../components/layout/PageHeader";
 import { QuestionnaireForm } from "./QuestionnaireForm";
 

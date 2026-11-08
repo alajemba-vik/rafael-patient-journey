@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { usePageTitle } from "./usePageTitle";
+import { usePageTitle } from "../../lib/hooks/usePageTitle";
 
 type Props = {
   title: string;

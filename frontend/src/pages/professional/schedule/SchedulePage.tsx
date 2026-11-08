@@ -4,9 +4,9 @@ import { Link } from "react-router";
 import { useMyAppointments, type Appointment } from "../../../api/scheduling";
 import { QueryState } from "../../../components/feedback/QueryState";
 import { StatusBadge } from "../../../components/feedback/StatusBadge";
-import { formatTime, formatWeekday } from "../../../components/format";
+import { formatTime, formatWeekday } from "../../../lib/format";
 import { PageHeader } from "../../../components/layout/PageHeader";
-import { addDays, instituteDateTime, instituteToday } from "../../../components/time";
+import { addDays, instituteDateTime, instituteToday } from "../../../lib/time";
 import { paths } from "../../../app/paths";
 
 const DAYS_SHOWN = 7;
