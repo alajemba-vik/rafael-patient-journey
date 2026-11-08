@@ -9,7 +9,7 @@ editing or deleting rows. A trigger now refuses:
 - any DELETE of an event younger than the retention period;
 - TRUNCATE, which would empty the table without going through the row check.
 
-Older events can be deleted (a purge job, when the Institute sets the rule). The trigger
+Older events can be deleted, one row at a time; nothing purges them yet. The trigger
 applies to every role, the table owner included; only a superuser can switch it off.
 
 Retention: one year, in line with the CNIL's usual guidance for access logs (six months to
