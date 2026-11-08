@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from "react";
 
-import { useAddToCareTeam, useCareStaff, useCareTeam, useRemoveFromCareTeam } from "../../api/careTeam";
-import { usePermissions } from "../../api/permissions";
+import { useAddToCareTeam, useCareStaff, useCareTeam, useRemoveFromCareTeam } from "../../api/care_team";
+import { usePermissions } from "../../api/identity_access";
 import { QueryState } from "../feedback/QueryState";
 import { Button } from "../forms/Button";
 import { ConfirmButton } from "../forms/ConfirmButton";

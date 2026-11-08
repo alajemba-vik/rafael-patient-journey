@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 
-import { useMe } from "../../../api/me";
+import { useMe } from "../../../api/identity_access";
 import { useMyPathways } from "../../../api/pathways";
 import { useDueQuestionnaires, useMyScores } from "../../../api/questionnaires";
 import { useMyAppointments } from "../../../api/scheduling";

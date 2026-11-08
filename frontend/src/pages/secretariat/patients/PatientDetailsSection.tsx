@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from "react";
 
-import { ApiError, type Schemas } from "../../../api/client";
+import { ApiError, type Schemas } from "../../../api/core/client";
 import { useUpdatePatient } from "../../../api/patients";
 import { Button } from "../../../components/forms/Button";
 import { TextField } from "../../../components/forms/TextField";

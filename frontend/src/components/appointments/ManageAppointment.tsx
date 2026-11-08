@@ -1,6 +1,6 @@
 import { useId, useState, type FormEvent } from "react";
 
-import { ApiError } from "../../api/client";
+import { ApiError } from "../../api/core/client";
 import {
   NOTE_MAX_LENGTH,
   useCancelAppointment,

@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { usePermissions } from "../../../api/permissions";
+import { usePermissions } from "../../../api/identity_access";
 import { useClosePathway, useOpenPathway, usePatientPathways, type Pathway } from "../../../api/pathways";
 import { QueryState } from "../../../components/feedback/QueryState";
 import { Button } from "../../../components/forms/Button";

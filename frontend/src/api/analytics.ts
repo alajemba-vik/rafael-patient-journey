@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { api, unwrap } from "./client";
+import { api, unwrap } from "./core/client";
 
 export function useDashboard() {
   return useQuery({

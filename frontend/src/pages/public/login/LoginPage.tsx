@@ -1,9 +1,9 @@
 import { useState, type FormEvent } from "react";
 import { Navigate, useLocation, useNavigate, useSearchParams } from "react-router";
 
-import { useLogin } from "../../../api/auth";
-import { ApiError } from "../../../api/client";
-import { session } from "../../../api/session";
+import { useLogin } from "../../../api/identity_access";
+import { ApiError } from "../../../api/core/client";
+import { session } from "../../../api/core/session";
 import { Button } from "../../../components/forms/Button";
 import { TextField } from "../../../components/forms/TextField";
 import { PageHeader } from "../../../components/layout/PageHeader";

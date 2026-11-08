@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from "react";
 
-import { ApiError } from "../../../api/client";
-import { useCreateAccount, type AccountCreate } from "../../../api/accounts";
+import { ApiError } from "../../../api/core/client";
+import { useCreateAccount, type AccountCreate } from "../../../api/identity_access";
 import { usePatients } from "../../../api/patients";
 import { Button } from "../../../components/forms/Button";
 import { SelectField } from "../../../components/forms/SelectField";
