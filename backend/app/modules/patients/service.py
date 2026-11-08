@@ -9,9 +9,10 @@ Access policy (role + care relationship):
   admin        → every patient, administrative only
 """
 
+import unicodedata
 import uuid
 
-from sqlalchemy import or_, select
+from sqlalchemy import ColumnElement, or_, select
 from sqlalchemy.orm import Session
 
 from app import audit
@@ -21,6 +22,7 @@ from app.modules.identity_access import service as identity
 from app.modules.identity_access.service import CurrentUser, Role
 from app.modules.patients.models import Patient
 from app.modules.patients.schemas import (
+    FRANCE_CODE,
     PatientAdministrative,
     PatientCreate,
     PatientDetail,
@@ -32,6 +34,9 @@ OFFICE_ROLES = {Role.SECRETARY, Role.ADMIN}
 # TODO(validate): how are new patients given a coordinator, and what may coordinators see
 # before that? For now they see unassigned patients' administrative data. (V-06, V-07)
 LIST_LIMIT = 100
+PHONE_SEARCH_DIGITS = 3
+# Sent as null, these are cleared: no email, no phone, or the login unlinked.
+CLEARABLE_FIELDS = {"email", "phone", "user_id"}
 
 
 def create_patient(db: Session, user: CurrentUser, data: PatientCreate) -> PatientAdministrative:
@@ -39,7 +44,9 @@ def create_patient(db: Session, user: CurrentUser, data: PatientCreate) -> Patie
         raise ForbiddenError("Only reception or admins can register patients")
     if data.user_id is not None:
         _check_account_can_be_linked(db, data.user_id)
-    patient = Patient(**data.model_dump())
+    if not data.allow_duplicate and _has_namesake(db, data):
+        raise ConflictError("A patient with this name and birth date is already registered")
+    patient = Patient(**data.model_dump(exclude={"allow_duplicate"}))
     db.add(patient)
     db.flush()
     audit.record(db, user.id, "patient.create", patient.id)
@@ -50,7 +57,7 @@ def create_patient(db: Session, user: CurrentUser, data: PatientCreate) -> Patie
 def update_patient(
     db: Session, user: CurrentUser, patient_id: uuid.UUID, data: PatientUpdate
 ) -> PatientAdministrative:
-    """Reception and admins update contact details or link the patient's login."""
+    """Reception and admins correct the record, update contact details or link the login."""
     patient = db.get(Patient, patient_id)
     if patient is None:
         raise NotFoundError("Patient not found")
@@ -58,7 +65,12 @@ def update_patient(
         audit.record(db, user.id, "patient.update.denied", patient.id)
         db.commit()
         raise ForbiddenError("Only reception or admins can update patients")
-    changes = data.model_dump(exclude_unset=True)
+    # A field sent as null clears it, except names and birth date, which every patient has.
+    changes = {
+        field: value
+        for field, value in data.model_dump(exclude_unset=True).items()
+        if value is not None or field in CLEARABLE_FIELDS
+    }
     if changes.get("user_id") is not None and changes["user_id"] != patient.user_id:
         _check_account_can_be_linked(db, changes["user_id"])
 
@@ -97,7 +109,8 @@ def list_patients(
 
     Practitioners and coordinators get their own care-team patients; with `unassigned`, a
     coordinator gets the patients nobody coordinates yet. `search` matches the start of a
-    first or last name.
+    first or last name, or, when it is a number, part of the phone number: reception
+    finds who is calling.
     """
     query = select(Patient).order_by(Patient.last_name, Patient.first_name).limit(LIST_LIMIT)
     if user.role == Role.COORDINATOR and unassigned:
@@ -106,15 +119,8 @@ def list_patients(
         query = query.where(Patient.id.in_(care_team.patient_ids_for(db, user.id)))
     elif user.role not in OFFICE_ROLES:
         raise ForbiddenError("You are not allowed to list patients")
-    if search:
-        escaped = search.strip().replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
-        pattern = f"{escaped}%"
-        query = query.where(
-            or_(
-                Patient.last_name.ilike(pattern, escape="\\"),
-                Patient.first_name.ilike(pattern, escape="\\"),
-            )
-        )
+    if search and search.strip():
+        query = query.where(_matches(search.strip()))
 
     patients = list(db.scalars(query))
     audit.record_many(db, user.id, "patient.list", {p.id for p in patients})
@@ -140,6 +146,49 @@ def patient_exists(db: Session, patient_id: uuid.UUID) -> bool:
 def get_patient_id_for_user(db: Session, user_id: uuid.UUID) -> uuid.UUID | None:
     """The patient record behind a patient's login, if any."""
     return db.scalar(select(Patient.id).where(Patient.user_id == user_id))
+
+
+def _matches(search: str) -> ColumnElement[bool]:
+    """A name prefix, or a run of at least PHONE_SEARCH_DIGITS digits anywhere in the phone."""
+    digits = "".join(ch for ch in search if ch.isdigit())
+    if len(digits) >= PHONE_SEARCH_DIGITS and not any(ch.isalpha() for ch in search):
+        return Patient.phone.contains(_stored_phone_digits(search, digits), autoescape=True)
+    pattern = _escape_like(search) + "%"
+    return or_(
+        Patient.last_name.ilike(pattern, escape="\\"),
+        Patient.first_name.ilike(pattern, escape="\\"),
+    )
+
+
+def _stored_phone_digits(search: str, digits: str) -> str:
+    """The digits as they are stored: "+33 6 12" is searched as "0612", like the number."""
+    international = search.strip().startswith("+") or digits.startswith("00")
+    national = digits.removeprefix("00") if international else digits
+    if international and national.startswith(FRANCE_CODE) and len(national) > len(FRANCE_CODE):
+        return "0" + national[len(FRANCE_CODE) :]
+    return national
+
+
+def _escape_like(text: str) -> str:
+    return text.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+
+
+def _has_namesake(db: Session, data: PatientCreate) -> bool:
+    """Same first name, last name and birth date: most likely the same person registered twice.
+
+    Compared without case or accents ("Elodie" is "Élodie"), in Python: the few people born
+    that day are fetched, so no database-specific accent function is needed.
+    """
+    wanted = (_fold(data.first_name), _fold(data.last_name))
+    rows = db.execute(
+        select(Patient.first_name, Patient.last_name).where(Patient.birth_date == data.birth_date)
+    )
+    return any((_fold(first), _fold(last)) == wanted for first, last in rows)
+
+
+def _fold(name: str) -> str:
+    decomposed = unicodedata.normalize("NFKD", name.strip())
+    return "".join(ch for ch in decomposed if not unicodedata.combining(ch)).casefold()
 
 
 def _check_account_can_be_linked(db: Session, user_id: uuid.UUID) -> None:

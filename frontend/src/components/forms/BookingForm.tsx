@@ -37,7 +37,13 @@ export function BookingForm({ patientId }: { patientId: string }) {
     const start = instituteDateTime(date, time);
     const end = new Date(start.getTime() + minutes * 60_000);
     book.mutate(
-      { patient_id: patientId, professional_id: memberId, starts_at: start.toISOString(), ends_at: end.toISOString() },
+      {
+        patient_id: patientId,
+        professional_id: memberId,
+        starts_at: start.toISOString(),
+        ends_at: end.toISOString(),
+        note: "",
+      },
       { onSuccess: () => setBooked(true) },
     );
   }
