@@ -1,11 +1,12 @@
-import { useAccounts } from "../../../api/identity_access";
+import { useAccounts, useMe } from "../../../api/identity_access";
 import { QueryState } from "../../../components/feedback/QueryState";
-import { ROLE_LABELS } from "../../../lib/labels";
 import { PageHeader } from "../../../components/layout/PageHeader";
+import { AccountRow } from "./AccountRow";
 import { CreateAccountForm } from "./CreateAccountForm";
 
 export function AccountsPage() {
   const accounts = useAccounts();
+  const me = useMe();
 
   return (
     <>
@@ -26,16 +27,13 @@ export function AccountsPage() {
                   <th scope="col">E-mail</th>
                   <th scope="col">Rôle</th>
                   <th scope="col">Discipline</th>
+                  <th scope="col">État</th>
+                  <th scope="col">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {list.map((a) => (
-                  <tr key={a.id}>
-                    <td>{a.full_name}</td>
-                    <td>{a.email}</td>
-                    <td>{ROLE_LABELS[a.role]}</td>
-                    <td>{a.discipline ?? "—"}</td>
-                  </tr>
+                  <AccountRow key={a.id} account={a} isSelf={a.id === me.data?.id} />
                 ))}
               </tbody>
             </table>

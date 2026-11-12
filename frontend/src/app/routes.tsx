@@ -64,6 +64,7 @@ export const router = createBrowserRouter([
         children: [
           page(paths.admin.accounts, () => import("../pages/admin/users/AccountsPage")),
           page(paths.admin.faq, () => import("../pages/admin/faq/FaqAdminPage")),
+          page(paths.admin.audit, () => import("../pages/admin/audit/AuditPage")),
           // The same de-identified dashboard care staff see.
           page(paths.admin.dashboard, () => import("../pages/professional/dashboard/DashboardPage")),
         ],

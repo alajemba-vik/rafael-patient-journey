@@ -58,7 +58,7 @@ src/
     patient/               home · appointments · pathway · questionnaires
     professional/          schedule · patients (list and file) · pathways · needs · dashboard
     reception/             board (arrivals, waiting room) · patients
-    admin/                 users · faq
+    admin/                 users · faq · audit
 ```
 
 One folder per page. A component used by one page lives in that page's folder; move it to `components/` once a second page needs it.
@@ -70,8 +70,8 @@ URLs are per role), and most pages draw on several modules, so this table is the
 
 | Backend module (`backend/app/modules/`) | Data hooks (`src/api/`) | Used by                                                                                                                                               |
 | --------------------------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `identity_access`                       | `identity_access.ts`    | `pages/public/login`, `pages/admin/users`, app shell and menus, `usePermissions` everywhere                                                           |
-| `patients`                              | `patients.ts`           | `pages/reception/patients`, `pages/professional/patients`, `pages/admin/users`                                                                        |
+| `identity_access`                       | `identity_access.ts`    | `pages/public/login`, `pages/admin/users`, `pages/admin/audit`, app shell and menus, `usePermissions` everywhere                                      |
+| `patients`                              | `patients.ts`           | `pages/reception/patients`, `pages/professional/patients`, `pages/admin/users`, `pages/admin/audit`                                                   |
 | `care_team`                             | `care_team.ts`          | `components/patient` (care team section), `pages/professional/patients`                                                                               |
 | `pathways`                              | `pathways.ts`           | `pages/professional/patients`, `pathways`, `needs` · `pages/patient/home`, `pathway`                                                                  |
 | `scheduling`                            | `scheduling.ts`         | `components/appointments`, `components/forms` (booking), `pages/reception/board`, `pages/professional/schedule`, `pages/patient/appointments`, `home` |

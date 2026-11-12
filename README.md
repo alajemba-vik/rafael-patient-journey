@@ -87,7 +87,7 @@ AGENTS.md               code guidelines and rules for people and AI agents
 
 | Module | Owns | Owner | Status |
 |---|---|---|---|
-| `identity_access` | users, roles, login | Louis | login, admin account creation |
+| `identity_access` | users, roles, login | Louis | login, admin account creation, role changes, deactivation |
 | `patients` | patient profiles | Victoria | reference module |
 | `care_team` | who cares for which patient | Hugo | assign, remove, list team |
 | `pathways` | ~6-month care pathway, reviews | Hugo | open, milestones, close, patient and coordinator views |

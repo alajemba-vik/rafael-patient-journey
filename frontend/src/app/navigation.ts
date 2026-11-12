@@ -36,6 +36,7 @@ export const NAV_BY_ROLE: Record<Role, NavItem[]> = {
   admin: [
     { to: paths.admin.accounts, label: "Comptes" },
     { to: paths.admin.faq, label: "Gérer la FAQ" },
+    { to: paths.admin.audit, label: "Journal d’accès" },
     { to: paths.admin.dashboard, label: "Tableau de bord" },
     FAQ,
   ],

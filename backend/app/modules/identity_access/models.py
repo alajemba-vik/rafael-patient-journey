@@ -1,7 +1,7 @@
 import uuid
 from enum import StrEnum
 
-from sqlalchemy import Enum, String, Uuid
+from sqlalchemy import Boolean, Enum, String, Uuid, true
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db import Base
@@ -28,3 +28,5 @@ class User(Base):
     )
     # A practitioner's discipline, e.g. "Sophrologie". Coordinators often practise one too.
     discipline: Mapped[str | None] = mapped_column(String(120))
+    # A deactivated account keeps its history (audit trail, past sessions) but can't log in.
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, server_default=true())

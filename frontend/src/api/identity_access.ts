@@ -7,7 +7,10 @@ import { PATIENTS } from "./patients";
 
 type Me = Schemas["UserOut"];
 export type Role = Me["role"];
+export type Account = Me;
 export type AccountCreate = Schemas["UserCreate"];
+export type AccountUpdate = Schemas["UserUpdate"];
+export type AuditEvent = Schemas["AuditEventOut"];
 
 // Session
 
@@ -67,6 +70,19 @@ export function useAccounts() {
   return useQuery({ queryKey: ACCOUNTS, queryFn: () => unwrap(api.GET("/api/v1/auth/users")) });
 }
 
+/** Change an account's role or name, or deactivate and reactivate its login. */
+export function useUpdateAccount() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, body }: { id: string; body: AccountUpdate }) =>
+      unwrap(api.PATCH("/api/v1/auth/users/{user_id}", { params: { path: { user_id: id } }, body })),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ACCOUNTS });
+      void queryClient.invalidateQueries({ queryKey: ["care-staff"] });
+    },
+  });
+}
+
 /** Create a login; for a patient, then link it to their record so they see their portal. */
 export function useCreateAccount() {
   const queryClient = useQueryClient();
@@ -88,5 +104,21 @@ export function useCreateAccount() {
       void queryClient.invalidateQueries({ queryKey: PATIENTS });
       void queryClient.invalidateQueries({ queryKey: ["care-staff"] });
     },
+  });
+}
+
+// Audit trail (admin)
+
+/** The newest audit events, optionally for one patient or one account. Never cached: each look is recorded. */
+export function useAuditEvents(filters: { patientId?: string; actorId?: string }) {
+  return useQuery({
+    queryKey: ["audit-events", filters],
+    queryFn: () =>
+      unwrap(
+        api.GET("/api/v1/auth/audit-events", {
+          params: { query: { patient_id: filters.patientId, actor_id: filters.actorId } },
+        }),
+      ),
+    staleTime: 0,
   });
 }
