@@ -83,6 +83,7 @@ backend/
   tests/
 frontend/               React app: pages per role + shared components (see frontend/README.md)
 AGENTS.md               code guidelines and rules for people and AI agents
+docs/architecture.md    how the platform is cut up and why
 ```
 
 | Module | Owns | Owner | Status |
