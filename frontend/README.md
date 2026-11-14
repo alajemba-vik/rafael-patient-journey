@@ -4,14 +4,14 @@ React and TypeScript, built with Vite. Data goes through TanStack Query (caching
 
 ## Run
 
-Needs Node 24. Start the backend first (see the root README), then:
+Needs Node 24. The root README's "Run it locally" has both setups: your screens on the live API, or everything on your machine.
 
 ```bash
 npm install
-npm run dev          # http://localhost:5173, calls the API set in .env.development
+npm run dev          # http://localhost:5173
 ```
 
-Point it at another API with `VITE_API_URL=https://… npm run dev`. A deployed build without `VITE_API_URL` calls the API on its own domain.
+The API it calls comes from `.env.development` (a local backend at `http://localhost:8000`), unless `.env.development.local` sets another `VITE_API_URL`, e.g. `https://rafael-api.vercel.app`. That file stays on your machine. A deployed build without `VITE_API_URL` calls the API on its own domain.
 
 | Command                                                                                      | Does                                                                                                                                                               |
 | -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
