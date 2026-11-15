@@ -6,7 +6,6 @@ import { ApiError } from "../../../api/core/client";
 import { session } from "../../../api/core/session";
 import { Button } from "../../../components/forms/Button";
 import { TextField } from "../../../components/forms/TextField";
-import { PageHeader } from "../../../components/layout/PageHeader";
 import { paths } from "../../../app/paths";
 
 export function LoginPage() {

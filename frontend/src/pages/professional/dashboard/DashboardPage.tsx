@@ -1,6 +1,6 @@
 import { useDashboard } from "../../../api/analytics";
 import { QueryState } from "../../../components/feedback/QueryState";
-import { formatChange, formatDate, formatMonth, formatNumber } from "../../../lib/format";
+import { formatChange, formatMonth, formatNumber } from "../../../lib/format";
 import { DIMENSIONS } from "../../../lib/labels";
 import { PageHeader } from "../../../components/layout/PageHeader";
 
