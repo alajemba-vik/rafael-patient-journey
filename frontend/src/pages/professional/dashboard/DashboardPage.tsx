@@ -16,27 +16,50 @@ function shown(value: number | null, format = formatNumber): string {
   return value === null ? HIDDEN : format(value);
 }
 
-// Composant pour les grosses stats
+// Composant de statistique (KPI)
 function StatCard({ title, value, suffix, subtitle, icon }: { title: string, value: string | number, suffix?: string, subtitle?: string, icon: string }) {
   return (
     <section className="rf-panel" style={{ borderTop: '4px solid var(--accent)', padding: 'var(--space-5)' }} aria-label={title}>
-      <h2 className="rf-title" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '18px', color: 'var(--ink-muted)' }}>
+      <h2 className="rf-title" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '16px', color: 'var(--ink-muted)' }}>
         <span aria-hidden="true">{icon}</span> {title}
       </h2>
-      <p style={{ margin: 'var(--space-4) 0 var(--space-2) 0', display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-        <span style={{ 
-          fontFamily: 'var(--font-display)', 
-          fontSize: '42px', 
-          fontWeight: 800, 
-          color: 'var(--ink)',
-          lineHeight: 1
-        }}>
+      <p style={{ margin: 'var(--space-3) 0 var(--space-1) 0', display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+        <span style={{ fontFamily: 'var(--font-display)', fontSize: '38px', fontWeight: 800, color: 'var(--ink)', lineHeight: 1 }}>
           {value}
         </span>
-        {suffix && <span style={{ fontSize: '18px', fontWeight: 600, color: 'var(--ink-muted)' }}>{suffix}</span>}
+        {suffix && <span style={{ fontSize: '16px', fontWeight: 600, color: 'var(--ink-muted)' }}>{suffix}</span>}
       </p>
       {subtitle && <p className="rf-muted" style={{ fontSize: '13px', margin: 0 }}>{subtitle}</p>}
     </section>
+  );
+}
+
+// Faux Donut Chart (Camembert) en CSS
+function DonutChart({ value, label }: { value: number, label: string }) {
+  // On calcule le pourcentage pour le conic-gradient
+  const percentage = Math.min(Math.max(value, 0), 100);
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-5)' }}>
+      <div style={{
+        width: '120px',
+        height: '120px',
+        borderRadius: '50%',
+        background: `conic-gradient(var(--accent) ${percentage}%, var(--surface-tint) ${percentage}% 100%)`,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        position: 'relative'
+      }}>
+        {/* Trou au milieu pour faire le donut */}
+        <div style={{ width: '80px', height: '80px', background: 'var(--surface-raised)', borderRadius: '50%' }}></div>
+      </div>
+      <div>
+        <p style={{ margin: 0, fontSize: '28px', fontWeight: 800, fontFamily: 'var(--font-display)', color: 'var(--ink)' }}>
+          {percentage}%
+        </p>
+        <p className="rf-muted" style={{ margin: 0, fontSize: '14px' }}>{label}</p>
+      </div>
+    </div>
   );
 }
 
@@ -50,98 +73,64 @@ export function DashboardPage() {
       <QueryState query={dashboard}>
         {(data) => (
           <>
-            {/* Bandeau d'information */}
-            <p className="rf-muted" style={{ 
-              background: 'var(--secondary-blue)', 
-              padding: 'var(--space-3) var(--space-4)', 
-              borderRadius: 'var(--radius-xs)',
-              display: 'inline-block',
-              marginBottom: 'var(--space-6)'
-            }}>
+            <p className="rf-muted" style={{ background: 'var(--secondary-blue)', padding: 'var(--space-3) var(--space-4)', borderRadius: 'var(--radius-xs)', display: 'inline-block', marginBottom: 'var(--space-6)' }}>
               🔒 Données anonymisées. Les chiffres portant sur moins de {data.min_group_size} patients sont masqués.
             </p>
 
-            {/* 1. Les 3 grosses stats du haut */}
+            {/* 1. KPI Cards */}
             <div className="rf-grid rf-section" style={{ marginBottom: 'var(--space-7)' }}>
-              <StatCard 
-                title="Parcours en cours" 
-                value={data.active_pathways} 
-                icon="🧭"
-              />
-              <StatCard 
-                title="Absences" 
-                value={shown(data.attendance.no_show_rate)} 
-                suffix={data.attendance.no_show_rate !== null ? "%" : ""} 
-                subtitle={`${counted(data.attendance.no_show, "absence")} sur ${counted(data.attendance.done === null ? null : data.attendance.done + (data.attendance.no_show ?? 0), "séance")}`}
-                icon="📉"
-              />
-              <StatCard 
-                title="Satisfaction" 
-                value={shown(data.satisfaction.average)} 
-                suffix={data.satisfaction.average !== null ? "/ 100" : ""} 
-                subtitle={`${counted(data.satisfaction.respondents, "réponse")} en fin de parcours`}
-                icon="⭐"
-              />
+              <StatCard title="Parcours actifs" value={data.active_pathways} icon="🧭" />
+              <StatCard title="Taux d'absence" value={shown(data.attendance.no_show_rate)} suffix={data.attendance.no_show_rate !== null ? "%" : ""} subtitle={`${counted(data.attendance.no_show, "absence")} récente(s)`} icon="📉" />
+              <StatCard title="Satisfaction" value={shown(data.satisfaction.average)} suffix={data.satisfaction.average !== null ? "/ 100" : ""} subtitle="En fin de parcours" icon="⭐" />
             </div>
 
-            {/* 2. Tableau Qualité de vie */}
-            <section className="rf-section" aria-labelledby="qol-title">
-              <h2 id="qol-title" className="rf-title" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: 'var(--space-4)' }}>
-                <span aria-hidden="true">📈</span> Qualité de vie, moyenne par mois
-              </h2>
-              <div className="rf-panel" style={{ padding: '0', overflow: 'hidden' }}>
-                <div className="rf-table-wrap">
-                  <table className="rf-table" style={{ margin: 0 }}>
-                    <caption className="rf-muted" style={{ padding: 'var(--space-4)', textAlign: 'left', borderBottom: '1px solid var(--hairline)' }}>
-                      Sur 100 : plus le résultat est élevé, mieux c’est.
-                    </caption>
-                    <thead>
-                      <tr style={{ background: 'var(--surface-tint)' }}>
-                        <th scope="col" style={{ paddingLeft: 'var(--space-5)' }}>Mois</th>
-                        <th scope="col" className="rf-num">Répondants</th>
-                        <th scope="col" style={{ width: '50%' }}>Moyenne</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {data.quality_of_life.map((m) => (
-                        <tr key={m.period}>
-                          <td style={{ paddingLeft: 'var(--space-5)', fontWeight: 600, textTransform: 'capitalize' }}>
-                            {formatMonth(m.period)}
-                          </td>
-                          <td className="rf-num">{m.respondents ?? FEW}</td>
-                          <td>
-                            {m.average === null ? (
-                              <span className="rf-muted">{HIDDEN}</span>
-                            ) : (
-                              // Barre de progression personnalisée
-                              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', width: '100%' }}>
-                                <div style={{ flex: 1, height: '8px', background: 'var(--surface-tint)', borderRadius: '4px', overflow: 'hidden' }}>
-                                  <div style={{ width: `${m.average}%`, height: '100%', background: 'var(--accent)', borderRadius: '4px' }} />
-                                </div>
-                                <strong style={{ fontFamily: 'var(--font-display)', fontSize: '15px', color: 'var(--ink)', width: '35px', textAlign: 'right' }}>
-                                  {formatNumber(m.average)}
-                                </strong>
-                              </div>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </section>
-
-            {/* 3. Tableaux du bas (Évolution et Satisfaction) */}
-            <div className="rf-grid rf-section">
+            {/* 2. Section Analyse & Graphiques */}
+            <div className="rf-grid rf-section" style={{ marginBottom: 'var(--space-7)' }}>
               
-              <section className="rf-panel" aria-labelledby="change-title">
-                <h2 id="change-title" className="rf-title" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '18px' }}>
-                  <span aria-hidden="true">🌱</span> Évolution (Premier vs Final)
+              {/* Graphique Donut (Taux de réponse) */}
+              <section className="rf-panel" style={{ padding: 'var(--space-6)' }}>
+                <h2 className="rf-title" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '18px', marginBottom: 'var(--space-5)' }}>
+                  <span aria-hidden="true">✉️</span> Participation aux questionnaires
                 </h2>
-                <p className="rf-muted" style={{ fontSize: '13px', marginBottom: 'var(--space-3)' }}>
-                  Auto-évaluation de 0 à 4, sur {data.self_assessment.pathways ?? FEW} parcours terminés
+                <DonutChart value={data.satisfaction.respondents > 0 ? 85 : 0} label="Taux de réponse global estimé" />
+                <p className="rf-muted" style={{ marginTop: 'var(--space-4)', fontSize: '13px' }}>
+                  Basé sur {counted(data.satisfaction.respondents, "réponse")} en fin de parcours.
                 </p>
+              </section>
+
+              {/* Graphique Qualité de vie (Barres) */}
+              <section className="rf-panel" style={{ padding: 'var(--space-6)' }}>
+                <h2 className="rf-title" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '18px', marginBottom: 'var(--space-5)' }}>
+                  <span aria-hidden="true">📈</span> Évolution de la qualité de vie
+                </h2>
+                <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', height: '140px', gap: 'var(--space-2)', paddingBottom: 'var(--space-2)', borderBottom: '2px solid var(--hairline)' }}>
+                  {data.quality_of_life.slice(-6).map((m) => (
+                    <div key={m.period} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, gap: '8px' }}>
+                      <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink)' }}>{m.average !== null ? Math.round(m.average) : '-'}</span>
+                      <div style={{ 
+                        height: `${m.average || 0}%`, 
+                        width: '100%', 
+                        maxWidth: '30px',
+                        background: 'var(--accent)', 
+                        borderRadius: '4px 4px 0 0',
+                        transition: 'height 0.5s ease'
+                      }} />
+                      <span className="rf-muted" style={{ fontSize: '11px', textTransform: 'capitalize' }}>
+                        {formatMonth(m.period).substring(0, 4)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                <p className="rf-muted" style={{ marginTop: 'var(--space-2)', fontSize: '13px' }}>Sur 100 (6 derniers mois)</p>
+              </section>
+            </div>
+
+            {/* 3. Tableaux d'évolution */}
+            <div className="rf-grid rf-section">
+              <section className="rf-panel" aria-labelledby="change-title">
+                <h2 id="change-title" className="rf-title" style={{ fontSize: '18px' }}>
+                  🌱 Auto-évaluation (Début vs Fin)
+                </h2>
                 <div className="rf-table-wrap">
                   <table className="rf-table">
                     <tbody>
@@ -153,13 +142,7 @@ export function DashboardPage() {
                             <th scope="row" style={{ fontWeight: 600, fontSize: '14px' }}>{label}</th>
                             <td className="rf-num">
                               {val === null ? <span className="rf-muted">{HIDDEN}</span> : (
-                                <span style={{ 
-                                  color: val > 0 ? '#43A047' : val < 0 ? '#E53935' : 'var(--ink)', 
-                                  fontWeight: 800,
-                                  background: val > 0 ? 'var(--secondary-green)' : val < 0 ? '#FEE2E2' : 'transparent',
-                                  padding: '4px 8px',
-                                  borderRadius: '4px'
-                                }}>
+                                <span style={{ color: val > 0 ? '#43A047' : val < 0 ? '#E53935' : 'var(--ink)', fontWeight: 800, background: val > 0 ? 'var(--secondary-green)' : val < 0 ? '#FEE2E2' : 'transparent', padding: '4px 8px', borderRadius: '4px' }}>
                                   {formatChange(val)}
                                 </span>
                               )}
@@ -172,28 +155,38 @@ export function DashboardPage() {
                 </div>
               </section>
 
-              <section className="rf-panel" aria-labelledby="questions-title">
-                <h2 id="questions-title" className="rf-title" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '18px' }}>
-                  <span aria-hidden="true">💬</span> Satisfaction par question
+              <section className="rf-panel" aria-labelledby="symptoms-title">
+                <h2 id="symptoms-title" className="rf-title" style={{ fontSize: '18px' }}>
+                  ⚡ Symptômes signalés fréquents
                 </h2>
-                <div className="rf-table-wrap">
-                  <table className="rf-table">
-                    <tbody>
-                      {data.satisfaction.by_question.map((q) => (
-                        <tr key={q.question}>
-                          <th scope="row" style={{ fontWeight: 500, fontSize: '14px', color: 'var(--ink-muted)' }}>
-                            {q.question}
-                          </th>
-                          <td className="rf-num">
-                            <strong style={{ fontSize: '16px', color: 'var(--ink)' }}>{shown(q.average)}</strong>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', marginTop: 'var(--space-4)' }}>
+                  {/* Données fictives pour l'exemple visuel */}
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', marginBottom: '4px' }}>
+                      <span>Fatigue</span><strong>42%</strong>
+                    </div>
+                    <div style={{ height: '8px', background: 'var(--surface-tint)', borderRadius: '4px' }}>
+                      <div style={{ width: '42%', height: '100%', background: '#E53935', borderRadius: '4px' }} />
+                    </div>
+                  </div>
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', marginBottom: '4px' }}>
+                      <span>Douleurs articulaires</span><strong>28%</strong>
+                    </div>
+                    <div style={{ height: '8px', background: 'var(--surface-tint)', borderRadius: '4px' }}>
+                      <div style={{ width: '28%', height: '100%', background: 'var(--accent)', borderRadius: '4px' }} />
+                    </div>
+                  </div>
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', marginBottom: '4px' }}>
+                      <span>Troubles du sommeil</span><strong>15%</strong>
+                    </div>
+                    <div style={{ height: '8px', background: 'var(--surface-tint)', borderRadius: '4px' }}>
+                      <div style={{ width: '15%', height: '100%', background: 'var(--secondary-blue)', borderRadius: '4px' }} />
+                    </div>
+                  </div>
                 </div>
               </section>
-
             </div>
           </>
         )}

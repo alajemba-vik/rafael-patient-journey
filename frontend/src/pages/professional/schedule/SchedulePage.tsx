@@ -10,10 +10,8 @@ import { addDays, instituteDateTime, instituteToday } from "../../../lib/time";
 import { paths } from "../../../app/paths";
 
 const DAYS_SHOWN = 7;
-// Reception marks arrivals: check for them every minute while the page is open.
 const REFRESH_MS = 60_000;
 
-/** From today's midnight at the Institute to the same midnight a week later. */
 function thisWeek() {
   const today = instituteToday();
   return {
@@ -32,12 +30,11 @@ function byDay(appointments: Appointment[]): [string, Appointment[]][] {
 }
 
 export function SchedulePage() {
-  // Fixed once per visit, so the query key doesn't change on every render.
   const [range] = useState(thisWeek);
   const appointments = useMyAppointments(range, REFRESH_MS);
 
   return (
-    <>
+    <div style={{ maxWidth: '800px', margin: '0 auto' }}>
       <PageHeader title="Mon planning" />
       <QueryState
         query={appointments}
@@ -46,27 +43,47 @@ export function SchedulePage() {
         {(list) =>
           byDay(list).map(([day, items]) => (
             <section key={day} className="rf-section" aria-label={day}>
-              <h2 className="rf-title">{day}</h2>
-              <ul className="rf-list">
+              <h2 className="rf-title" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: 'var(--space-4)', color: 'var(--ink)' }}>
+                <span aria-hidden="true">📅</span> {day}
+              </h2>
+              
+              <div className="rf-stack" style={{ gap: 'var(--space-3)' }}>
                 {items.map((a) => (
-                  <li key={a.id}>
-                    <span>
-                      <strong>{formatTime(a.starts_at)}</strong>{" "}
-                      <Link className="rf-link" to={paths.pro.patient(a.patient_id)}>
+                  <div key={a.id} className="rf-panel" style={{ 
+                    flexDirection: 'row', 
+                    alignItems: 'center', 
+                    justifyContent: 'space-between',
+                    padding: 'var(--space-4) var(--space-5)',
+                    borderLeft: '4px solid var(--accent)',
+                    flexWrap: 'wrap',
+                    gap: 'var(--space-4)'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
+                      <span style={{ 
+                        fontFamily: 'var(--font-display)', 
+                        fontWeight: 800, 
+                        fontSize: '18px', 
+                        color: 'var(--accent)',
+                        background: 'var(--accent-doux)',
+                        padding: '4px 12px',
+                        borderRadius: 'var(--radius-xs)'
+                      }}>
+                        {formatTime(a.starts_at)}
+                      </span>
+                      <Link className="rf-link" to={paths.pro.patient(a.patient_id)} style={{ fontWeight: 600, fontSize: '16px' }}>
                         {a.patient_name}
                       </Link>
-                    </span>
+                    </div>
                     <StatusBadge status={a.status} />
-                  </li>
+                  </div>
                 ))}
-              </ul>
+              </div>
             </section>
           ))
         }
       </QueryState>
-    </>
+    </div>
   );
 }
 
-// React Router loads a lazy route's component from this export.
 export { SchedulePage as Component };
