@@ -12,8 +12,6 @@ body {
 .rf-root {
   position: relative;
   background-color: var(--surface);
-  /* On utilise une image SVG pour les petits pois, c'est 100% net */
-  background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='2' cy='2' r='1.5' fill='%2312234A' fill-opacity='0.15'/%3E%3C/svg%3E");
   z-index: 0;
 }
 
@@ -359,8 +357,9 @@ body {
 .rf-panel {
   display: flex; flex-direction: column; gap: var(--space-4); min-width: 0;
   padding: var(--space-5); background: var(--surface-raised);
-  border: 1px solid var(--hairline); border-radius: var(--radius-md);
-  box-shadow: 0 4px 12px rgba(18, 35, 74, 0.04); /* Ombre ajoutée */
+  border: 2px solid var(--hairline); /* Épaisseur passée à 2px */
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 12px rgba(18, 35, 74, 0.04);
 }
 .rf-panel > h2 { margin: 0; }
 .rf-panel--highlight { border: 2px solid var(--accent); box-shadow: 0 4px 20px rgba(240, 165, 0, 0.15); }
@@ -493,7 +492,8 @@ body {
 .rf-card {
   display: flex; flex-direction: column; gap: var(--space-2); min-width: 0;
   padding: var(--space-4); background: var(--surface-raised);
-  border: 1px solid var(--hairline); border-radius: var(--radius-md);
+  border: 2px solid var(--hairline); /* Épaisseur passée à 2px */
+  border-radius: var(--radius-md);
   box-shadow: 0 2px 8px rgba(18, 35, 74, 0.03); transition: all 0.2s ease;
 }
 .rf-card:hover { box-shadow: 0 6px 16px rgba(18, 35, 74, 0.08); transform: translateY(-2px); }
@@ -521,3 +521,38 @@ body {
 .rf-card__menu .rf-card__actions { padding-top: var(--space-2); }
 .rf-inline-panel .rf-field { max-width: 320px; }
 .rf-cards--grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); align-items: start; }
+
+/* =========================================
+   EMOJIS LÉVITANTS EN FOND
+   ========================================= */
+.bg-ambiance {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none; /* Empêche de bloquer les clics sur le site */
+  z-index: -1;          /* Reste derrière tout le contenu */
+  overflow: hidden;
+}
+
+.bg-emoji {
+  position: absolute;
+  opacity: 0.6;         /* Semi-transparent pour ne pas agresser l'œil */
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.1)); /* Petite ombre douce */
+  animation: flotter infinite alternate ease-in-out;
+}
+
+/* Animation de lévitation */
+@keyframes flotter {
+  0% { transform: translateY(0px) rotate(0deg); }
+  100% { transform: translateY(-30px) rotate(10deg); }
+}
+
+/* Positionnement, tailles et vitesses des emojis */
+.emoji-1 { top: 10%; left: 5%;  font-size: 4rem; animation-duration: 8s; }
+.emoji-2 { top: 40%; left: 2%;  font-size: 2.5rem; animation-duration: 6s; animation-delay: 1s; }
+.emoji-3 { top: 75%; left: 8%;  font-size: 3.5rem; animation-duration: 10s; animation-delay: 2s; }
+.emoji-4 { top: 15%; right: 5%; font-size: 5rem; animation-duration: 9s; animation-delay: 0.5s; }
+.emoji-5 { top: 60%; right: 4%; font-size: 3rem; animation-duration: 7s; animation-delay: 1.5s; }
+.emoji-6 { top: 85%; right: 10%; font-size: 2rem; animation-duration: 11s; animation-delay: 3s; }
