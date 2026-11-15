@@ -106,25 +106,53 @@ export function DashboardPage() {
                 <h2 className="rf-title" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '18px', marginBottom: 'var(--space-5)' }}>
                   <span aria-hidden="true">📈</span> Évolution de la qualité de vie
                 </h2>
-                <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', height: '140px', gap: 'var(--space-2)', paddingBottom: 'var(--space-2)', borderBottom: '2px solid var(--hairline)' }}>
+                
+                {/* Conteneur principal avec une hauteur fixe */}
+                <div style={{ 
+                  display: 'flex', 
+                  alignItems: 'flex-end', 
+                  justifyContent: 'space-between', 
+                  height: '160px', // Hauteur fixe
+                  gap: 'var(--space-2)', 
+                  paddingBottom: 'var(--space-2)', 
+                  borderBottom: '2px solid var(--hairline)' 
+                }}>
                   {data.quality_of_life.slice(-6).map((m) => (
-                    <div key={m.period} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, gap: '8px' }}>
-                      <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink)' }}>{m.average !== null ? Math.round(m.average) : '-'}</span>
+                    <div key={m.period} style={{ 
+                      display: 'flex', 
+                      flexDirection: 'column', 
+                      alignItems: 'center', 
+                      flex: 1, 
+                      height: '100%', // TRÈS IMPORTANT : prend toute la hauteur
+                      justifyContent: 'flex-end', // Aligne le contenu en bas
+                      gap: '6px' 
+                    }}>
+                      {/* Le chiffre */}
+                      <span style={{ fontSize: '13px', fontWeight: 800, color: 'var(--ink)' }}>
+                        {m.average !== null ? Math.round(m.average) : '-'}
+                      </span>
+                      
+                      {/* La barre */}
                       <div style={{ 
-                        height: `${m.average || 0}%`, 
+                        height: `${m.average || 0}%`, // Maintenant le % se base sur les 160px !
                         width: '100%', 
-                        maxWidth: '30px',
+                        maxWidth: '36px',
                         background: 'var(--accent)', 
-                        borderRadius: '4px 4px 0 0',
-                        transition: 'height 0.5s ease'
+                        borderRadius: '6px 6px 0 0',
+                        transition: 'height 0.5s ease',
+                        minHeight: '4px' // Une petite barre visible même si le score est très bas
                       }} />
-                      <span className="rf-muted" style={{ fontSize: '11px', textTransform: 'capitalize' }}>
+                      
+                      {/* Le mois */}
+                      <span className="rf-muted" style={{ fontSize: '12px', textTransform: 'capitalize', marginTop: '4px' }}>
                         {formatMonth(m.period).substring(0, 4)}
                       </span>
                     </div>
                   ))}
                 </div>
-                <p className="rf-muted" style={{ marginTop: 'var(--space-2)', fontSize: '13px' }}>Sur 100 (6 derniers mois)</p>
+                <p className="rf-muted" style={{ marginTop: 'var(--space-3)', fontSize: '13px' }}>
+                  Sur 100 (6 derniers mois)
+                </p>
               </section>
             </div>
 
