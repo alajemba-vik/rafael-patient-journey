@@ -349,15 +349,51 @@ body {
 }
 
 /* Disclosure (FAQ answers) */
-.rf-disclosure { border-bottom: 1px solid var(--hairline); }
+.rf-disclosure {
+  margin-bottom: var(--space-3);
+  background: var(--surface-raised);
+  border: 2px solid var(--hairline);
+  border-radius: var(--radius-md);
+  transition: all 0.2s ease;
+}
+.rf-disclosure[open] {
+  border-color: var(--accent);
+  box-shadow: 0 4px 12px rgba(240, 165, 0, 0.08);
+}
 .rf-disclosure summary {
-  cursor: pointer; min-height: 44px; display: flex; align-items: center;
-  justify-content: space-between; gap: var(--space-4); font-weight: 600; list-style: none;
+  cursor: pointer; 
+  min-height: 56px; 
+  padding: 0 var(--space-5);
+  display: flex; 
+  align-items: center; 
+  justify-content: space-between; 
+  gap: var(--space-4); 
+  font-weight: 700;
+  font-family: var(--font-display);
+  font-size: 16px;
+  color: var(--ink);
+  list-style: none;
 }
 .rf-disclosure summary::-webkit-details-marker { display: none; }
-.rf-disclosure summary::after { content: "+"; font-family: var(--font-display); font-size: 20px; line-height: 1; font-weight: 800; }
-.rf-disclosure[open] summary::after { content: "−"; }
-.rf-disclosure__body { margin: 0 0 var(--space-4); color: var(--ink); }
+.rf-disclosure summary::after { 
+  content: "+"; 
+  font-family: var(--font-display); 
+  font-size: 24px; 
+  line-height: 1; 
+  font-weight: 800; 
+  color: var(--accent);
+  transition: transform 0.2s ease;
+}
+.rf-disclosure[open] summary::after { 
+  content: "−"; 
+  transform: rotate(180deg);
+}
+.rf-disclosure__body { 
+  margin: 0; 
+  padding: 0 var(--space-5) var(--space-5) var(--space-5); 
+  color: var(--ink-muted); 
+  line-height: 1.6;
+}
 
 /* Panels, grids and lists */
 .rf-grid {
@@ -573,4 +609,47 @@ body {
   -webkit-text-stroke: 2px var(--accent); /* Bordure orange de 2px */
   text-transform: uppercase;
   letter-spacing: 1px;
+}
+
+/* =========================================
+   TIMELINE (Chronologie du parcours patient)
+   ========================================= */
+.rf-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  position: relative;
+  margin-top: var(--space-5);
+}
+
+/* La ligne verticale */
+.rf-timeline::before {
+  content: "";
+  position: absolute;
+  left: 20px;
+  top: 10px;
+  bottom: 0;
+  width: 3px;
+  background: var(--hairline);
+  border-radius: var(--radius-xs);
+}
+
+.rf-timeline-item {
+  position: relative;
+  padding-left: 60px;
+}
+
+/* La pastille orange sur la ligne */
+.rf-timeline-item::before {
+  content: "";
+  position: absolute;
+  left: 14px;
+  top: 6px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 4px solid var(--surface-raised);
+  box-shadow: 0 0 0 2px var(--accent);
+  z-index: 1;
 }
