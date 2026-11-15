@@ -92,7 +92,10 @@ export function DashboardPage() {
                 <h2 className="rf-title" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '18px', marginBottom: 'var(--space-5)' }}>
                   <span aria-hidden="true">✉️</span> Participation aux questionnaires
                 </h2>
-                <DonutChart value={data.satisfaction.respondents > 0 ? 85 : 0} label="Taux de réponse global estimé" />
+                <DonutChart 
+  value={(data.satisfaction.respondents !== null && data.satisfaction.respondents > 0) ? 85 : 0} 
+  label="Taux de réponse global estimé" 
+/>
                 <p className="rf-muted" style={{ marginTop: 'var(--space-4)', fontSize: '13px' }}>
                   Basé sur {counted(data.satisfaction.respondents, "réponse")} en fin de parcours.
                 </p>
