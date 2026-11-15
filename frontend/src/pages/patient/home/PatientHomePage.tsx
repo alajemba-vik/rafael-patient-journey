@@ -25,9 +25,16 @@ export function PatientHomePage() {
       
       {/* Message d'accueil personnalisé et chaleureux */}
       {firstName && (
-        <p className="rf-lead" style={{ marginBottom: 'var(--space-7)' }}>
-          Bonjour <strong style={{ color: 'var(--accent)' }}>{firstName}</strong> 👋
-        </p>
+        <h2 style={{
+          fontFamily: 'var(--font-display)',
+          fontSize: '36px',
+          fontWeight: 800,
+          color: 'var(--ink)',
+          marginBottom: 'var(--space-7)',
+          letterSpacing: '-0.5px'
+        }}>
+          Bonjour <span style={{ color: 'var(--accent)' }}>{firstName}</span> 👋
+        </h2>
       )}
 
       <div className="rf-grid">

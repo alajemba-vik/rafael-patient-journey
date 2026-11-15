@@ -2,6 +2,61 @@
  * Shared components: plain CSS classes prefixed rf-, built only from tokens.css.
  */
 
+/* =========================================
+   FOND ANIMÉ ET PATTERNS
+   ========================================= */
+body {
+  overflow-x: hidden; /* Empêche le fond de créer une barre de défilement horizontale */
+}
+
+.rf-root {
+  position: relative;
+  background-color: var(--surface);
+  background-image: radial-gradient(var(--hairline) 1.5px, transparent 1.5px);
+  background-size: 30px 30px; /* Petit pattern de pois discret */
+  z-index: 0;
+}
+
+/* Lumières floues animées */
+.rf-root::before,
+.rf-root::after {
+  content: "";
+  position: fixed;
+  width: 60vw;
+  height: 60vw;
+  border-radius: 50%;
+  filter: blur(120px);
+  z-index: -1;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* La lumière bleue en haut à gauche */
+.rf-root::before {
+  background: var(--secondary-blue);
+  top: -20vh;
+  left: -10vw;
+  animation: floatBlue 25s ease-in-out infinite alternate;
+}
+
+/* La lumière verte en bas à droite */
+.rf-root::after {
+  background: var(--secondary-green);
+  bottom: -20vh;
+  right: -10vw;
+  animation: floatGreen 30s ease-in-out infinite alternate;
+}
+
+@keyframes floatBlue {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(10vw, 15vh) scale(1.3); }
+}
+
+@keyframes floatGreen {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(-10vw, -15vh) scale(1.2); }
+}
+
 .rf-root {
   background: var(--surface);
   color: var(--ink);
@@ -78,8 +133,23 @@
   text-transform: uppercase;
   color: var(--ink);
   text-decoration: none;
-  border-bottom: 3px solid transparent;
-  transition: border-color 0.2s ease;
+  padding: 0 var(--space-5); /* Ajoute de l'espace sur les côtés */
+  border: 2px solid var(--hairline); /* Bordure définie */
+  border-radius: var(--radius-xs); /* Forme pilule */
+  background: var(--surface-raised);
+  transition: all 0.2s ease;
+}
+
+.rf-navlink:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.rf-navlink[aria-current="page"] {
+  border-color: var(--accent);
+  background: var(--accent-doux);
+  color: var(--ink);
 }
 .rf-navlink[aria-current="page"] {
   border-bottom-color: var(--accent);
@@ -198,9 +268,18 @@
 }
 .rf-shell__bar > .rf-nav { grid-area: nav; }
 .rf-shell__brand {
-  grid-area: brand; justify-self: start; display: inline-flex; align-items: center;
-  min-height: 44px; font-family: var(--font-display); font-size: 18px; font-weight: 800;
-  text-transform: uppercase; color: var(--ink); text-decoration: none;
+  grid-area: brand; 
+  justify-self: start; 
+  display: inline-flex; 
+  align-items: center;
+  min-height: 44px; 
+  font-family: var(--font-display); 
+  font-size: 26px; /* Plus gros */
+  font-weight: 800; /* Plus rond/gras */
+  letter-spacing: -0.5px;
+  text-transform: uppercase; 
+  color: var(--ink); 
+  text-decoration: none;
 }
 .rf-shell__account { grid-area: account; display: flex; align-items: center; gap: var(--space-4); }
 .rf-shell__user { font-size: 14px; color: var(--ink-muted); font-weight: 500; }

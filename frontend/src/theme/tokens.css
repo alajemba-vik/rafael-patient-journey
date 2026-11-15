@@ -22,6 +22,11 @@
   /* --- BORDURES --- */
   --hairline: #EAE3D8;           /* Bordure beige douce */
   --focus-ring: #F0A500;         /* Anneau de focus orange */
+
+  /* --- NOUVELLES COULEURS SECONDAIRES (Hugo) --- */
+  --secondary-blue: #E0F2FE;  /* Bleu très clair */
+  --secondary-green: #DCFCE7; /* Vert très clair */
+  --accent-doux: #FFF1D6;     /* Orange très clair pour les fonds */
 }
 
 /* Colors: Nuit (dark), opt in with data-theme="dark" on <html>. */
