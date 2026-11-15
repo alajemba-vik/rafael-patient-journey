@@ -64,8 +64,8 @@ export function QuestionnaireForm({ questionnaire, onSubmitted }: Props) {
           <span className="rf-muted" style={{ fontWeight: 600 }}>
             Votre progression
           </span>
-          <span className="rf-muted">
-            {answered} / {total}
+          <span className="rf-muted" aria-live="polite">
+            {answered} réponse{answered > 1 ? "s" : ""} sur {total}
           </span>
         </div>
         <div style={{ height: "10px", background: "var(--surface-tint)", borderRadius: "999px", overflow: "hidden" }}>
