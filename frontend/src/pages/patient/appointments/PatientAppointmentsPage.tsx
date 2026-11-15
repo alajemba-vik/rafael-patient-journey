@@ -8,8 +8,8 @@ export function PatientAppointmentsPage() {
   const appointments = useMyAppointments();
 
   return (
-    <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-        <PageHeader title="Mes rendez-vous" />
+    <div style={{ maxWidth: "800px", margin: "0 auto" }}>
+      <PageHeader title="Mes rendez-vous" />
 
       <QueryState
         query={appointments}
@@ -25,43 +25,51 @@ export function PatientAppointmentsPage() {
         }}
       >
         {(list) => (
-          <div className="rf-stack" style={{ gap: 'var(--space-4)' }}>
-            <p className="rf-muted" style={{ marginBottom: 'var(--space-2)' }}>
+          <div className="rf-stack" style={{ gap: "var(--space-4)" }}>
+            <p className="rf-muted" style={{ marginBottom: "var(--space-2)" }}>
               Voici vos rendez-vous pour les trois prochains mois :
             </p>
-            
+
             {list.map((a) => (
-              <div 
-                key={a.id} 
-                className="rf-panel" 
-                style={{ 
-                  flexDirection: 'row', 
-                  alignItems: 'center', 
-                  justifyContent: 'space-between',
-                  padding: 'var(--space-4) var(--space-5)',
-                  borderLeft: '6px solid var(--accent)', // Bande orange sur le côté gauche
-                  flexWrap: 'wrap',
-                  gap: 'var(--space-4)'
+              <div
+                key={a.id}
+                className="rf-panel"
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  padding: "var(--space-4) var(--space-5)",
+                  borderLeft: "6px solid var(--accent)", // Bande orange sur le côté gauche
+                  flexWrap: "wrap",
+                  gap: "var(--space-4)",
                 }}
               >
                 {/* Bloc Date / Heure */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', minWidth: '200px' }}>
-                  <span style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '18px', color: 'var(--ink)' }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "4px", minWidth: "200px" }}>
+                  <span
+                    style={{
+                      fontFamily: "var(--font-display)",
+                      fontWeight: 800,
+                      fontSize: "18px",
+                      color: "var(--ink)",
+                    }}
+                  >
                     {formatWeekday(a.starts_at)}
                   </span>
-                  <span style={{ color: 'var(--accent)', fontWeight: 700, fontSize: '15px' }}>
+                  <span style={{ color: "var(--accent)", fontWeight: 700, fontSize: "15px" }}>
                     🕒 {formatTime(a.starts_at)} – {formatTime(a.ends_at)}
                   </span>
                 </div>
 
                 {/* Bloc Praticien */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1 }}>
-                  <span className="rf-muted" style={{ fontSize: '13px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "4px", flex: 1 }}>
+                  <span
+                    className="rf-muted"
+                    style={{ fontSize: "13px", textTransform: "uppercase", letterSpacing: "0.5px" }}
+                  >
                     Avec
                   </span>
-                  <span style={{ fontWeight: 600, fontSize: '16px' }}>
-                    {a.professional_name}
-                  </span>
+                  <span style={{ fontWeight: 600, fontSize: "16px" }}>{a.professional_name}</span>
                 </div>
 
                 {/* Bloc Statut */}

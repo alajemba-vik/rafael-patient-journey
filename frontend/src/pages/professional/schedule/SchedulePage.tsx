@@ -34,7 +34,7 @@ export function SchedulePage() {
   const appointments = useMyAppointments(range, REFRESH_MS);
 
   return (
-    <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+    <div style={{ maxWidth: "800px", margin: "0 auto" }}>
       <PageHeader title="Mon planning" />
       <QueryState
         query={appointments}
@@ -43,34 +43,53 @@ export function SchedulePage() {
         {(list) =>
           byDay(list).map(([day, items]) => (
             <section key={day} className="rf-section" aria-label={day}>
-              <h2 className="rf-title" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: 'var(--space-4)', color: 'var(--ink)' }}>
+              <h2
+                className="rf-title"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  marginBottom: "var(--space-4)",
+                  color: "var(--ink)",
+                }}
+              >
                 <span aria-hidden="true">📅</span> {day}
               </h2>
-              
-              <div className="rf-stack" style={{ gap: 'var(--space-3)' }}>
+
+              <div className="rf-stack" style={{ gap: "var(--space-3)" }}>
                 {items.map((a) => (
-                  <div key={a.id} className="rf-panel" style={{ 
-                    flexDirection: 'row', 
-                    alignItems: 'center', 
-                    justifyContent: 'space-between',
-                    padding: 'var(--space-4) var(--space-5)',
-                    borderLeft: '4px solid var(--accent)',
-                    flexWrap: 'wrap',
-                    gap: 'var(--space-4)'
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
-                      <span style={{ 
-                        fontFamily: 'var(--font-display)', 
-                        fontWeight: 800, 
-                        fontSize: '18px', 
-                        color: 'var(--accent)',
-                        background: 'var(--accent-doux)',
-                        padding: '4px 12px',
-                        borderRadius: 'var(--radius-xs)'
-                      }}>
+                  <div
+                    key={a.id}
+                    className="rf-panel"
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      padding: "var(--space-4) var(--space-5)",
+                      borderLeft: "4px solid var(--accent)",
+                      flexWrap: "wrap",
+                      gap: "var(--space-4)",
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", gap: "var(--space-4)" }}>
+                      <span
+                        style={{
+                          fontFamily: "var(--font-display)",
+                          fontWeight: 800,
+                          fontSize: "18px",
+                          color: "var(--accent)",
+                          background: "var(--accent-doux)",
+                          padding: "4px 12px",
+                          borderRadius: "var(--radius-xs)",
+                        }}
+                      >
                         {formatTime(a.starts_at)}
                       </span>
-                      <Link className="rf-link" to={paths.pro.patient(a.patient_id)} style={{ fontWeight: 600, fontSize: '16px' }}>
+                      <Link
+                        className="rf-link"
+                        to={paths.pro.patient(a.patient_id)}
+                        style={{ fontWeight: 600, fontSize: "16px" }}
+                      >
                         {a.patient_name}
                       </Link>
                     </div>

@@ -22,22 +22,26 @@ export function QuestionnaireForm({ questionnaire, onSubmitted }: Props) {
   }
 
   return (
-    <form className="rf-form" onSubmit={send} style={{ maxWidth: '640px' }}>
-      <p className="rf-lead" style={{ color: 'var(--ink-muted)', marginBottom: 'var(--space-6)' }}>
+    <form className="rf-form" onSubmit={send} style={{ maxWidth: "640px" }}>
+      <p className="rf-lead" style={{ color: "var(--ink-muted)", marginBottom: "var(--space-6)" }}>
         {questionnaire.introduction}
       </p>
 
       {questionnaire.questions.map((question) => (
-        <fieldset key={question.id} className="rf-question" style={{ 
-          background: 'var(--surface-raised)', 
-          padding: 'var(--space-5)', 
-          borderRadius: 'var(--radius-md)',
-          border: '1px solid var(--hairline)',
-          boxShadow: '0 2px 8px rgba(18, 35, 74, 0.02)',
-          width: '100%'
-        }}>
-          <legend style={{ fontSize: '18px', marginBottom: 'var(--space-4)' }}>{question.text}</legend>
-          <div className="rf-choices" style={{ gap: 'var(--space-3)' }}>
+        <fieldset
+          key={question.id}
+          className="rf-question"
+          style={{
+            background: "var(--surface-raised)",
+            padding: "var(--space-5)",
+            borderRadius: "var(--radius-md)",
+            border: "1px solid var(--hairline)",
+            boxShadow: "0 2px 8px rgba(18, 35, 74, 0.02)",
+            width: "100%",
+          }}
+        >
+          <legend style={{ fontSize: "18px", marginBottom: "var(--space-4)" }}>{question.text}</legend>
+          <div className="rf-choices" style={{ gap: "var(--space-3)" }}>
             {questionnaire.choices.map((choice) => (
               <label key={choice.value} className="rf-choice">
                 <input
@@ -55,19 +59,25 @@ export function QuestionnaireForm({ questionnaire, onSubmitted }: Props) {
       ))}
 
       {/* Barre de progression visuelle */}
-      <div style={{ width: '100%', marginTop: 'var(--space-5)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--space-2)' }}>
-          <span className="rf-muted" style={{ fontWeight: 600 }}>Votre progression</span>
-          <span className="rf-muted">{answered} / {total}</span>
+      <div style={{ width: "100%", marginTop: "var(--space-5)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "var(--space-2)" }}>
+          <span className="rf-muted" style={{ fontWeight: 600 }}>
+            Votre progression
+          </span>
+          <span className="rf-muted">
+            {answered} / {total}
+          </span>
         </div>
-        <div style={{ height: '10px', background: 'var(--surface-tint)', borderRadius: '999px', overflow: 'hidden' }}>
-          <div style={{ 
-            height: '100%', 
-            width: `${progressPercent}%`, 
-            background: 'var(--accent)', 
-            borderRadius: '999px',
-            transition: 'width 0.4s cubic-bezier(0.4, 0, 0.2, 1)' 
-          }} />
+        <div style={{ height: "10px", background: "var(--surface-tint)", borderRadius: "999px", overflow: "hidden" }}>
+          <div
+            style={{
+              height: "100%",
+              width: `${progressPercent}%`,
+              background: "var(--accent)",
+              borderRadius: "999px",
+              transition: "width 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+            }}
+          />
         </div>
       </div>
 
@@ -77,7 +87,7 @@ export function QuestionnaireForm({ questionnaire, onSubmitted }: Props) {
         </p>
       )}
 
-      <div style={{ marginTop: 'var(--space-6)', width: '100%', display: 'flex', justifyContent: 'flex-end' }}>
+      <div style={{ marginTop: "var(--space-6)", width: "100%", display: "flex", justifyContent: "flex-end" }}>
         <Button type="submit" pending={submit.isPending} disabled={answered < total}>
           Envoyer mes réponses
         </Button>

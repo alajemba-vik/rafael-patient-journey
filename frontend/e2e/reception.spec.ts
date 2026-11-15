@@ -15,7 +15,9 @@ test.beforeEach(async ({ page }) => {
 test("reception registers a new patient", async ({ page }) => {
   await page.goto("/accueil/patients");
 
-  await page.getByText("Enregistrer un patient").click();
+  // On clique sur l'accordéon (le texte a été mis à jour)
+  await page.getByText("Enregistrer un nouveau patient").click();
+
   await page.getByLabel("Prénom").fill("Sam");
   await page.getByLabel("Nom", { exact: true }).fill("Exemple");
   await page.getByLabel("Date de naissance").fill("1980-02-03");
@@ -39,17 +41,19 @@ test("reception books an appointment and runs the patient's visit on the day's b
 
   // Arrival, call-in, end of session, each from the card on today's board.
   await page.goto("/accueil");
-  const upcoming = page.getByRole("region", { name: "À venir" });
+
+  // On utilise des Regex (//) pour que Playwright ignore les émojis (📅, ⏳, 🩺)
+  const upcoming = page.getByRole("region", { name: /À venir/ });
   await upcoming.getByRole("button", { name: /^Arrivé·e/ }).click();
 
-  const waiting = page.getByRole("region", { name: "En salle d’attente" });
+  const waiting = page.getByRole("region", { name: /En salle d’attente/ });
   await expect(waiting.getByRole("link", { name: "Alex Synthetic" })).toBeVisible();
   await waiting.getByRole("button", { name: /^Appeler/ }).click();
 
-  const inSession = page.getByRole("region", { name: "En séance" });
+  const inSession = page.getByRole("region", { name: /En séance/ });
   await expect(inSession.getByRole("link", { name: "Alex Synthetic" })).toBeVisible();
   await inSession.getByRole("button", { name: /^Terminer/ }).click();
 
   await expect(page.getByText("Terminés · 1")).toBeVisible();
-  await expect(page.getByRole("region", { name: "En séance" }).getByText("Aucune séance en cours.")).toBeVisible();
+  await expect(page.getByRole("region", { name: /En séance/ }).getByText("Aucune séance en cours.")).toBeVisible();
 });
