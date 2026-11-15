@@ -653,3 +653,132 @@ body {
   box-shadow: 0 0 0 2px var(--accent);
   z-index: 1;
 }
+
+/* =========================================
+   TABLEAU DE BORD ACCUEIL (Reception Board)
+   ========================================= */
+
+/* Le bandeau de résumé du haut */
+.rf-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  list-style: none;
+  padding: 0;
+  margin-bottom: var(--space-6);
+}
+
+.rf-summary li {
+  background: var(--surface-raised);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-xs);
+  padding: var(--space-2) var(--space-4);
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 2px 4px rgba(18, 35, 74, 0.02);
+}
+
+.rf-summary strong {
+  font-family: var(--font-display);
+  font-size: 18px;
+  color: var(--accent);
+  line-height: 1;
+}
+
+/* Les colonnes (lanes) du tableau */
+.rf-board {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  gap: var(--space-5);
+  align-items: start;
+}
+
+.rf-lane {
+  background: var(--surface-tint); /* Léger fond pour démarquer la colonne */
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.rf-lane__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid var(--hairline);
+  padding-bottom: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.rf-lane__header h2 {
+  font-size: 16px;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rf-lane__count {
+  background: var(--surface-raised);
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--ink);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* Cartes de rendez-vous avec bordure de statut */
+.rf-card {
+  background: var(--surface-raised);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Bordure gauche colorée selon le statut */
+.rf-card--arrived { border-left: 5px solid var(--accent); }
+.rf-card--in_session { border-left: 5px solid var(--secondary-blue); }
+.rf-card--upcoming { border-left: 5px solid var(--secondary-green); }
+.rf-card--done { border-left: 5px solid var(--ink-muted); }
+.rf-card--no_show { border-left: 5px solid #E53935; }
+
+.rf-card__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.rf-card__time {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 14px;
+  background: var(--surface-tint);
+  padding: 4px 8px;
+  border-radius: var(--radius-xs);
+  color: var(--ink);
+}
+
+/* Alerte de retard / attente */
+.rf-flag {
+  font-size: 12px;
+  font-weight: 700;
+  color: #B91C1C;
+  background: #FEE2E2;
+  padding: 2px 8px;
+  border-radius: var(--radius-xs);
+}

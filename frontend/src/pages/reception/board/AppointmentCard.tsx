@@ -54,7 +54,11 @@ export function AppointmentCard({ appointment: a, now, live, actions, manageable
     ));
 
   return (
-    <li className={["rf-card", signal?.attention && "rf-card--attention"].filter(Boolean).join(" ")}>
+    <li className={[
+      "rf-card", 
+      `rf-card--${a.status}`, // Ajout de la classe de statut
+      signal?.attention && "rf-card--attention"
+    ].filter(Boolean).join(" ")}>
       <div className="rf-card__head">
         <span className="rf-card__time">
           {formatTime(a.starts_at)} – {formatTime(a.ends_at)}

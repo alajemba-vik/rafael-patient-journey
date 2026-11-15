@@ -74,24 +74,24 @@ export function ReceptionBoardPage() {
               </ul>
               {isToday && (
                 <div className="rf-board">
-                  <Lane title="En salle d’attente" items={lanes.waiting} empty="Personne n’attend.">
+                  <Lane title="⏳ En salle d’attente" items={lanes.waiting} empty="Personne n’attend.">
                     {manage}
                   </Lane>
-                  <Lane title="En séance" items={lanes.inSession} empty="Aucune séance en cours.">
+                  <Lane title="🩺 En séance" items={lanes.inSession} empty="Aucune séance en cours.">
                     {manage}
                   </Lane>
-                  <Lane title="À venir" items={lanes.upcoming} empty="Plus rien de prévu.">
+                  <Lane title="📅 À venir" items={lanes.upcoming} empty="Plus rien de prévu.">
                     {manage}
                   </Lane>
                 </div>
               )}
               {isFuture && (
-                <Lane title="Rendez-vous prévus" items={lanes.upcoming} empty="Aucun rendez-vous prévu." wide>
+                <Lane title="📅 Rendez-vous prévus" items={lanes.upcoming} empty="Aucun rendez-vous prévu." wide>
                   {manage}
                 </Lane>
               )}
               {isPast && unresolved.length > 0 && (
-                <Lane title="Sans suite" items={unresolved} empty="" wide>
+                <Lane title="⚠️ Sans suite" items={unresolved} empty="" wide>
                   {manage}
                 </Lane>
               )}
