@@ -8,15 +8,16 @@ export function PatientAppointmentsPage() {
   const appointments = useMyAppointments();
 
   return (
-    <>
-      <PageHeader title="Mes rendez-vous" />
+    <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+        <PageHeader title="Mes rendez-vous" />
+
       <QueryState
         query={appointments}
         empty={{
           isEmpty: (list) => list.length === 0,
           title: "Aucun rendez-vous prévu.",
           children: (
-            <p>
+            <p className="rf-lead">
               Votre coordinatrice ou coordinateur fixe vos premiers rendez-vous ; ensuite, vous convenez des suivants
               avec vos praticiens ou avec l’accueil.
             </p>
@@ -24,36 +25,55 @@ export function PatientAppointmentsPage() {
         }}
       >
         {(list) => (
-          <div className="rf-table-wrap">
-            <table className="rf-table">
-              <caption className="rf-muted">Les trois prochains mois</caption>
-              <thead>
-                <tr>
-                  <th scope="col">Date</th>
-                  <th scope="col">Heure</th>
-                  <th scope="col">Avec</th>
-                  <th scope="col">Statut</th>
-                </tr>
-              </thead>
-              <tbody>
-                {list.map((a) => (
-                  <tr key={a.id}>
-                    <td>{formatWeekday(a.starts_at)}</td>
-                    <td>
-                      {formatTime(a.starts_at)} – {formatTime(a.ends_at)}
-                    </td>
-                    <td>{a.professional_name}</td>
-                    <td>
-                      <StatusBadge status={a.status} />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="rf-stack" style={{ gap: 'var(--space-4)' }}>
+            <p className="rf-muted" style={{ marginBottom: 'var(--space-2)' }}>
+              Voici vos rendez-vous pour les trois prochains mois :
+            </p>
+            
+            {list.map((a) => (
+              <div 
+                key={a.id} 
+                className="rf-panel" 
+                style={{ 
+                  flexDirection: 'row', 
+                  alignItems: 'center', 
+                  justifyContent: 'space-between',
+                  padding: 'var(--space-4) var(--space-5)',
+                  borderLeft: '6px solid var(--accent)', // Bande orange sur le côté gauche
+                  flexWrap: 'wrap',
+                  gap: 'var(--space-4)'
+                }}
+              >
+                {/* Bloc Date / Heure */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', minWidth: '200px' }}>
+                  <span style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '18px', color: 'var(--ink)' }}>
+                    {formatWeekday(a.starts_at)}
+                  </span>
+                  <span style={{ color: 'var(--accent)', fontWeight: 700, fontSize: '15px' }}>
+                    🕒 {formatTime(a.starts_at)} – {formatTime(a.ends_at)}
+                  </span>
+                </div>
+
+                {/* Bloc Praticien */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1 }}>
+                  <span className="rf-muted" style={{ fontSize: '13px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                    Avec
+                  </span>
+                  <span style={{ fontWeight: 600, fontSize: '16px' }}>
+                    {a.professional_name}
+                  </span>
+                </div>
+
+                {/* Bloc Statut */}
+                <div>
+                  <StatusBadge status={a.status} />
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </QueryState>
-    </>
+    </div>
   );
 }
 

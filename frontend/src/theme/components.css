@@ -274,12 +274,22 @@ body {
   align-items: center;
   min-height: 44px; 
   font-family: var(--font-display); 
-  font-size: 34px; /* Encore plus gros */
-  font-weight: 800; /* Très gras, bien rond */
-  letter-spacing: -0.5px;
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
   text-transform: uppercase; 
-  color: var(--accent); /* Couleur orange */
+  
+  /* L'effet de bordure sur les lettres */
+  color: transparent;
+  -webkit-text-stroke: 2px var(--accent); 
+  
   text-decoration: none;
+}
+
+/* Optionnel : on ajoute un petit effet de remplissage au survol pour le fun */
+.rf-shell__brand:hover {
+  color: var(--accent);
+  transition: color 0.3s ease;
 }
 .rf-shell__account { grid-area: account; display: flex; align-items: center; gap: var(--space-4); }
 .rf-shell__user { font-size: 14px; color: var(--ink-muted); font-weight: 500; }
@@ -556,3 +566,11 @@ body {
 .emoji-4 { top: 15%; right: 5%; font-size: 5rem; animation-duration: 9s; animation-delay: 0.5s; }
 .emoji-5 { top: 60%; right: 4%; font-size: 3rem; animation-duration: 7s; animation-delay: 1.5s; }
 .emoji-6 { top: 85%; right: 10%; font-size: 2rem; animation-duration: 11s; animation-delay: 3s; }
+
+/* Titre avec effet de contour */
+.rf-title-outline {
+  color: transparent;
+  -webkit-text-stroke: 2px var(--accent); /* Bordure orange de 2px */
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
