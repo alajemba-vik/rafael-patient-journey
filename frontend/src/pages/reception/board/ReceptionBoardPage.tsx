@@ -74,24 +74,24 @@ export function ReceptionBoardPage() {
               </ul>
               {isToday && (
                 <div className="rf-board">
-                  <Lane title="⏳ En salle d’attente" items={lanes.waiting} empty="Personne n’attend.">
+                  <Lane icon="⏳" title="En salle d’attente" items={lanes.waiting} empty="Personne n’attend.">
                     {manage}
                   </Lane>
-                  <Lane title="🩺 En séance" items={lanes.inSession} empty="Aucune séance en cours.">
+                  <Lane icon="🩺" title="En séance" items={lanes.inSession} empty="Aucune séance en cours.">
                     {manage}
                   </Lane>
-                  <Lane title="📅 À venir" items={lanes.upcoming} empty="Plus rien de prévu.">
+                  <Lane icon="📅" title="À venir" items={lanes.upcoming} empty="Plus rien de prévu.">
                     {manage}
                   </Lane>
                 </div>
               )}
               {isFuture && (
-                <Lane title="📅 Rendez-vous prévus" items={lanes.upcoming} empty="Aucun rendez-vous prévu." wide>
+                <Lane icon="📅" title="Rendez-vous prévus" items={lanes.upcoming} empty="Aucun rendez-vous prévu." wide>
                   {manage}
                 </Lane>
               )}
               {isPast && unresolved.length > 0 && (
-                <Lane title="⚠️ Sans suite" items={unresolved} empty="" wide>
+                <Lane icon="⚠️" title="Sans suite" items={unresolved} empty="" wide>
                   {manage}
                 </Lane>
               )}
@@ -122,13 +122,21 @@ function Count({ value, label }: { value: number; label: string }) {
 
 type LaneProps = { title: string; items: Appointment[]; children: (a: Appointment) => React.ReactNode };
 
-function Lane({ title, items, empty, wide, children }: LaneProps & { empty: string; wide?: boolean }) {
+function Lane({
+  icon,
+  title,
+  items,
+  empty,
+  wide,
+  children,
+}: LaneProps & { icon: string; empty: string; wide?: boolean }) {
   const id = useId();
   return (
     <section className={wide ? "rf-lane rf-section" : "rf-lane"} aria-labelledby={id}>
       <div className="rf-lane__header">
+        {/* The icon is decoration: the lane's accessible name stays its plain title. */}
         <h2 id={id} className="rf-title">
-          {title}
+          <span aria-hidden="true">{icon}</span> {title}
         </h2>
         <span className="rf-lane__count" aria-label={`${items.length} rendez-vous`}>
           {items.length}
