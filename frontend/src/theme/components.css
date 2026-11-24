@@ -139,29 +139,23 @@ body {
   line-height: 14px;
   letter-spacing: 0.5px;
   text-transform: uppercase;
-  color: var(--ink);
+  color: var(--ink-muted); /* Gris par défaut */
   text-decoration: none;
-  padding: 0 var(--space-5); /* Ajoute de l'espace sur les côtés */
-  border: 2px solid var(--hairline); /* Bordure définie */
-  border-radius: var(--radius-xs); /* Forme pilule */
-  background: var(--surface-raised);
+  padding: 0 var(--space-3);
+  border-bottom: 3px solid transparent; /* Ligne invisible par défaut */
   transition: all 0.2s ease;
 }
 
 .rf-navlink:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-  transform: translateY(-1px);
+  color: var(--ink);
 }
 
 .rf-navlink[aria-current="page"] {
-  border-color: var(--accent);
-  background: var(--accent-doux);
   color: var(--ink);
+  border-bottom-color: var(--accent); /* Ligne orange en dessous */
+  background: transparent;
 }
-.rf-navlink[aria-current="page"] {
-  border-bottom-color: var(--accent);
-}
+
 .rf-navlink__chevron {
   width: 9px;
   height: 9px;
@@ -302,21 +296,17 @@ body {
   grid-area: nav;
 }
 .rf-shell__brand {
-  grid-area: brand;
-  justify-self: start;
-  display: inline-flex;
+  grid-area: brand; 
+  justify-self: start; 
+  display: inline-flex; 
   align-items: center;
-  min-height: 44px;
-  font-family: var(--font-display);
-  font-size: 34px;
+  min-height: 44px; 
+  font-family: var(--font-display); 
+  font-size: 28px;
   font-weight: 800;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-
-  /* L'effet de bordure sur les lettres */
-  color: transparent;
-  -webkit-text-stroke: 2px var(--accent);
-
+  letter-spacing: -0.5px;
+  text-transform: uppercase; 
+  color: var(--ink); /* Bleu marine plein */
   text-decoration: none;
 }
 
@@ -1090,88 +1080,6 @@ body {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
   align-items: start;
-}
-
-/* =========================================
-   EMOJIS LÉVITANTS EN FOND
-   ========================================= */
-.bg-ambiance {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  pointer-events: none; /* Empêche de bloquer les clics sur le site */
-  z-index: -1; /* Reste derrière tout le contenu */
-  overflow: hidden;
-}
-
-.bg-emoji {
-  position: absolute;
-  opacity: 0.6; /* Semi-transparent pour ne pas agresser l'œil */
-  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.1)); /* Petite ombre douce */
-  animation: flotter infinite alternate ease-in-out;
-}
-
-/* Animation de lévitation */
-@keyframes flotter {
-  0% {
-    transform: translateY(0px) rotate(0deg);
-  }
-  100% {
-    transform: translateY(-30px) rotate(10deg);
-  }
-}
-
-/* Positionnement, tailles et vitesses des emojis */
-.emoji-1 {
-  top: 10%;
-  left: 5%;
-  font-size: 4rem;
-  animation-duration: 8s;
-}
-.emoji-2 {
-  top: 40%;
-  left: 2%;
-  font-size: 2.5rem;
-  animation-duration: 6s;
-  animation-delay: 1s;
-}
-.emoji-3 {
-  top: 75%;
-  left: 8%;
-  font-size: 3.5rem;
-  animation-duration: 10s;
-  animation-delay: 2s;
-}
-.emoji-4 {
-  top: 15%;
-  right: 5%;
-  font-size: 5rem;
-  animation-duration: 9s;
-  animation-delay: 0.5s;
-}
-.emoji-5 {
-  top: 60%;
-  right: 4%;
-  font-size: 3rem;
-  animation-duration: 7s;
-  animation-delay: 1.5s;
-}
-.emoji-6 {
-  top: 85%;
-  right: 10%;
-  font-size: 2rem;
-  animation-duration: 11s;
-  animation-delay: 3s;
-}
-
-/* Titre avec effet de contour */
-.rf-title-outline {
-  color: transparent;
-  -webkit-text-stroke: 2px var(--accent); /* Bordure orange de 2px */
-  text-transform: uppercase;
-  letter-spacing: 1px;
 }
 
 /* =========================================

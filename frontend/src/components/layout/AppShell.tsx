@@ -37,15 +37,6 @@ export function AppShell() {
       </a>
       <header className="rf-shell__header">
         <div className="rf-shell__bar">
-          {/* Emojis lévitants en fond */}
-          <div className="bg-ambiance" aria-hidden="true">
-            <span className="bg-emoji emoji-1">🌻</span>
-            <span className="bg-emoji emoji-2">🐝</span>
-            <span className="bg-emoji emoji-3">🌻</span>
-            <span className="bg-emoji emoji-4">🐝</span>
-            <span className="bg-emoji emoji-5">🌻</span>
-            <span className="bg-emoji emoji-6">🐝</span>
-          </div>
           <Link to={paths.home} className="rf-shell__brand">
             Institut Rafaël
           </Link>

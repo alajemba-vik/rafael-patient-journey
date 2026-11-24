@@ -4,29 +4,28 @@
  */
 :root,
 [data-theme="light"] {
-  /* --- FONDS (Chaleureux) --- */
-  --surface: #fbf8f3; /* Fond crème chaleureux */
-  --surface-raised: #ffffff; /* Blanc pur pour les cartes */
-  --surface-tint: #f5f1ea; /* Beige doux */
-
+  /* --- FONDS (Chaleureux mais sobre) --- */
+  --surface: #FAFAFA;            /* Un gris/off-white très doux, moins "crème" */
+  --surface-raised: #FFFFFF;     /* Blanc pur pour les cartes */
+  --surface-tint: #F3F4F6;       /* Gris très clair pour les zones secondaires */
+  
   /* --- TEXTES ET COULEURS PRINCIPALES --- */
-  --ink: #12234a; /* Bleu marine */
-  --ink-muted: #6b7280; /* Gris doux pour les textes secondaires */
-  --band: #12234a; /* Bleu marine pour les bandeaux */
-  --on-band: #ffffff;
-
+  --ink: #12234A;                /* Bleu marine (inchangé) */
+  --ink-muted: #6B7280;          /* Gris moyen pour les textes secondaires */
+  --band: #12234A;
+  --on-band: #FFFFFF;
+  
   /* --- ACCENTS --- */
-  --accent: #f0a500; /* Orange */
-  --on-accent: #12234a; /* Texte bleu marine sur l'orange (meilleur contraste) */
-
+  --accent: #F0A500;             /* Orange (inchangé) */
+  --on-accent: #12234A;
+  
   /* --- BORDURES --- */
-  --hairline: #f7cd82; /* Bordure orange douce, thème de l'assos */
-  --focus-ring: #f0a500; /* Anneau de focus orange */
-
-  /* --- NOUVELLES COULEURS SECONDAIRES (Hugo) --- */
-  --secondary-blue: #e0f2fe; /* Bleu très clair */
-  --secondary-green: #dcfce7; /* Vert très clair */
-  --accent-doux: #fff1d6; /* Orange très clair pour les fonds */
+  --hairline: #E5E7EB;           /* Gris neutre (on enlève le orange pâle) */
+  --focus-ring: #12234A;         /* Focus bleu marine */
+  
+  /* --- COULEURS SECONDAIRES (Remplace le pastel enfantin) --- */
+  --secondary-blue: #E0F2FE;     /* Bleu très clair (pour les infos) */
+  --secondary-gray: #F3F4F6;     /* Gris clair (pour les listes) */
 }
 
 /* Colors: Nuit (dark), opt in with data-theme="dark" on <html>. */
