@@ -296,16 +296,16 @@ body {
   grid-area: nav;
 }
 .rf-shell__brand {
-  grid-area: brand; 
-  justify-self: start; 
-  display: inline-flex; 
+  grid-area: brand;
+  justify-self: start;
+  display: inline-flex;
   align-items: center;
-  min-height: 44px; 
-  font-family: var(--font-display); 
+  min-height: 44px;
+  font-family: var(--font-display);
   font-size: 28px;
   font-weight: 800;
   letter-spacing: -0.5px;
-  text-transform: uppercase; 
+  text-transform: uppercase;
   color: var(--ink); /* Bleu marine plein */
   text-decoration: none;
 }
