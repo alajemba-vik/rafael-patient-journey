@@ -350,7 +350,11 @@
     "symptoms": "⚡ Frequently reported symptoms",
     "symptomFatigue": "Fatigue",
     "symptomJointPain": "Joint pain",
-    "symptomSleep": "Sleep problems"
+    "symptomSleep": "Sleep problems",
+    "sessionSatisfaction": "Satisfaction after sessions",
+    "sessionRatings_one": "{{count}} rating",
+    "sessionRatings_other": "{{count}} ratings",
+    "sessionRatingsFew": "Too few patients to show"
   },
   "board": {
     "titleToday": "Today at reception",
@@ -522,5 +526,51 @@
     "hint": "The patient's whole care team can read this message.",
     "send": "Send",
     "sendError": "The message couldn't be sent. Try again."
+  },
+  "sessions": {
+    "title": "Sessions and ratings",
+    "empty": "No finished sessions yet.",
+    "patientDifficulty": "Difficulty felt (patient)",
+    "patientSatisfaction": "Satisfaction (patient)",
+    "coping": "How they coped",
+    "mets": "Intensity (METs)",
+    "rate": "Rate the session on {{date}}",
+    "edit": "Edit the rating of {{date}}",
+    "save": "Save",
+    "copingQuestion": "How did the patient cope?",
+    "metsLabel": "Session intensity in METs (optional)",
+    "metsHint": "For physical activity: walking is about 3.",
+    "metsError": "Between 0.5 and 25.",
+    "toRateTitle": "Your sessions to rate",
+    "toRateIntro": "Two questions, a few seconds: your feedback helps your practitioner adapt the next sessions.",
+    "sessionWith": "Session on {{date}} with {{name}}",
+    "rateFormLabel": "Rate the session on {{date}} with {{name}}",
+    "difficultyQuestion": "How did you find the session?",
+    "satisfactionQuestion": "Are you satisfied with the session?",
+    "send": "Send my feedback",
+    "rateError": "The rating couldn't be saved. Try again.",
+    "levels": {
+      "difficulty": {
+        "0": "Far too easy",
+        "1": "Easy",
+        "2": "About right",
+        "3": "Hard",
+        "4": "Far too hard"
+      },
+      "satisfaction": {
+        "0": "Not satisfied",
+        "1": "Slightly satisfied",
+        "2": "Satisfied",
+        "3": "Very satisfied",
+        "4": "Can't wait to come back"
+      },
+      "coping": {
+        "0": "Couldn't do it",
+        "1": "Many difficulties",
+        "2": "Some difficulties",
+        "3": "At ease",
+        "4": "Very much at ease"
+      }
+    }
   }
 }

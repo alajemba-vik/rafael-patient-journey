@@ -8,7 +8,11 @@ from sqlalchemy.orm import Session
 
 from app.modules.identity_access.service import Role
 from app.modules.pathways.models import CarePathway, MilestoneKind, PathwayMilestone, PathwayStatus
-from app.modules.questionnaires.models import Instrument, QuestionnaireResponse
+from app.modules.questionnaires.models import (
+    Instrument,
+    QuestionnaireResponse,
+    SessionEvaluation,
+)
 from app.modules.scheduling.models import Appointment, AppointmentStatus
 
 THIS_MONTH = datetime.now(UTC).strftime("%Y-%m")
@@ -173,3 +177,36 @@ def test_attendance_of_fewer_than_five_patients_is_hidden_however_many_appointme
 
     assert body["attendance"]["no_show"] is None
     assert body["attendance"]["no_show_rate"] is None
+
+
+def add_session_ratings(db: Session, patients: int, sessions_each: int, satisfaction: int) -> None:
+    for _ in range(patients):
+        patient_id = uuid.uuid4()
+        for _ in range(sessions_each):
+            db.add(
+                SessionEvaluation(
+                    appointment_id=uuid.uuid4(),
+                    patient_id=patient_id,
+                    professional_id=uuid.uuid4(),
+                    patient_difficulty=2,
+                    patient_satisfaction=satisfaction,
+                    patient_rated_at=datetime.now(UTC),
+                )
+            )
+    db.commit()
+
+
+def test_session_satisfaction_is_hidden_below_five_patients_however_many_ratings(db, client_as):
+    add_session_ratings(db, patients=4, sessions_each=10, satisfaction=4)
+
+    body = client_as(Role.PROFESSIONAL).get("/api/v1/analytics/dashboard").json()
+
+    assert body["session_satisfaction"] == {"patients": None, "ratings": None, "average": None}
+
+
+def test_session_satisfaction_is_shown_out_of_100(db, client_as):
+    add_session_ratings(db, patients=5, sessions_each=2, satisfaction=3)
+
+    body = client_as(Role.ADMIN).get("/api/v1/analytics/dashboard").json()
+
+    assert body["session_satisfaction"] == {"patients": 5, "ratings": 10, "average": 75.0}

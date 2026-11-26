@@ -8,9 +8,12 @@ from app.modules.identity_access.service import CurrentUser, get_current_user
 from app.modules.questionnaires import service
 from app.modules.questionnaires.models import Instrument
 from app.modules.questionnaires.schemas import (
+    PatientRating,
+    PractitionerRating,
     Questionnaire,
     ResponseCreate,
     ScoreOut,
+    SessionOut,
     SubmittedOut,
 )
 
@@ -49,3 +52,40 @@ def list_patient_scores(
     db: Session = Depends(get_db),
 ) -> list[ScoreOut]:
     return service.list_patient_scores(db, user, patient_id)
+
+
+@router.get("/sessions/to-rate")
+def list_sessions_to_rate(
+    user: CurrentUser = Depends(get_current_user), db: Session = Depends(get_db)
+) -> list[SessionOut]:
+    """The patient's recent finished sessions still waiting for their rating."""
+    return service.list_sessions_to_rate(db, user)
+
+
+@router.post("/sessions/{appointment_id}/patient-rating")
+def rate_session_as_patient(
+    appointment_id: uuid.UUID,
+    body: PatientRating,
+    user: CurrentUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> SessionOut:
+    return service.rate_session_as_patient(db, user, appointment_id, body)
+
+
+@router.post("/sessions/{appointment_id}/practitioner-rating")
+def rate_session_as_practitioner(
+    appointment_id: uuid.UUID,
+    body: PractitionerRating,
+    user: CurrentUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> SessionOut:
+    return service.rate_session_as_practitioner(db, user, appointment_id, body)
+
+
+@router.get("/patients/{patient_id}/sessions")
+def list_patient_sessions(
+    patient_id: uuid.UUID,
+    user: CurrentUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> list[SessionOut]:
+    return service.list_patient_sessions(db, user, patient_id)

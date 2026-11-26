@@ -350,7 +350,11 @@
     "symptoms": "⚡ Symptômes signalés fréquents",
     "symptomFatigue": "Fatigue",
     "symptomJointPain": "Douleurs articulaires",
-    "symptomSleep": "Troubles du sommeil"
+    "symptomSleep": "Troubles du sommeil",
+    "sessionSatisfaction": "Satisfaction après les séances",
+    "sessionRatings_one": "{{count}} évaluation",
+    "sessionRatings_other": "{{count}} évaluations",
+    "sessionRatingsFew": "Trop peu de patients pour l’afficher"
   },
   "board": {
     "titleToday": "Accueil du jour",
@@ -522,5 +526,51 @@
     "hint": "Toute l’équipe de soins du patient peut lire ce message.",
     "send": "Envoyer",
     "sendError": "Le message n’a pas pu être envoyé. Réessayez."
+  },
+  "sessions": {
+    "title": "Séances et évaluations",
+    "empty": "Aucune séance terminée pour l’instant.",
+    "patientDifficulty": "Difficulté ressentie (patient)",
+    "patientSatisfaction": "Satisfaction (patient)",
+    "coping": "Aisance observée",
+    "mets": "Intensité (MET)",
+    "rate": "Évaluer la séance du {{date}}",
+    "edit": "Modifier l’évaluation du {{date}}",
+    "save": "Enregistrer",
+    "copingQuestion": "Comment le patient s’en est-il sorti ?",
+    "metsLabel": "Intensité de la séance en MET (facultatif)",
+    "metsHint": "Pour l’activité physique : la marche vaut environ 3.",
+    "metsError": "Entre 0,5 et 25.",
+    "toRateTitle": "Vos séances à évaluer",
+    "toRateIntro": "Deux questions, quelques secondes : votre avis aide votre praticien à adapter les prochaines séances.",
+    "sessionWith": "Séance du {{date}} avec {{name}}",
+    "rateFormLabel": "Évaluer la séance du {{date}} avec {{name}}",
+    "difficultyQuestion": "Comment avez-vous trouvé la séance ?",
+    "satisfactionQuestion": "Êtes-vous satisfait(e) de la séance ?",
+    "send": "Envoyer mon avis",
+    "rateError": "L’évaluation n’a pas pu être enregistrée. Réessayez.",
+    "levels": {
+      "difficulty": {
+        "0": "Trop facile",
+        "1": "Facile",
+        "2": "Adaptée",
+        "3": "Difficile",
+        "4": "Trop difficile"
+      },
+      "satisfaction": {
+        "0": "Pas satisfait(e)",
+        "1": "Peu satisfait(e)",
+        "2": "Satisfait(e)",
+        "3": "Très satisfait(e)",
+        "4": "J’ai hâte de revenir"
+      },
+      "coping": {
+        "0": "N’a pas pu faire",
+        "1": "Beaucoup de difficultés",
+        "2": "Quelques difficultés",
+        "3": "À l’aise",
+        "4": "Très à l’aise"
+      }
+    }
   }
 }

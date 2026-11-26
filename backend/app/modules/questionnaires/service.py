@@ -7,10 +7,15 @@ Access policy:
 - patient                                → answer their own, see their own quality-of-life scores
 - professional or coordinator in the team → the patient's quality-of-life scores
 - satisfaction answers                   → nobody individually; analytics shows averages only
+
+Session evaluations, after each finished session:
+- patient                                → rate their own session once (difficulty, satisfaction)
+- the practitioner who led it            → record how the patient coped and the intensity
+- professional or coordinator in the team → every evaluation of the patient's sessions
 """
 
 import uuid
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from statistics import mean
 from typing import NoReturn
 from zoneinfo import ZoneInfo
@@ -25,17 +30,24 @@ from app.modules.care_team import service as care_team
 from app.modules.identity_access.service import CurrentUser, Role
 from app.modules.pathways import service as pathways
 from app.modules.patients import service as patients
-from app.modules.questionnaires.models import Instrument, QuestionnaireResponse
+from app.modules.questionnaires.models import Instrument, QuestionnaireResponse, SessionEvaluation
 from app.modules.questionnaires.schemas import (
     Choice,
+    PatientRating,
+    PractitionerRating,
     Question,
     Questionnaire,
     ResponseCreate,
     ScoreOut,
+    SessionOut,
     SubmittedOut,
 )
+from app.modules.scheduling import service as scheduling
+from app.modules.scheduling.service import AppointmentOut, AppointmentStatus
 
 CARE_ROLES = {Role.PROFESSIONAL, Role.COORDINATOR}
+# A session can be rated by the patient for two weeks: later, nobody remembers how it felt.
+RATING_WINDOW = timedelta(days=14)
 
 # Short questionnaires written by the team, not validated instruments. The Institute uses the
 # EORTC QLQ-C30, whose questions can't be copied without EORTC's permission.
@@ -146,6 +158,79 @@ def list_patient_scores(db: Session, user: CurrentUser, patient_id: uuid.UUID) -
     return scores
 
 
+def list_sessions_to_rate(db: Session, user: CurrentUser) -> list[SessionOut]:
+    """The patient's finished sessions of the last two weeks that they haven't rated yet."""
+    patient_id = _own_patient_id(db, user)
+    since = datetime.now(UTC) - RATING_WINDOW
+    sessions = _sessions_out(db, scheduling.list_done_sessions(db, patient_id, since))
+    audit.record(db, user.id, "session_evaluation.due.read", patient_id)
+    db.commit()
+    return [s for s in sessions if s.patient_satisfaction is None]
+
+
+def rate_session_as_patient(
+    db: Session, user: CurrentUser, appointment_id: uuid.UUID, data: PatientRating
+) -> SessionOut:
+    patient_id = _own_patient_id(db, user)
+    appointment = _finished_session(db, appointment_id)
+    if appointment.patient_id != patient_id:
+        audit.record(db, user.id, "session_evaluation.rate.denied", appointment.patient_id)
+        db.commit()
+        raise ForbiddenError("This is not your session")
+    if appointment.starts_at < datetime.now(UTC) - RATING_WINDOW:
+        raise ConflictError("This session is too old to rate")
+    evaluation = _evaluation_for(db, appointment)
+    if evaluation.patient_rated_at is not None:
+        raise ConflictError("You have already rated this session")
+    evaluation.patient_difficulty = data.difficulty
+    evaluation.patient_satisfaction = data.satisfaction
+    evaluation.patient_rated_at = datetime.now(UTC)
+    audit.record(db, user.id, "session_evaluation.patient", patient_id)
+    db.commit()
+    return _sessions_out(db, [appointment])[0]
+
+
+def rate_session_as_practitioner(
+    db: Session, user: CurrentUser, appointment_id: uuid.UUID, data: PractitionerRating
+) -> SessionOut:
+    """Only the practitioner who led the session; they may correct their rating later."""
+    appointment = _finished_session(db, appointment_id)
+    if user.role not in CARE_ROLES or appointment.professional_id != user.id:
+        audit.record(db, user.id, "session_evaluation.rate.denied", appointment.patient_id)
+        db.commit()
+        raise ForbiddenError("Only the practitioner who led this session can rate it")
+    evaluation = _evaluation_for(db, appointment)
+    evaluation.coping = data.coping
+    evaluation.intensity_mets = data.intensity_mets
+    evaluation.practitioner_rated_at = datetime.now(UTC)
+    audit.record(db, user.id, "session_evaluation.practitioner", appointment.patient_id)
+    db.commit()
+    return _sessions_out(db, [appointment])[0]
+
+
+def list_patient_sessions(
+    db: Session, user: CurrentUser, patient_id: uuid.UUID
+) -> list[SessionOut]:
+    """Every finished session of the patient and its evaluation, newest first."""
+    if user.role not in CARE_ROLES or not care_team.is_in_care_team(db, user.id, patient_id):
+        _deny(db, user, patient_id)
+    sessions = _sessions_out(db, scheduling.list_done_sessions(db, patient_id))
+    audit.record(db, user.id, "session_evaluation.read", patient_id)
+    db.commit()
+    return sessions
+
+
+def session_satisfaction(db: Session) -> tuple[int, list[int]]:
+    """For analytics: how many patients rated sessions, and every satisfaction rating, with
+    nothing that identifies anyone."""
+    rated = SessionEvaluation.patient_satisfaction.is_not(None)
+    patient_count = db.scalar(
+        select(func.count(func.distinct(SessionEvaluation.patient_id))).where(rated)
+    )
+    values = db.scalars(select(SessionEvaluation.patient_satisfaction).where(rated))
+    return patient_count or 0, [value for value in values if value is not None]
+
+
 def monthly_quality_of_life(db: Session, since: str) -> list[tuple[str, int, float]]:
     """For analytics: per month from `since` ("2026-01"), respondents and average score."""
     query = (
@@ -219,6 +304,49 @@ def _quality_of_life_scores(db: Session, patient_id: uuid.UUID) -> list[ScoreOut
             )
         )
     return scores
+
+
+def _finished_session(db: Session, appointment_id: uuid.UUID) -> AppointmentOut:
+    appointment = scheduling.get_appointment(db, appointment_id)
+    if appointment.status != AppointmentStatus.DONE:
+        raise ConflictError("Only a finished session can be rated")
+    return appointment
+
+
+def _evaluation_for(db: Session, appointment: AppointmentOut) -> SessionEvaluation:
+    """The session's evaluation row, created on first rating. Locked until commit."""
+    query = select(SessionEvaluation).where(SessionEvaluation.appointment_id == appointment.id)
+    evaluation = db.scalar(query.with_for_update())
+    if evaluation is None:
+        evaluation = SessionEvaluation(
+            appointment_id=appointment.id,
+            patient_id=appointment.patient_id,
+            professional_id=appointment.professional_id,
+        )
+        db.add(evaluation)
+    return evaluation
+
+
+def _sessions_out(db: Session, appointments: list[AppointmentOut]) -> list[SessionOut]:
+    ids = [a.id for a in appointments]
+    query = select(SessionEvaluation).where(SessionEvaluation.appointment_id.in_(ids))
+    by_appointment = {e.appointment_id: e for e in db.scalars(query)} if ids else {}
+    sessions = []
+    for a in appointments:
+        evaluation = by_appointment.get(a.id) or SessionEvaluation()
+        sessions.append(
+            SessionOut(
+                appointment_id=a.id,
+                starts_at=a.starts_at,
+                professional_id=a.professional_id,
+                professional_name=a.professional_name,
+                patient_difficulty=evaluation.patient_difficulty,
+                patient_satisfaction=evaluation.patient_satisfaction,
+                coping=evaluation.coping,
+                intensity_mets=evaluation.intensity_mets,
+            )
+        )
+    return sessions
 
 
 def _own_patient_id(db: Session, user: CurrentUser) -> uuid.UUID:

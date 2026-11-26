@@ -143,6 +143,17 @@ export function DashboardPage() {
                 subtitle={t("dashboard.atPathwayEnd")}
                 icon="⭐"
               />
+              <StatCard
+                title={t("dashboard.sessionSatisfaction")}
+                value={shown(data.session_satisfaction.average)}
+                suffix={data.session_satisfaction.average !== null ? t("dashboard.outOf100") : ""}
+                subtitle={
+                  data.session_satisfaction.ratings === null
+                    ? t("dashboard.sessionRatingsFew")
+                    : t("dashboard.sessionRatings", { count: data.session_satisfaction.ratings })
+                }
+                icon="💬"
+              />
             </div>
 
             {/* 2. Section Analyse & Graphiques */}

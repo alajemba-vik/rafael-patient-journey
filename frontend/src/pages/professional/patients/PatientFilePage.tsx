@@ -14,6 +14,7 @@ import { CareTeamSection } from "../../../components/patient/CareTeamSection";
 import { MessagesSection } from "./MessagesSection";
 import { PathwaySection } from "./PathwaySection";
 import { ScoresSection } from "./ScoresSection";
+import { SessionsSection } from "./SessionsSection";
 
 export function PatientFilePage() {
   const { t } = useTranslation();
@@ -58,6 +59,7 @@ export function PatientFilePage() {
             <>
               <PathwaySection patientId={record.id} />
               <AppointmentsSection patientId={record.id} />
+              <SessionsSection patientId={record.id} />
               <MessagesSection patientId={record.id} />
             </>
           ) : (

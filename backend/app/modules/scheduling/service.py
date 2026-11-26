@@ -295,6 +295,15 @@ def set_status(db: Session, appointment_id: uuid.UUID, status: AppointmentStatus
         appointment.called_in_at = None
     appointment.status = status
     out = _to_out(db, [appointment])[0]
+    if status == AppointmentStatus.DONE:
+        # Rated right after the session, while the patient still remembers how it felt.
+        notifications.notify(
+            db,
+            [patients.get_user_id_for_patient(db, out.patient_id)],
+            Template.SESSION_TO_RATE,
+            out.id,
+            _params(out),
+        )
     if status == AppointmentStatus.NO_SHOW:
         # The practitioner confirms the patient is still following the pathway: absences are
         # how patients get lost to follow-up.
@@ -335,6 +344,18 @@ def send_appointment_reminders(db: Session, now: datetime | None = None) -> int:
         sent += 1
     db.commit()
     return sent
+
+
+def list_done_sessions(
+    db: Session, patient_id: uuid.UUID, since: datetime | None = None
+) -> list[AppointmentOut]:
+    """A patient's finished sessions, newest first. Callers check access and audit."""
+    query = select(Appointment).where(
+        Appointment.patient_id == patient_id, Appointment.status == AppointmentStatus.DONE
+    )
+    if since is not None:
+        query = query.where(Appointment.starts_at >= since)
+    return _to_out(db, db.scalars(query.order_by(Appointment.starts_at.desc())))
 
 
 def get_appointment(db: Session, appointment_id: uuid.UUID) -> AppointmentOut:

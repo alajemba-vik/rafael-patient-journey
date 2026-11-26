@@ -19,6 +19,7 @@ from app.modules.analytics.schemas import (
     QuestionAverage,
     Satisfaction,
     SelfAssessment,
+    SessionSatisfaction,
 )
 from app.modules.identity_access.service import CurrentUser, Role
 from app.modules.pathways import service as pathways
@@ -46,6 +47,7 @@ def get_dashboard(db: Session, user: CurrentUser) -> Dashboard:
         quality_of_life=_quality_of_life(db, now),
         satisfaction=_satisfaction(db),
         self_assessment=_self_assessment(db),
+        session_satisfaction=_session_satisfaction(db),
     )
 
 
@@ -105,6 +107,15 @@ def _self_assessment(db: Session) -> SelfAssessment:
             DimensionChange(dimension=dimension, average_change=_shown(count, change))
             for dimension, change in changes.items()
         ],
+    )
+
+
+def _session_satisfaction(db: Session) -> SessionSatisfaction:
+    patient_count, values = questionnaires.session_satisfaction(db)
+    return SessionSatisfaction(
+        patients=_count(patient_count, patient_count),
+        ratings=_count(patient_count, len(values)),
+        average=_shown(patient_count, _out_of_100(values)),
     )
 
 

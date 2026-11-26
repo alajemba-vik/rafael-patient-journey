@@ -44,6 +44,14 @@ class SelfAssessment(BaseModel):
     by_dimension: list[DimensionChange]
 
 
+class SessionSatisfaction(BaseModel):
+    """Patients' ratings right after their sessions, 0–100. Drop-out follows low satisfaction."""
+
+    patients: int | None
+    ratings: int | None
+    average: float | None
+
+
 class Dashboard(BaseModel):
     generated_at: datetime
     min_group_size: int
@@ -52,3 +60,4 @@ class Dashboard(BaseModel):
     quality_of_life: list[MonthlyScore]
     satisfaction: Satisfaction
     self_assessment: SelfAssessment
+    session_satisfaction: SessionSatisfaction

@@ -5,6 +5,7 @@ import { QueryState } from "../../../components/feedback/QueryState";
 import { StatusBadge } from "../../../components/feedback/StatusBadge";
 import { formatTime, formatWeekday } from "../../../lib/format";
 import { PageHeader } from "../../../components/layout/PageHeader";
+import { RateSessions } from "./RateSessions";
 
 export function PatientAppointmentsPage() {
   const { t } = useTranslation();
@@ -13,6 +14,7 @@ export function PatientAppointmentsPage() {
   return (
     <div style={{ maxWidth: "800px", margin: "0 auto" }}>
       <PageHeader title={t("patientAppointments.title")} />
+      <RateSessions />
 
       <QueryState
         query={appointments}

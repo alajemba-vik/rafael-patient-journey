@@ -606,6 +606,77 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/questionnaires/sessions/to-rate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Sessions To Rate
+         * @description The patient's recent finished sessions still waiting for their rating.
+         */
+        get: operations["list_sessions_to_rate_api_v1_questionnaires_sessions_to_rate_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/questionnaires/sessions/{appointment_id}/patient-rating": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Rate Session As Patient */
+        post: operations["rate_session_as_patient_api_v1_questionnaires_sessions__appointment_id__patient_rating_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/questionnaires/sessions/{appointment_id}/practitioner-rating": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Rate Session As Practitioner */
+        post: operations["rate_session_as_practitioner_api_v1_questionnaires_sessions__appointment_id__practitioner_rating_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/questionnaires/patients/{patient_id}/sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Patient Sessions */
+        get: operations["list_patient_sessions_api_v1_questionnaires_patients__patient_id__sessions_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/reception/today": {
         parameters: {
             query?: never;
@@ -1038,6 +1109,7 @@ export interface components {
             quality_of_life: components["schemas"]["MonthlyScore"][];
             satisfaction: components["schemas"]["Satisfaction"];
             self_assessment: components["schemas"]["SelfAssessment"];
+            session_satisfaction: components["schemas"]["SessionSatisfaction"];
         };
         /** DimensionChange */
         DimensionChange: {
@@ -1524,6 +1596,16 @@ export interface components {
             milestones: components["schemas"]["PatientMilestone"][];
         };
         /**
+         * PatientRating
+         * @description 0 = far too easy … 4 = far too hard; 0 = not satisfied … 4 = can't wait to come back.
+         */
+        PatientRating: {
+            /** Difficulty */
+            difficulty: number;
+            /** Satisfaction */
+            satisfaction: number;
+        };
+        /**
          * PatientUpdate
          * @description Corrections to the administrative record, or the patient's login once an admin has
          *     created it. Only the fields sent change.
@@ -1541,6 +1623,16 @@ export interface components {
             phone?: string | null;
             /** User Id */
             user_id?: string | null;
+        };
+        /**
+         * PractitionerRating
+         * @description 0 = could not do it … 4 = at ease. METs only where intensity is measured.
+         */
+        PractitionerRating: {
+            /** Coping */
+            coping: number;
+            /** Intensity Mets */
+            intensity_mets?: number | null;
         };
         /**
          * PublicCategory
@@ -1645,6 +1737,49 @@ export interface components {
             pathways: number | null;
             /** By Dimension */
             by_dimension: components["schemas"]["DimensionChange"][];
+        };
+        /**
+         * SessionOut
+         * @description A finished session and its evaluation so far.
+         */
+        SessionOut: {
+            /**
+             * Appointment Id
+             * Format: uuid
+             */
+            appointment_id: string;
+            /**
+             * Starts At
+             * Format: date-time
+             */
+            starts_at: string;
+            /**
+             * Professional Id
+             * Format: uuid
+             */
+            professional_id: string;
+            /** Professional Name */
+            professional_name: string;
+            /** Patient Difficulty */
+            patient_difficulty: number | null;
+            /** Patient Satisfaction */
+            patient_satisfaction: number | null;
+            /** Coping */
+            coping: number | null;
+            /** Intensity Mets */
+            intensity_mets: number | null;
+        };
+        /**
+         * SessionSatisfaction
+         * @description Patients' ratings right after their sessions, 0–100. Drop-out follows low satisfaction.
+         */
+        SessionSatisfaction: {
+            /** Patients */
+            patients: number | null;
+            /** Ratings */
+            ratings: number | null;
+            /** Average */
+            average: number | null;
         };
         /**
          * Status
@@ -2945,6 +3080,127 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ScoreOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_sessions_to_rate_api_v1_questionnaires_sessions_to_rate_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionOut"][];
+                };
+            };
+        };
+    };
+    rate_session_as_patient_api_v1_questionnaires_sessions__appointment_id__patient_rating_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                appointment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PatientRating"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    rate_session_as_practitioner_api_v1_questionnaires_sessions__appointment_id__practitioner_rating_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                appointment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PractitionerRating"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_patient_sessions_api_v1_questionnaires_patients__patient_id__sessions_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                patient_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionOut"][];
                 };
             };
             /** @description Validation Error */
