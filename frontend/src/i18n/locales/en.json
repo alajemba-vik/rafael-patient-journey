@@ -49,7 +49,10 @@
     "mainNav": "Main navigation",
     "signOut": "Sign out",
     "signIn": "Sign in",
-    "language": "Language"
+    "language": "Language",
+    "notifications": "Notifications",
+    "unreadCount_one": "{{count}} unread",
+    "unreadCount_other": "{{count}} unread"
   },
   "nav": {
     "faq": "FAQ",
@@ -486,5 +489,22 @@
     "question": "Question",
     "answer": "Answer",
     "saveFailed": "Saving failed. Your text is kept: try again."
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "No notifications yet.",
+    "unread": "Unread:",
+    "markRead": "Mark as read",
+    "markAllRead": "Mark all as read",
+    "sentAt": "{{date}} at {{time}}",
+    "templates": {
+      "appointment_booked": "Appointment on {{date}} at {{time}} with {{name}}.",
+      "appointment_moved": "Appointment with {{name}} moved to {{date}} at {{time}}.",
+      "appointment_cancelled": "Appointment on {{date}} at {{time}} with {{name}} cancelled.",
+      "appointment_reminder": "Reminder: appointment on {{date}} at {{time}} with {{name}}.",
+      "missed_appointment": "A patient missed their appointment on {{date}} at {{time}}. Check they are still following their pathway.",
+      "message_received": "New message.",
+      "session_to_rate": "How did your session on {{date}} with {{name}} go? Give your feedback."
+    }
   }
 }

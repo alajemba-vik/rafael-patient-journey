@@ -49,7 +49,10 @@
     "mainNav": "Navigation principale",
     "signOut": "Se déconnecter",
     "signIn": "Se connecter",
-    "language": "Langue"
+    "language": "Langue",
+    "notifications": "Notifications",
+    "unreadCount_one": "{{count}} non lue",
+    "unreadCount_other": "{{count}} non lues"
   },
   "nav": {
     "faq": "Questions fréquentes",
@@ -486,5 +489,22 @@
     "question": "Question",
     "answer": "Réponse",
     "saveFailed": "L’enregistrement n’a pas abouti. Votre texte est conservé : réessayez."
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "Aucune notification pour l’instant.",
+    "unread": "Non lue :",
+    "markRead": "Marquer comme lue",
+    "markAllRead": "Tout marquer comme lu",
+    "sentAt": "Le {{date}} à {{time}}",
+    "templates": {
+      "appointment_booked": "Rendez-vous prévu le {{date}} à {{time}} avec {{name}}.",
+      "appointment_moved": "Rendez-vous avec {{name}} déplacé au {{date}} à {{time}}.",
+      "appointment_cancelled": "Rendez-vous du {{date}} à {{time}} avec {{name}} annulé.",
+      "appointment_reminder": "Rappel : rendez-vous le {{date}} à {{time}} avec {{name}}.",
+      "missed_appointment": "Un patient n’est pas venu à son rendez-vous du {{date}} à {{time}}. Confirmez qu’il poursuit son parcours.",
+      "message_received": "Nouveau message.",
+      "session_to_rate": "Comment s’est passée votre séance du {{date}} avec {{name}} ? Donnez votre avis."
+    }
   }
 }

@@ -4,6 +4,7 @@ export const paths = {
   home: "/",
   login: "/connexion",
   faq: "/faq",
+  notifications: "/notifications",
   patient: {
     home: "/patient",
     appointments: "/patient/rendez-vous",

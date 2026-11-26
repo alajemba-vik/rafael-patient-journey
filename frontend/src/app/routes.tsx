@@ -22,7 +22,13 @@ export const router = createBrowserRouter([
     children: [
       { path: paths.login, element: <LoginPage /> },
       { path: paths.faq, element: <FaqPage /> },
-      { element: <RequireAuth />, children: [{ path: paths.home, element: <RoleHome /> }] },
+      {
+        element: <RequireAuth />,
+        children: [
+          { path: paths.home, element: <RoleHome /> },
+          page(paths.notifications, () => import("../pages/shared/notifications/NotificationsPage")),
+        ],
+      },
       {
         element: <RequireAuth roles={["patient"]} />,
         children: [

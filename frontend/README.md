@@ -82,7 +82,7 @@ URLs are per role), and most pages draw on several modules, so this table is the
 | `questionnaires`                        | `questionnaires.ts`     | `pages/patient/questionnaires`, `home` · `pages/professional/patients`                                                                                |
 | `analytics`                             | `analytics.ts`          | `pages/professional/dashboard` (also shown to admins at `/admin/tableau-de-bord`)                                                                     |
 | `faq`                                   | `faq.ts`                | `pages/public/faq`, `pages/admin/faq`                                                                                                                 |
-| `notifications`                         | none yet                | none yet                                                                                                                                              |
+| `notifications`                         | `notifications.ts`      | `pages/shared/notifications`, app shell (unread count)                                                                                                |
 
 ## Ownership
 
@@ -92,4 +92,5 @@ URLs are per role), and most pages draw on several modules, so this table is the
 | `src/pages/professional/`                             | Hugo                                                 |
 | `src/pages/reception/`                                | Victoria                                             |
 | `src/pages/admin/`, `src/pages/public/`               | Louis                                                |
+| `src/pages/shared/` (pages every signed-in role uses) | shared: changes need one reviewer from another owner |
 | `src/components/`, `src/lib/`, `src/api/`, `src/app/` | shared: changes need one reviewer from another owner |

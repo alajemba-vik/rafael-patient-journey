@@ -148,6 +148,11 @@ def get_patient_id_for_user(db: Session, user_id: uuid.UUID) -> uuid.UUID | None
     return db.scalar(select(Patient.id).where(Patient.user_id == user_id))
 
 
+def get_user_id_for_patient(db: Session, patient_id: uuid.UUID) -> uuid.UUID | None:
+    """The patient's own login, if they have one: where their notifications go."""
+    return db.scalar(select(Patient.user_id).where(Patient.id == patient_id))
+
+
 def _matches(search: str) -> ColumnElement[bool]:
     """A name prefix, or a run of at least PHONE_SEARCH_DIGITS digits anywhere in the phone."""
     digits = "".join(ch for ch in search if ch.isdigit())

@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router";
 
 import { useMe } from "../../api/identity_access";
+import { useNotifications } from "../../api/notifications";
 import { session } from "../../api/core/session";
 import { NAV_BY_ROLE } from "../../app/navigation";
 import { paths } from "../../app/paths";
@@ -12,6 +13,7 @@ import { LanguageSwitcher } from "./LanguageSwitcher";
 export function AppShell() {
   const { t } = useTranslation();
   const { data: me } = useMe();
+  const { data: inbox } = useNotifications(Boolean(me));
   const location = useLocation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -62,6 +64,15 @@ export function AppShell() {
             <LanguageSwitcher />
             {me ? (
               <>
+                <NavLink to={paths.notifications} className="rf-navlink rf-shell__inbox">
+                  {t("shell.notifications")}
+                  {inbox && inbox.unread > 0 && (
+                    <span className="rf-count">
+                      <span aria-hidden="true">{inbox.unread}</span>
+                      <span className="rf-visually-hidden">{t("shell.unreadCount", { count: inbox.unread })}</span>
+                    </span>
+                  )}
+                </NavLink>
                 <span className="rf-shell__user">{me.full_name}</span>
                 <button type="button" className="rf-btn rf-btn--secondary" onClick={signOut}>
                   {t("shell.signOut")}

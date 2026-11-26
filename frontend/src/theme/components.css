@@ -1270,3 +1270,22 @@ body {
   padding: 2px 8px;
   border-radius: var(--radius-xs);
 }
+
+/* Notifications: unread count in the header, unread items in the inbox */
+.rf-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  margin-left: var(--space-2);
+  padding: 0 var(--space-1);
+  font-size: 12px;
+  line-height: 22px;
+  font-weight: 700;
+  color: var(--on-accent);
+  background: var(--accent);
+  border-radius: var(--radius-xs);
+}
+.rf-notification--unread p:first-child {
+  font-weight: 700;
+}

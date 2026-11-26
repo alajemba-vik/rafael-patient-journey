@@ -28,6 +28,8 @@ from app.errors import AppError, ConflictError, ForbiddenError, NotFoundError
 from app.modules.care_team import service as care_team
 from app.modules.identity_access import service as identity
 from app.modules.identity_access.service import CurrentUser, Role
+from app.modules.notifications import service as notifications
+from app.modules.notifications.models import Template
 from app.modules.patients import service as patients
 from app.modules.scheduling.models import Appointment, AppointmentStatus
 from app.modules.scheduling.schemas import (
@@ -49,6 +51,8 @@ BOOKING_ROLES = {Role.COORDINATOR, Role.SECRETARY}
 OWN_AGENDA_ROLES = {Role.PROFESSIONAL}
 CARE_ROLES = {Role.PROFESSIONAL, Role.COORDINATOR}
 UPCOMING_WINDOW = timedelta(days=90)
+# Patients are reminded of appointments starting within this window.
+REMINDER_WINDOW = timedelta(hours=24)
 
 # Opening hours: sessions on weekdays, 9:00 to 19:00, the same for every practitioner.
 # Only free-slot suggestions follow these hours: staff can still book any time by hand.
@@ -110,7 +114,7 @@ def create_appointment(db: Session, user: CurrentUser, data: AppointmentCreate) 
     db.add(appointment)
     audit.record(db, user.id, "appointment.create", data.patient_id)
     _commit_unless_slot_taken(db)
-    return _to_out(db, [appointment])[0]
+    return _notified(db, user, appointment, Template.APPOINTMENT_BOOKED)
 
 
 def reschedule_appointment(
@@ -136,7 +140,7 @@ def reschedule_appointment(
     appointment.starts_at, appointment.ends_at = data.starts_at, data.ends_at
     audit.record(db, user.id, "appointment.reschedule", appointment.patient_id)
     _commit_unless_slot_taken(db)
-    return _to_out(db, [appointment])[0]
+    return _notified(db, user, appointment, Template.APPOINTMENT_MOVED)
 
 
 def cancel_appointment(
@@ -157,7 +161,7 @@ def cancel_appointment(
     appointment.cancel_reason = (data or AppointmentCancel()).reason
     audit.record(db, user.id, "appointment.cancel", appointment.patient_id)
     db.commit()
-    return _to_out(db, [appointment])[0]
+    return _notified(db, user, appointment, Template.APPOINTMENT_CANCELLED)
 
 
 def update_appointment(
@@ -290,7 +294,52 @@ def set_status(db: Session, appointment_id: uuid.UUID, status: AppointmentStatus
         appointment.arrived_at = None
         appointment.called_in_at = None
     appointment.status = status
-    return _to_out(db, [appointment])[0]
+    out = _to_out(db, [appointment])[0]
+    if status == AppointmentStatus.NO_SHOW:
+        # The practitioner confirms the patient is still following the pathway: absences are
+        # how patients get lost to follow-up.
+        notifications.notify(
+            db,
+            [out.professional_id],
+            Template.MISSED_APPOINTMENT,
+            out.patient_id,
+            {"starts_at": out.starts_at.isoformat()},
+        )
+    return out
+
+
+def send_appointment_reminders(db: Session, now: datetime | None = None) -> int:
+    """Remind patients of appointments starting within the next day, once per appointment.
+
+    Run on a schedule (`scripts/send_reminders.py`); safe to run as often as wanted. Returns
+    how many reminders were sent.
+    """
+    now = now or datetime.now(UTC)
+    upcoming = db.scalars(
+        select(Appointment).where(
+            Appointment.status == AppointmentStatus.SCHEDULED,
+            Appointment.starts_at >= now,
+            Appointment.starts_at < now + REMINDER_WINDOW,
+        )
+    )
+    sent = 0
+    for appointment in _to_out(db, upcoming):
+        recipient = patients.get_user_id_for_patient(db, appointment.patient_id)
+        if recipient is None or notifications.was_sent(
+            db, recipient, Template.APPOINTMENT_REMINDER, appointment.id
+        ):
+            continue
+        notifications.notify(
+            db, [recipient], Template.APPOINTMENT_REMINDER, appointment.id, _params(appointment)
+        )
+        sent += 1
+    db.commit()
+    return sent
+
+
+def get_appointment(db: Session, appointment_id: uuid.UUID) -> AppointmentOut:
+    """One appointment, for other modules that act on it. Callers check access and audit."""
+    return _to_out(db, [_get(db, appointment_id)])[0]
 
 
 def count_by_status(db: Session, start: datetime, end: datetime) -> dict[AppointmentStatus, int]:
@@ -422,6 +471,31 @@ def _has_overlap(
     if ignore_id is not None:
         query = query.where(Appointment.id != ignore_id)
     return db.scalar(query.limit(1)) is not None
+
+
+def _notified(
+    db: Session, user: CurrentUser, appointment: Appointment, template: Template
+) -> AppointmentOut:
+    """The patient and the practitioner hear about a change, unless they made it themselves.
+
+    Sent once the change itself is committed: the database may still refuse an overlapping
+    slot at commit time, and nobody should be told about a booking that didn't happen.
+    """
+    out = _to_out(db, [appointment])[0]
+    recipients = [patients.get_user_id_for_patient(db, out.patient_id), out.professional_id]
+    notifications.notify(
+        db, [r for r in recipients if r != user.id], template, out.id, _params(out)
+    )
+    db.commit()
+    return out
+
+
+def _params(appointment: AppointmentOut) -> dict[str, str]:
+    """When and with whom: no patient name, no health detail."""
+    return {
+        "starts_at": appointment.starts_at.isoformat(),
+        "professional_name": appointment.professional_name,
+    }
 
 
 def _aware(value: datetime) -> datetime:
