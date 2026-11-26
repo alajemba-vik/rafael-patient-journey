@@ -20,13 +20,16 @@ export function AppShell() {
   const mainRef = useRef<HTMLElement>(null);
   const isFirstPage = useRef(true);
 
-  // After navigating, move focus to the new page so keyboard and screen-reader users start there.
+  // After navigating, start the new page at the top, and move focus to it so keyboard and
+  // screen-reader users start there too. preventScroll: focusing must not scroll the page down
+  // past the header.
   useEffect(() => {
     if (isFirstPage.current) {
       isFirstPage.current = false;
       return;
     }
-    mainRef.current?.focus();
+    window.scrollTo(0, 0);
+    mainRef.current?.focus({ preventScroll: true });
   }, [location.pathname]);
 
   function signOut() {
