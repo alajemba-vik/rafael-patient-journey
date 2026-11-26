@@ -74,7 +74,8 @@
     "adminAudit": "Journal d’accès",
     "planning": "Planning partagé",
     "groups": "Séances collectives",
-    "tasks": "Tâches"
+    "tasks": "Tâches",
+    "staffHome": "Accueil"
   },
   "feedback": {
     "loading": "Chargement en cours",
@@ -948,5 +949,25 @@
       "in_progress": "Terminer",
       "done": "Rouvrir"
     }
+  },
+  "staffHome": {
+    "title": "Accueil",
+    "hello": "Bonjour {{name}}",
+    "today": "Aujourd’hui",
+    "seeSchedule": "Voir mon planning",
+    "noSession": "Aucune séance aujourd’hui.",
+    "tasks": "Mes tâches",
+    "seeTasks": "Voir toutes mes tâches",
+    "noTask": "Aucune tâche en attente.",
+    "openTasks_one": "{{count}} tâche à faire ou en cours :",
+    "openTasks_other": "{{count}} tâches à faire ou en cours :",
+    "inbox": "À regarder",
+    "notifications": "Notifications",
+    "unread_zero": "Aucune notification non lue",
+    "unread_one": "{{count}} notification non lue",
+    "unread_other": "{{count}} notifications non lues",
+    "needs_zero": "Aucun besoin signalé en attente",
+    "needs_one": "{{count}} besoin signalé en attente",
+    "needs_other": "{{count}} besoins signalés en attente"
   }
 }

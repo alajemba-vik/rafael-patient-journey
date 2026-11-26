@@ -80,8 +80,12 @@ export function useLedPathways() {
 }
 
 /** The coordinator's inbox of flagged needs. */
-export function useOpenNeeds() {
-  return useQuery({ queryKey: [...PATHWAYS, "needs"], queryFn: () => unwrap(api.GET("/api/v1/pathways/needs")) });
+export function useOpenNeeds(enabled = true) {
+  return useQuery({
+    queryKey: [...PATHWAYS, "needs"],
+    queryFn: () => unwrap(api.GET("/api/v1/pathways/needs")),
+    enabled,
+  });
 }
 
 export function useResolveNeed() {

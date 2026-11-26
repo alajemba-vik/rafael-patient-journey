@@ -59,7 +59,8 @@ src/
   pages/
     public/                login · faq · not_found
     patient/               home · appointments · pathway · questionnaires
-    professional/          schedule · patients (list and file) · pathways · needs · dashboard
+    professional/          home · schedule · patients (file, clinical profile, report) · pathways · needs · dashboard
+    shared/                notifications · tasks
     reception/             board (arrivals, waiting room) · patients
     admin/                 users · faq
 ```

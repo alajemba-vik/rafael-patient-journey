@@ -15,6 +15,7 @@ export const paths = {
   },
   pro: {
     schedule: "/pro",
+    home: "/pro/accueil",
     patients: "/pro/patients",
     patient: (patientId: string) => `/pro/patients/${patientId}`,
     report: (patientId: string) => `/pro/patients/${patientId}/compte-rendu`,

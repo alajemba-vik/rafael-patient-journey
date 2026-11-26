@@ -74,7 +74,8 @@
     "adminAudit": "Access log",
     "planning": "Shared planning",
     "groups": "Group sessions",
-    "tasks": "Tasks"
+    "tasks": "Tasks",
+    "staffHome": "Home"
   },
   "feedback": {
     "loading": "Loading",
@@ -948,5 +949,25 @@
       "in_progress": "Finish",
       "done": "Reopen"
     }
+  },
+  "staffHome": {
+    "title": "Home",
+    "hello": "Hello {{name}}",
+    "today": "Today",
+    "seeSchedule": "See my schedule",
+    "noSession": "No session today.",
+    "tasks": "My tasks",
+    "seeTasks": "See all my tasks",
+    "noTask": "No task waiting.",
+    "openTasks_one": "{{count}} task to do or in progress:",
+    "openTasks_other": "{{count}} tasks to do or in progress:",
+    "inbox": "To look at",
+    "notifications": "Notifications",
+    "unread_zero": "No unread notification",
+    "unread_one": "{{count}} unread notification",
+    "unread_other": "{{count}} unread notifications",
+    "needs_zero": "No flagged need waiting",
+    "needs_one": "{{count}} flagged need waiting",
+    "needs_other": "{{count}} flagged needs waiting"
   }
 }

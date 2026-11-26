@@ -29,6 +29,7 @@ export const NAV_BY_ROLE: Record<Role, NavItem[]> = {
     FAQ,
   ],
   professional: [
+    { to: paths.pro.home, label: "nav.staffHome" },
     { to: paths.pro.schedule, label: "nav.proSchedule" },
     { to: paths.pro.patients, label: "nav.proPatients" },
     TASKS,
@@ -37,6 +38,7 @@ export const NAV_BY_ROLE: Record<Role, NavItem[]> = {
     FAQ,
   ],
   coordinator: [
+    { to: paths.pro.home, label: "nav.staffHome" },
     { to: paths.pro.schedule, label: "nav.proSchedule" },
     { to: paths.pro.patients, label: "nav.proPatients" },
     { to: paths.pro.pathways, label: "nav.proPathways" },
