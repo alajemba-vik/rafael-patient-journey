@@ -9,6 +9,7 @@ from app.modules.pathways import service
 from app.modules.pathways.schemas import (
     AssessmentOut,
     AssessmentRecord,
+    Assignee,
     MessageCreate,
     MessageOut,
     MilestoneCreate,
@@ -18,6 +19,9 @@ from app.modules.pathways.schemas import (
     PathwayOut,
     PathwaySummary,
     PatientPathway,
+    TaskCreate,
+    TaskOut,
+    TaskStatusChange,
 )
 
 router = APIRouter(prefix="/pathways", tags=["pathways"])
@@ -155,3 +159,47 @@ def list_patient_assessments(
     db: Session = Depends(get_db),
 ) -> list[AssessmentOut]:
     return service.list_patient_assessments(db, user, patient_id)
+
+
+@router.get("/tasks/assignees")
+def list_task_assignees(
+    user: CurrentUser = Depends(get_current_user), db: Session = Depends(get_db)
+) -> list[Assignee]:
+    return service.list_assignees(db, user)
+
+
+@router.get("/tasks")
+def list_tasks(
+    given: bool = False,
+    user: CurrentUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> list[TaskOut]:
+    return service.list_tasks(db, user, given)
+
+
+@router.post("/tasks", status_code=status.HTTP_201_CREATED)
+def create_task(
+    body: TaskCreate,
+    user: CurrentUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> TaskOut:
+    return service.create_task(db, user, body)
+
+
+@router.post("/tasks/{task_id}/status")
+def change_task_status(
+    task_id: uuid.UUID,
+    body: TaskStatusChange,
+    user: CurrentUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> TaskOut:
+    return service.change_task_status(db, user, task_id, body.status)
+
+
+@router.delete("/tasks/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_task(
+    task_id: uuid.UUID,
+    user: CurrentUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> None:
+    service.delete_task(db, user, task_id)

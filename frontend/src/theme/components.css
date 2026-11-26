@@ -1459,3 +1459,17 @@ body {
     overflow: visible;
   }
 }
+
+/* Tasks: priority badges and a late due date. */
+.rf-badge--priority-high {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}
+.rf-badge--priority-low {
+  color: var(--ink-muted);
+  border-color: var(--hairline);
+}
+.rf-overdue {
+  font-weight: 700;
+}

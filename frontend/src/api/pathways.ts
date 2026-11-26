@@ -152,3 +152,57 @@ export function useRecordAssessment() {
     onSettled: () => queryClient.invalidateQueries({ queryKey: ASSESSMENTS }),
   });
 }
+
+const TASKS = [...PATHWAYS, "tasks"] as const;
+
+export type Task = Schemas["TaskOut"];
+export type TaskStatus = Schemas["TaskStatus"];
+export type TaskPriority = Schemas["TaskPriority"];
+
+/** My tasks, or with `given`, the ones I gave to colleagues. */
+export function useTasks(given = false) {
+  return useQuery({
+    queryKey: [...TASKS, given],
+    queryFn: () => unwrap(api.GET("/api/v1/pathways/tasks", { params: { query: { given } } })),
+  });
+}
+
+/** Reception, practitioners and coordinators: who a task can be given to. */
+export function useTaskAssignees() {
+  return useQuery({
+    queryKey: [...TASKS, "assignees"],
+    queryFn: () => unwrap(api.GET("/api/v1/pathways/tasks/assignees")),
+    staleTime: 5 * 60_000,
+  });
+}
+
+export function useCreateTask() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (body: Schemas["TaskCreate"]) => unwrap(api.POST("/api/v1/pathways/tasks", { body })),
+    onSuccess: () => void queryClient.invalidateQueries({ queryKey: TASKS }),
+  });
+}
+
+export function useChangeTaskStatus() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ taskId, status }: { taskId: string; status: TaskStatus }) =>
+      unwrap(
+        api.POST("/api/v1/pathways/tasks/{task_id}/status", {
+          params: { path: { task_id: taskId } },
+          body: { status },
+        }),
+      ),
+    onSuccess: () => void queryClient.invalidateQueries({ queryKey: TASKS }),
+  });
+}
+
+export function useDeleteTask() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (taskId: string) =>
+      unwrap(api.DELETE("/api/v1/pathways/tasks/{task_id}", { params: { path: { task_id: taskId } } })),
+    onSuccess: () => void queryClient.invalidateQueries({ queryKey: TASKS }),
+  });
+}

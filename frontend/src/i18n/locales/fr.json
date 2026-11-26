@@ -73,7 +73,8 @@
     "receptionCallBacks": "À rappeler",
     "adminAudit": "Journal d’accès",
     "planning": "Planning partagé",
-    "groups": "Séances collectives"
+    "groups": "Séances collectives",
+    "tasks": "Tâches"
   },
   "feedback": {
     "loading": "Chargement en cours",
@@ -513,7 +514,8 @@
       "appointment_reminder": "Rappel : rendez-vous le {{date}} à {{time}} avec {{name}}.",
       "missed_appointment": "Un patient n’est pas venu à son rendez-vous du {{date}} à {{time}}. Confirmez qu’il poursuit son parcours.",
       "message_received": "Nouveau message.",
-      "session_to_rate": "Comment s’est passée votre séance du {{date}} avec {{name}} ? Donnez votre avis."
+      "session_to_rate": "Comment s’est passée votre séance du {{date}} avec {{name}} ? Donnez votre avis.",
+      "task_assigned": "Une tâche vous a été confiée."
     }
   },
   "messages": {
@@ -902,5 +904,49 @@
     "noMilestone": "Aucun bilan enregistré.",
     "notAllowed": "Seule l’équipe de soins du patient peut éditer ce compte rendu.",
     "confidential": "Document confidentiel : données de santé. Ne pas transmettre en dehors de l’équipe de soins."
+  },
+  "tasks": {
+    "title": "Tâches",
+    "new": "Nouvelle tâche",
+    "titleField": "Tâche",
+    "assignedTo": "Confiée à",
+    "givenBy": "Donnée par",
+    "me": "Moi",
+    "patient": "Patient",
+    "patientHint": "Facultatif. La personne choisie doit pouvoir voir ce patient.",
+    "noPatient": "Aucun patient",
+    "priority": "Priorité",
+    "dueOn": "À faire pour le",
+    "note": "Précisions",
+    "create": "Créer la tâche",
+    "cancel": "Annuler",
+    "createFailed": "La tâche n’a pas pu être créée. Vérifiez que la personne fait partie de l’équipe de soins du patient.",
+    "whose": "Quelles tâches afficher",
+    "mine": "Mes tâches",
+    "given": "Tâches confiées",
+    "overdue": "en retard",
+    "delete": "Supprimer",
+    "deleteQuestion": "Supprimer cette tâche ?",
+    "deleteConfirm": "Oui, supprimer",
+    "priorities": {
+      "high": "Haute",
+      "medium": "Moyenne",
+      "low": "Basse"
+    },
+    "lanes": {
+      "todo": "À faire",
+      "in_progress": "En cours",
+      "done": "Terminées"
+    },
+    "empty": {
+      "todo": "Rien à faire pour l’instant.",
+      "in_progress": "Aucune tâche en cours.",
+      "done": "Aucune tâche terminée ces deux dernières semaines."
+    },
+    "move": {
+      "todo": "Commencer",
+      "in_progress": "Terminer",
+      "done": "Rouvrir"
+    }
   }
 }

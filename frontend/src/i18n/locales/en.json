@@ -73,7 +73,8 @@
     "receptionCallBacks": "To call back",
     "adminAudit": "Access log",
     "planning": "Shared planning",
-    "groups": "Group sessions"
+    "groups": "Group sessions",
+    "tasks": "Tasks"
   },
   "feedback": {
     "loading": "Loading",
@@ -513,7 +514,8 @@
       "appointment_reminder": "Reminder: appointment on {{date}} at {{time}} with {{name}}.",
       "missed_appointment": "A patient missed their appointment on {{date}} at {{time}}. Check they are still following their pathway.",
       "message_received": "New message.",
-      "session_to_rate": "How did your session on {{date}} with {{name}} go? Give your feedback."
+      "session_to_rate": "How did your session on {{date}} with {{name}} go? Give your feedback.",
+      "task_assigned": "A task was given to you."
     }
   },
   "messages": {
@@ -902,5 +904,49 @@
     "noMilestone": "No review recorded.",
     "notAllowed": "Only the patient’s care team can produce this report.",
     "confidential": "Confidential: health data. Do not share outside the care team."
+  },
+  "tasks": {
+    "title": "Tasks",
+    "new": "New task",
+    "titleField": "Task",
+    "assignedTo": "Given to",
+    "givenBy": "Given by",
+    "me": "Me",
+    "patient": "Patient",
+    "patientHint": "Optional. The person you choose must be able to see this patient.",
+    "noPatient": "No patient",
+    "priority": "Priority",
+    "dueOn": "Due on",
+    "note": "Details",
+    "create": "Create the task",
+    "cancel": "Cancel",
+    "createFailed": "The task couldn’t be created. Check the person is in the patient’s care team.",
+    "whose": "Which tasks to show",
+    "mine": "My tasks",
+    "given": "Tasks I gave",
+    "overdue": "overdue",
+    "delete": "Delete",
+    "deleteQuestion": "Delete this task?",
+    "deleteConfirm": "Yes, delete",
+    "priorities": {
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    },
+    "lanes": {
+      "todo": "To do",
+      "in_progress": "In progress",
+      "done": "Done"
+    },
+    "empty": {
+      "todo": "Nothing to do for now.",
+      "in_progress": "No task in progress.",
+      "done": "No task finished in the last two weeks."
+    },
+    "move": {
+      "todo": "Start",
+      "in_progress": "Finish",
+      "done": "Reopen"
+    }
   }
 }

@@ -12,6 +12,8 @@ export function notificationLink(notification: Notification, role: Role): string
     case "message_received":
       if (staff && notification.subject_id) return paths.pro.patient(notification.subject_id);
       return role === "patient" ? paths.patient.messages : null;
+    case "task_assigned":
+      return role === "patient" ? null : paths.tasks;
     case "session_to_rate":
       return role === "patient" ? paths.patient.appointments : null;
     default:

@@ -11,10 +11,14 @@ from app.modules.pathways.models import (
     MAX_DISCIPLINES,
     MAX_GOALS,
     MESSAGE_MAX_LENGTH,
+    TASK_NOTE_MAX_LENGTH,
+    TASK_TITLE_MAX_LENGTH,
     AssessmentTest,
     Goal,
     MilestoneKind,
     PathwayStatus,
+    TaskPriority,
+    TaskStatus,
 )
 
 Score = Annotated[int, Field(ge=0, le=4)]
@@ -172,3 +176,53 @@ class AssessmentOut(BaseModel):
     band: str | None
     recorded_by_name: str
     recorded_at: datetime
+
+
+def _blank_to_none(value: str | None) -> str | None:
+    return value or None
+
+
+class TaskCreate(BaseModel):
+    title: Annotated[
+        str,
+        StringConstraints(strip_whitespace=True, min_length=1, max_length=TASK_TITLE_MAX_LENGTH),
+    ]
+    note: Annotated[
+        str | None,
+        StringConstraints(strip_whitespace=True, max_length=TASK_NOTE_MAX_LENGTH),
+        AfterValidator(_blank_to_none),
+    ] = None
+    patient_id: uuid.UUID | None = None
+    assigned_to: uuid.UUID
+    priority: TaskPriority = TaskPriority.MEDIUM
+    due_on: date | None = None
+
+
+class TaskStatusChange(BaseModel):
+    status: TaskStatus
+
+
+class TaskOut(BaseModel):
+    id: uuid.UUID
+    title: str
+    note: str | None
+    patient_id: uuid.UUID | None
+    patient_name: str | None
+    assigned_to: uuid.UUID
+    assigned_to_name: str
+    created_by: uuid.UUID
+    created_by_name: str
+    priority: TaskPriority
+    status: TaskStatus
+    due_on: date | None
+    created_at: datetime
+    done_at: datetime | None
+
+
+class Assignee(BaseModel):
+    """Someone a task can be given to."""
+
+    id: uuid.UUID
+    full_name: str
+    role: str
+    discipline: str | None

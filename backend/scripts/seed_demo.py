@@ -21,6 +21,7 @@ What it creates, around today in the Institute's time zone:
   each with a few enrolled patients;
 - a clinical profile per patient (cancer site, treatments with dates, social life and
   habits);
+- a few tasks per care-team member (book a review, call back, send a document);
 - a short conversation with the care team for some patients, and patient and practitioner
   ratings for most finished sessions.
 
@@ -57,6 +58,9 @@ from app.modules.pathways.models import (
     Message,
     MilestoneKind,
     PathwayMilestone,
+    Task,
+    TaskPriority,
+    TaskStatus,
 )
 from app.modules.patients.models import (
     CancerSite,
@@ -190,6 +194,9 @@ def remove_demo_data(db: Session) -> int:
         demo_groups = select(GroupSession.id).where(GroupSession.professional_id.in_(staff_ids))
         db.execute(delete(GroupEnrollment).where(GroupEnrollment.session_id.in_(demo_groups)))
         db.execute(delete(GroupSession).where(GroupSession.professional_id.in_(staff_ids)))
+        db.execute(
+            delete(Task).where(Task.created_by.in_(staff_ids) | Task.assigned_to.in_(staff_ids))
+        )
         db.execute(delete(Appointment).where(Appointment.professional_id.in_(staff_ids)))
         db.execute(delete(CareAssignment).where(CareAssignment.professional_id.in_(staff_ids)))
         db.execute(delete(User).where(User.id.in_(staff_ids)))
@@ -226,6 +233,7 @@ def seed(db: Session, attach: list[str], rng: random.Random) -> dict[str, int]:
     ratings = _add_session_ratings(db, rng)
     groups = _add_group_sessions(db, practitioners, patients, rng)
     profiles = _add_clinical_profiles(db, teams, rng)
+    tasks = _add_tasks(db, teams, rng)
     return {
         "staff": len(STAFF),
         "patients": len(patients),
@@ -236,6 +244,7 @@ def seed(db: Session, attach: list[str], rng: random.Random) -> dict[str, int]:
         "session ratings": ratings,
         "group sessions": groups,
         "clinical profiles": profiles,
+        "tasks": tasks,
     }
 
 
@@ -569,6 +578,44 @@ def _add_clinical_profiles(
             )
     db.flush()
     return len(teams)
+
+
+TASK_TITLES = [
+    ("Convocation bilan 3 mois", TaskPriority.MEDIUM),
+    ("Rappeler pour l'atelier nutrition", TaskPriority.LOW),
+    ("Envoyer le compte rendu au médecin traitant", TaskPriority.HIGH),
+    ("Proposer un rendez-vous de sophrologie", TaskPriority.MEDIUM),
+]
+
+
+def _add_tasks(db: Session, teams: dict[uuid.UUID, list[User]], rng: random.Random) -> int:
+    """For about half the patients: their coordinator asks a team member to do something,
+    or notes it for themself; some already started or done."""
+    now = datetime.now(UTC)
+    count = 0
+    for patient_id, team in teams.items():
+        if rng.random() < 0.5:
+            continue
+        title, priority = rng.choice(TASK_TITLES)
+        status = rng.choice(
+            [TaskStatus.TODO, TaskStatus.TODO, TaskStatus.IN_PROGRESS, TaskStatus.DONE]
+        )
+        db.add(
+            Task(
+                title=title,
+                patient_id=patient_id,
+                created_by=team[0].id,
+                assigned_to=rng.choice(team).id,
+                priority=priority,
+                status=status,
+                due_on=_working_day(now.date(), rng.randint(1, 8)),
+                created_at=now - timedelta(days=rng.randint(1, 6)),
+                done_at=now if status == TaskStatus.DONE else None,
+            )
+        )
+        count += 1
+    db.flush()
+    return count
 
 
 def _add_session_ratings(db: Session, rng: random.Random) -> int:

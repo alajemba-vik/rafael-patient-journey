@@ -36,10 +36,13 @@ from app.modules.pathways.models import (
     PathwayMilestone,
     PathwayNeed,
     PathwayStatus,
+    Task,
+    TaskStatus,
 )
 from app.modules.pathways.schemas import (
     AssessmentOut,
     AssessmentRecord,
+    Assignee,
     MessageCreate,
     MessageOut,
     Milestone,
@@ -51,10 +54,16 @@ from app.modules.pathways.schemas import (
     PathwaySummary,
     PatientMilestone,
     PatientPathway,
+    TaskCreate,
+    TaskOut,
 )
 from app.modules.patients import service as patients
 
 CARE_ROLES = {Role.PROFESSIONAL, Role.COORDINATOR}
+# Who works with tasks: reception and the care staff. Admins manage the platform, not care.
+TASK_ROLES = {Role.SECRETARY, Role.PROFESSIONAL, Role.COORDINATOR}
+# Finished tasks stay on the board this long, then only the open ones show.
+DONE_TASKS_SHOWN = timedelta(days=14)
 # Every practitioner in the patient's care team sees all the scores.
 MILESTONE_ORDER = [MilestoneKind.INTAKE, MilestoneKind.REVIEW, MilestoneKind.FINAL]
 DIMENSIONS = ("physical", "psychological", "emotional", "sexual", "socio_professional")
@@ -537,6 +546,138 @@ def _get(db: Session, pathway_id: uuid.UUID) -> CarePathway:
     if pathway is None:
         raise NotFoundError("Pathway not found")
     return pathway
+
+
+# --- tasks -----------------------------------------------------------------
+
+
+def list_assignees(db: Session, user: CurrentUser) -> list[Assignee]:
+    """Reception, practitioners and coordinators, to give a task to."""
+    _check_task_role(user)
+    ids = [uid for role in TASK_ROLES for uid in identity.list_ids_with_role(db, role)]
+    people = sorted(identity.get_users(db, ids), key=lambda u: u.full_name)
+    return [
+        Assignee(id=u.id, full_name=u.full_name, role=u.role.value, discipline=u.discipline)
+        for u in people
+    ]
+
+
+def create_task(db: Session, user: CurrentUser, data: TaskCreate) -> TaskOut:
+    """Both the creator and the assignee must be allowed to handle the patient, if any."""
+    _check_task_role(user)
+    assignee_role = identity.get_role(db, data.assigned_to)
+    if assignee_role not in TASK_ROLES:
+        raise NotFoundError("No staff member with this id")
+    if data.patient_id is not None:
+        if not patients.patient_exists(db, data.patient_id):
+            raise NotFoundError("Patient not found")
+        if not _can_handle_patient(db, user.id, user.role, data.patient_id):
+            _deny(db, user, "task.create.denied", data.patient_id)
+        if not _can_handle_patient(db, data.assigned_to, assignee_role, data.patient_id):
+            raise ConflictError("This person is not in the patient's care team")
+
+    task = Task(**data.model_dump(), created_by=user.id, created_at=datetime.now(UTC))
+    db.add(task)
+    db.flush()
+    if data.patient_id is not None:
+        audit.record(db, user.id, "task.create", data.patient_id)
+    if data.assigned_to != user.id:
+        notifications.notify(db, [data.assigned_to], Template.TASK_ASSIGNED, subject_id=task.id)
+    db.commit()
+    return _tasks_out(db, [task])[0]
+
+
+def list_tasks(db: Session, user: CurrentUser, given: bool = False) -> list[TaskOut]:
+    """My tasks, or with `given`, those I gave to others. Open ones, plus those finished in the
+    last DONE_TASKS_SHOWN; most urgent first."""
+    _check_task_role(user)
+    owner = Task.created_by if given else Task.assigned_to
+    query = select(Task).where(
+        owner == user.id,
+        (Task.status != TaskStatus.DONE) | (Task.done_at >= datetime.now(UTC) - DONE_TASKS_SHOWN),
+    )
+    if given:
+        query = query.where(Task.assigned_to != user.id)
+    tasks = list(db.scalars(query.order_by(Task.due_on.asc().nulls_last(), Task.created_at)))
+    audit.record_many(db, user.id, "task.list", {t.patient_id for t in tasks if t.patient_id})
+    db.commit()
+    return _tasks_out(db, tasks)
+
+
+def change_task_status(
+    db: Session, user: CurrentUser, task_id: uuid.UUID, status: TaskStatus
+) -> TaskOut:
+    """The assignee moves the task along; its creator can too."""
+    task = db.scalar(select(Task).where(Task.id == task_id).with_for_update())
+    if task is None:
+        raise NotFoundError("Task not found")
+    if user.id not in {task.assigned_to, task.created_by}:
+        if task.patient_id is not None:
+            _deny(db, user, "task.update.denied", task.patient_id)
+        raise ForbiddenError("Only the person in charge or who created it can change this task")
+    task.status = status
+    task.done_at = datetime.now(UTC) if status == TaskStatus.DONE else None
+    if task.patient_id is not None:
+        audit.record(db, user.id, "task.update", task.patient_id)
+    db.commit()
+    return _tasks_out(db, [task])[0]
+
+
+def delete_task(db: Session, user: CurrentUser, task_id: uuid.UUID) -> None:
+    """Only its creator removes a task (made by mistake, no longer needed)."""
+    task = db.scalar(select(Task).where(Task.id == task_id).with_for_update())
+    if task is None:
+        raise NotFoundError("Task not found")
+    if task.created_by != user.id:
+        if task.patient_id is not None:
+            _deny(db, user, "task.delete.denied", task.patient_id)
+        raise ForbiddenError("Only the person who created this task can delete it")
+    if task.patient_id is not None:
+        audit.record(db, user.id, "task.delete", task.patient_id)
+    db.delete(task)
+    db.commit()
+
+
+def _check_task_role(user: CurrentUser) -> None:
+    if user.role not in TASK_ROLES:
+        raise ForbiddenError("Only reception and care staff use tasks")
+
+
+def _can_handle_patient(
+    db: Session, user_id: uuid.UUID, role: Role | None, patient_id: uuid.UUID
+) -> bool:
+    """Reception handles every patient's admin; care staff only their care-team patients."""
+    if role == Role.SECRETARY:
+        return True
+    return role in CARE_ROLES and care_team.is_in_care_team(db, user_id, patient_id)
+
+
+def _tasks_out(db: Session, tasks: list[Task]) -> list[TaskOut]:
+    """Add patient and staff names with two queries in total."""
+    if not tasks:
+        return []
+    patient_names = patients.get_names(db, {t.patient_id for t in tasks if t.patient_id})
+    staff_ids = list({t.assigned_to for t in tasks} | {t.created_by for t in tasks})
+    staff_names = {u.id: u.full_name for u in identity.get_users(db, staff_ids)}
+    return [
+        TaskOut(
+            id=t.id,
+            title=t.title,
+            note=t.note,
+            patient_id=t.patient_id,
+            patient_name=patient_names.get(t.patient_id) if t.patient_id else None,
+            assigned_to=t.assigned_to,
+            assigned_to_name=staff_names.get(t.assigned_to, ""),
+            created_by=t.created_by,
+            created_by_name=staff_names.get(t.created_by, ""),
+            priority=t.priority,
+            status=t.status,
+            due_on=t.due_on,
+            created_at=t.created_at,
+            done_at=t.done_at,
+        )
+        for t in tasks
+    ]
 
 
 def _deny(db: Session, user: CurrentUser, action: str, patient_id: uuid.UUID) -> NoReturn:

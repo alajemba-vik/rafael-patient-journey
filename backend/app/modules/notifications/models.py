@@ -20,6 +20,7 @@ class Template(StrEnum):
     MISSED_APPOINTMENT = "missed_appointment"
     MESSAGE_RECEIVED = "message_received"
     SESSION_TO_RATE = "session_to_rate"
+    TASK_ASSIGNED = "task_assigned"
 
 
 class Channel(StrEnum):

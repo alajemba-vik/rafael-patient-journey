@@ -15,6 +15,7 @@ from app.modules.pathways.models import (
     MilestoneKind,
     PathwayMilestone,
     PathwayStatus,
+    Task,
 )
 from app.modules.patients.models import ClinicalProfile, Patient, Treatment
 from app.modules.questionnaires.models import SessionEvaluation
@@ -183,3 +184,17 @@ def test_seed_gives_every_patient_a_clinical_profile_and_removal_clears_it(db):
 
     assert seeded[0] == 16 and seeded[1] >= 32
     assert (count(db, ClinicalProfile), count(db, Treatment)) == (0, 0)
+
+
+def test_seed_adds_tasks_within_care_teams_and_removal_clears_them(db):
+    seed(db, attach=[], rng=random.Random(5))
+    db.commit()
+
+    tasks = list(db.scalars(select(Task)))
+    teams = {(a.professional_id, a.patient_id) for a in db.scalars(select(CareAssignment))}
+    remove_demo_data(db)
+    db.commit()
+
+    assert tasks
+    assert all((t.assigned_to, t.patient_id) in teams for t in tasks)
+    assert count(db, Task) == 0

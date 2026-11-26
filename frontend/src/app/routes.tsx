@@ -30,6 +30,10 @@ export const router = createBrowserRouter([
         ],
       },
       {
+        element: <RequireAuth roles={["secretary", "professional", "coordinator"]} />,
+        children: [page(paths.tasks, () => import("../pages/shared/tasks/TasksPage"))],
+      },
+      {
         element: <RequireAuth roles={["patient"]} />,
         children: [
           page(paths.patient.home, () => import("../pages/patient/home/PatientHomePage")),

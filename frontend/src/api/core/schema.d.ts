@@ -556,6 +556,75 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/pathways/tasks/assignees": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Task Assignees */
+        get: operations["list_task_assignees_api_v1_pathways_tasks_assignees_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pathways/tasks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Tasks */
+        get: operations["list_tasks_api_v1_pathways_tasks_get"];
+        put?: never;
+        /** Create Task */
+        post: operations["create_task_api_v1_pathways_tasks_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pathways/tasks/{task_id}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Change Task Status */
+        post: operations["change_task_status_api_v1_pathways_tasks__task_id__status_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pathways/tasks/{task_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Task */
+        delete: operations["delete_task_api_v1_pathways_tasks__task_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/patients": {
         parameters: {
             query?: never;
@@ -1230,6 +1299,23 @@ export interface components {
          * @enum {string}
          */
         AssessmentTest: "k10" | "mna_screening" | "marshall" | "sitting_hours" | "balance_right" | "balance_left" | "sit_to_stand" | "handgrip";
+        /**
+         * Assignee
+         * @description Someone a task can be given to.
+         */
+        Assignee: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Full Name */
+            full_name: string;
+            /** Role */
+            role: string;
+            /** Discipline */
+            discipline: string | null;
+        };
         /** AssignmentCreate */
         AssignmentCreate: {
             /**
@@ -2408,12 +2494,85 @@ export interface components {
             /** Intensity */
             intensity: number;
         };
+        /** TaskCreate */
+        TaskCreate: {
+            /** Title */
+            title: string;
+            /** Note */
+            note?: string | null;
+            /** Patient Id */
+            patient_id?: string | null;
+            /**
+             * Assigned To
+             * Format: uuid
+             */
+            assigned_to: string;
+            /** @default medium */
+            priority: components["schemas"]["TaskPriority"];
+            /** Due On */
+            due_on?: string | null;
+        };
+        /** TaskOut */
+        TaskOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Title */
+            title: string;
+            /** Note */
+            note: string | null;
+            /** Patient Id */
+            patient_id: string | null;
+            /** Patient Name */
+            patient_name: string | null;
+            /**
+             * Assigned To
+             * Format: uuid
+             */
+            assigned_to: string;
+            /** Assigned To Name */
+            assigned_to_name: string;
+            /**
+             * Created By
+             * Format: uuid
+             */
+            created_by: string;
+            /** Created By Name */
+            created_by_name: string;
+            priority: components["schemas"]["TaskPriority"];
+            status: components["schemas"]["TaskStatus"];
+            /** Due On */
+            due_on: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Done At */
+            done_at: string | null;
+        };
+        /**
+         * TaskPriority
+         * @enum {string}
+         */
+        TaskPriority: "low" | "medium" | "high";
+        /**
+         * TaskStatus
+         * @enum {string}
+         */
+        TaskStatus: "todo" | "in_progress" | "done";
+        /** TaskStatusChange */
+        TaskStatusChange: {
+            status: components["schemas"]["TaskStatus"];
+        };
         /**
          * Template
          * @description What happened. The interface turns the template and its parameters into a sentence.
          * @enum {string}
          */
-        Template: "appointment_booked" | "appointment_moved" | "appointment_cancelled" | "appointment_reminder" | "missed_appointment" | "message_received" | "session_to_rate";
+        Template: "appointment_booked" | "appointment_moved" | "appointment_cancelled" | "appointment_reminder" | "missed_appointment" | "message_received" | "session_to_rate" | "task_assigned";
         /** TimeSlot */
         TimeSlot: {
             /**
@@ -3576,6 +3735,154 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["AssessmentOut"][];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_task_assignees_api_v1_pathways_tasks_assignees_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Assignee"][];
+                };
+            };
+        };
+    };
+    list_tasks_api_v1_pathways_tasks_get: {
+        parameters: {
+            query?: {
+                given?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_task_api_v1_pathways_tasks_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TaskCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    change_task_status_api_v1_pathways_tasks__task_id__status_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                task_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TaskStatusChange"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_task_api_v1_pathways_tasks__task_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                task_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {

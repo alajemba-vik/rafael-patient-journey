@@ -1,16 +1,18 @@
 import uuid
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from enum import StrEnum
 
 from sqlalchemy import (
     JSON,
     CheckConstraint,
+    Date,
     DateTime,
     Enum,
     Float,
     ForeignKey,
     Index,
     SmallInteger,
+    String,
     Text,
     UniqueConstraint,
     Uuid,
@@ -194,3 +196,50 @@ class AssessmentScore(Base):
     value: Mapped[float] = mapped_column(Float)
     recorded_by: Mapped[uuid.UUID] = mapped_column(Uuid)
     recorded_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class TaskStatus(StrEnum):
+    TODO = "todo"
+    IN_PROGRESS = "in_progress"
+    DONE = "done"
+
+
+class TaskPriority(StrEnum):
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
+
+
+TASK_TITLE_MAX_LENGTH = 120
+TASK_NOTE_MAX_LENGTH = 1000
+
+
+class Task(Base):
+    """A piece of coordination work one staff member asks of another (or of themself):
+    "book Mrs X's review", "call back about the nutrition workshop". It may be about a
+    patient, and then only people who can see that patient can be involved."""
+
+    __tablename__ = "tasks"
+    __table_args__ = (
+        Index("ix_tasks_assignee_status", "assigned_to", "status"),
+        Index("ix_tasks_creator_status", "created_by", "status"),
+        CheckConstraint("status IN ('todo', 'in_progress', 'done')", name="ck_tasks_status_valid"),
+        CheckConstraint("priority IN ('low', 'medium', 'high')", name="ck_tasks_priority_valid"),
+        CheckConstraint(
+            "(status = 'done') = (done_at IS NOT NULL)", name="ck_tasks_done_when_done_at"
+        ),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    title: Mapped[str] = mapped_column(String(TASK_TITLE_MAX_LENGTH))
+    note: Mapped[str | None] = mapped_column(String(TASK_NOTE_MAX_LENGTH))
+    patient_id: Mapped[uuid.UUID | None] = mapped_column(Uuid, index=True)  # no cross-module FK
+    assigned_to: Mapped[uuid.UUID] = mapped_column(Uuid)
+    created_by: Mapped[uuid.UUID] = mapped_column(Uuid)
+    priority: Mapped[TaskPriority] = mapped_column(
+        _enum(TaskPriority, 8), default=TaskPriority.MEDIUM
+    )
+    status: Mapped[TaskStatus] = mapped_column(_enum(TaskStatus, 16), default=TaskStatus.TODO)
+    due_on: Mapped[date | None] = mapped_column(Date)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    done_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))

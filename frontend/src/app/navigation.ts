@@ -7,6 +7,7 @@ import { paths } from "./paths";
 type NavItem = { to: string; label: ParseKeys };
 
 const FAQ: NavItem = { to: paths.faq, label: "nav.faq" };
+const TASKS: NavItem = { to: paths.tasks, label: "nav.tasks" };
 
 /** Menu per role. */
 export const NAV_BY_ROLE: Record<Role, NavItem[]> = {
@@ -24,11 +25,13 @@ export const NAV_BY_ROLE: Record<Role, NavItem[]> = {
     { to: paths.reception.groups, label: "nav.groups" },
     { to: paths.reception.patients, label: "nav.receptionPatients" },
     { to: paths.reception.callBacks, label: "nav.receptionCallBacks" },
+    TASKS,
     FAQ,
   ],
   professional: [
     { to: paths.pro.schedule, label: "nav.proSchedule" },
     { to: paths.pro.patients, label: "nav.proPatients" },
+    TASKS,
     { to: paths.pro.groups, label: "nav.groups" },
     { to: paths.pro.dashboard, label: "nav.dashboard" },
     FAQ,
@@ -38,6 +41,7 @@ export const NAV_BY_ROLE: Record<Role, NavItem[]> = {
     { to: paths.pro.patients, label: "nav.proPatients" },
     { to: paths.pro.pathways, label: "nav.proPathways" },
     { to: paths.pro.needs, label: "nav.proNeeds" },
+    TASKS,
     { to: paths.pro.planning, label: "nav.planning" },
     { to: paths.pro.groups, label: "nav.groups" },
     { to: paths.pro.dashboard, label: "nav.dashboard" },
