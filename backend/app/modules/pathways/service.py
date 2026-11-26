@@ -362,19 +362,22 @@ def _own_patient_id(db: Session, user: CurrentUser) -> uuid.UUID:
 
 
 def _messages_out(db: Session, patient_id: uuid.UUID, messages: list[Message]) -> list[MessageOut]:
-    patient_user_id = patients.get_user_id_for_patient(db, patient_id)
-    staff_ids = list({m.sender_id for m in messages if m.sender_id != patient_user_id})
-    names = {u.id: u.full_name for u in identity.get_users(db, staff_ids)} if staff_ids else {}
+    """Only the patient and their care team write here, so a sender who isn't a staff
+    account is the patient."""
+    sender_ids = list({m.sender_id for m in messages})
+    staff = {
+        u.id: u.full_name
+        for u in (identity.get_users(db, sender_ids) if sender_ids else [])
+        if u.role != Role.PATIENT
+    }
     patient_name = patients.get_names(db, {patient_id}).get(patient_id, "")
     return [
         MessageOut(
             id=m.id,
             patient_id=m.patient_id,
             sender_id=m.sender_id,
-            sender_name=patient_name
-            if m.sender_id == patient_user_id
-            else names.get(m.sender_id, ""),
-            from_patient=m.sender_id == patient_user_id,
+            sender_name=staff.get(m.sender_id, patient_name),
+            from_patient=m.sender_id not in staff,
             body=m.body,
             sent_at=m.sent_at if m.sent_at.tzinfo else m.sent_at.replace(tzinfo=UTC),
         )

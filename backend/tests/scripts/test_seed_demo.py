@@ -9,8 +9,15 @@ from sqlalchemy.orm import Session
 
 from app.modules.care_team.models import CareAssignment
 from app.modules.identity_access.models import Role, User
-from app.modules.pathways.models import CarePathway, MilestoneKind, PathwayMilestone
+from app.modules.pathways.models import (
+    CarePathway,
+    Message,
+    MilestoneKind,
+    PathwayMilestone,
+    PathwayStatus,
+)
 from app.modules.patients.models import Patient
+from app.modules.questionnaires.models import SessionEvaluation
 from app.modules.scheduling.models import Appointment, AppointmentStatus
 from scripts.seed_demo import remove_demo_data, seed
 
@@ -98,8 +105,13 @@ def test_removing_the_demo_also_removes_what_other_modules_hold_about_demo_patie
     seed(db, attach=[], rng=random.Random(5))
     db.commit()
     demo_patient = db.scalars(select(Patient)).first()
+    # Closed: the seed already gave the patient their one open pathway.
     pathway = CarePathway(
-        patient_id=demo_patient.id, coordinator_id=uuid.uuid4(), opened_at=datetime.now(UTC)
+        patient_id=demo_patient.id,
+        coordinator_id=uuid.uuid4(),
+        opened_at=datetime.now(UTC),
+        status=PathwayStatus.CLOSED,
+        closed_at=datetime.now(UTC),
     )
     db.add(pathway)
     db.flush()
@@ -147,3 +159,15 @@ def test_an_attached_logins_own_sessions_are_never_overlapped(db):
     db.commit()
 
     assert not overlaps(list(db.scalars(select(Appointment))), "professional_id")
+
+
+def test_seed_fills_pathways_messages_and_session_ratings_and_removal_clears_them(db):
+    seed(db, attach=[], rng=random.Random(9))
+    db.commit()
+
+    seeded = (count(db, CarePathway), count(db, Message), count(db, SessionEvaluation))
+    remove_demo_data(db)
+    db.commit()
+
+    assert seeded[0] == 16 and seeded[1] > 0 and seeded[2] > 0
+    assert (count(db, CarePathway), count(db, Message), count(db, SessionEvaluation)) == (0, 0, 0)

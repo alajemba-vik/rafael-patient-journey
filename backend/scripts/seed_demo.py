@@ -13,7 +13,11 @@ What it creates, around today in the Institute's time zone:
   their names appear in lists and agendas;
 - 16 patients, each with a coordinator and two or three practitioners in their care team;
 - yesterday's appointments (done or missed), today's at every stage of the waiting room,
-  and the next five working days.
+  and the next five working days;
+- an open pathway per patient, led by their coordinator, with its intake (and for some a
+  three-month review) recorded;
+- a short conversation with the care team for some patients, and patient and practitioner
+  ratings for most finished sessions.
 
 `--attach EMAIL` adds an existing practitioner or coordinator login to the demo care teams
 and gives them sessions today, so a real account sees the demo when it logs in. Reception
@@ -38,7 +42,10 @@ from app.config import get_settings
 from app.db import Base, SessionLocal, load_all_models
 from app.modules.care_team.models import CareAssignment
 from app.modules.identity_access.models import Role, User
+from app.modules.notifications.models import Notification
+from app.modules.pathways.models import CarePathway, Message, MilestoneKind, PathwayMilestone
 from app.modules.patients.models import Patient
+from app.modules.questionnaires.models import SessionEvaluation
 from app.modules.scheduling.models import Appointment, AppointmentStatus, CancelReason
 from app.modules.scheduling.service import institute_time_zone
 
@@ -69,6 +76,33 @@ NOTES = [
     "Vient accompagnée de sa fille.",
     "Souhaite un rendez-vous en fin de matinée la prochaine fois.",
     "A rappelé pour confirmer sa venue.",
+]
+
+# Administrative questions only: demo messages carry no health details.
+CONVERSATIONS = [
+    (
+        "Bonjour, puis-je décaler ma séance de jeudi à la semaine prochaine ?",
+        "Bonjour, c’est noté : je vous propose mardi à 10 h, cela vous convient-il ?",
+    ),
+    (
+        "Bonjour, je serai en retard d’un quart d’heure demain matin.",
+        "Merci de nous prévenir, à demain.",
+    ),
+    (
+        "Où se trouve la salle pour l’atelier du mercredi ?",
+        "Au premier étage, deuxième porte à gauche en sortant de l’ascenseur.",
+    ),
+]
+GOALS = [
+    "Retrouver de l’énergie au quotidien",
+    "Mieux dormir",
+    "Reprendre une activité physique régulière",
+    "Reprendre le travail à temps partiel",
+]
+PLANS = [
+    "Activité physique adaptée deux fois par semaine, sophrologie toutes les deux semaines.",
+    "Séances de psychologie mensuelles, yoga hebdomadaire.",
+    "Naturopathie et art-thérapie, point avec la coordinatrice dans trois mois.",
 ]
 
 # Today's sessions, in minutes from the moment the seed runs, so whenever it runs the board
@@ -110,6 +144,18 @@ def remove_demo_data(db: Session) -> int:
     staff_ids = list(
         db.scalars(select(User.id).where(User.auth_subject.startswith(DEMO_SUBJECT_PREFIX)))
     )
+    if patient_ids or staff_ids:
+        # Notifications point at people and appointments by id: drop those about the demo.
+        demo_appointments = select(Appointment.id).where(
+            Appointment.patient_id.in_(patient_ids) | Appointment.professional_id.in_(staff_ids)
+        )
+        db.execute(
+            delete(Notification).where(
+                Notification.recipient_id.in_(staff_ids)
+                | Notification.subject_id.in_(patient_ids)
+                | Notification.subject_id.in_(demo_appointments)
+            )
+        )
     if patient_ids:
         _delete_rows_about_patients(db, patient_ids)
     if staff_ids:
@@ -144,11 +190,17 @@ def seed(db: Session, attach: list[str], rng: random.Random) -> dict[str, int]:
     patients = _add_patients(db, rng)
     teams = _add_care_teams(db, patients, coordinators, practitioners, rng)
     appointments = _add_appointments(db, teams, attached, rng)
+    pathways = _add_pathways(db, teams, rng)
+    messages = _add_messages(db, patients, teams, rng)
+    ratings = _add_session_ratings(db, rng)
     return {
         "staff": len(STAFF),
         "patients": len(patients),
         "care-team links": sum(len(team) for team in teams.values()),
         "appointments": appointments,
+        "pathways": pathways,
+        "messages": messages,
+        "session ratings": ratings,
     }
 
 
@@ -281,6 +333,103 @@ def _add_appointments(
     for day in (_working_day(today, -1), *(_working_day(today, n) for n in range(1, 6))):
         for patient_id in rng.sample(patient_ids, k=8):
             book(patient_id, rng.choice(teams[patient_id]), day, rng.randint(9, 17), 0)
+    db.flush()
+    return count
+
+
+def _add_pathways(db: Session, teams: dict[uuid.UUID, list[User]], rng: random.Random) -> int:
+    """An open pathway per patient, led by the coordinator in their care team."""
+    now = datetime.now(UTC)
+    for patient_id, team in teams.items():
+        coordinator = team[0]
+        opened_at = now - timedelta(days=rng.randint(10, 150))
+        pathway = CarePathway(
+            patient_id=patient_id, coordinator_id=coordinator.id, opened_at=opened_at
+        )
+        db.add(pathway)
+        db.flush()
+        kinds = [(MilestoneKind.INTAKE, opened_at)]
+        if now - opened_at > timedelta(days=91):
+            kinds.append((MilestoneKind.REVIEW, opened_at + timedelta(days=91)))
+        for step, (kind, recorded_at) in enumerate(kinds):
+            db.add(
+                PathwayMilestone(
+                    pathway_id=pathway.id,
+                    kind=kind,
+                    recorded_at=recorded_at,
+                    recorded_by=coordinator.id,
+                    # A little better at the review than at intake.
+                    **{
+                        dimension: min(4, rng.randint(0, 2) + step)
+                        for dimension in (
+                            "physical",
+                            "psychological",
+                            "emotional",
+                            "sexual",
+                            "socio_professional",
+                        )
+                    },
+                    symptoms=[
+                        {"name": "Fatigue", "intensity": max(1, rng.randint(4, 8) - 2 * step)}
+                    ],
+                    goals=rng.choice(GOALS),
+                    plan=rng.choice(PLANS),
+                )
+            )
+    db.flush()
+    return len(teams)
+
+
+def _add_messages(
+    db: Session, patients: list[Patient], teams: dict[uuid.UUID, list[User]], rng: random.Random
+) -> int:
+    """A question and its answer for every other patient. Demo patients can't log in, so the
+    patient's side is written under their record's own id."""
+    now = datetime.now(UTC)
+    count = 0
+    for patient in patients[::2]:
+        question, answer = rng.choice(CONVERSATIONS)
+        asked_at = now - timedelta(days=rng.randint(1, 6), hours=rng.randint(1, 8))
+        sender = patient.user_id or patient.id
+        db.add(Message(patient_id=patient.id, sender_id=sender, body=question, sent_at=asked_at))
+        db.add(
+            Message(
+                patient_id=patient.id,
+                sender_id=teams[patient.id][0].id,
+                body=answer,
+                sent_at=asked_at + timedelta(hours=2),
+            )
+        )
+        count += 2
+    db.flush()
+    return count
+
+
+def _add_session_ratings(db: Session, rng: random.Random) -> int:
+    """Both sides' ratings for most finished demo sessions; a few left for the demo to fill."""
+    demo_patients = select(Patient.id).where(_is_demo_email(Patient.email))
+    done = db.scalars(
+        select(Appointment).where(
+            Appointment.status == AppointmentStatus.DONE, Appointment.patient_id.in_(demo_patients)
+        )
+    )
+    count = 0
+    for appointment in done:
+        if rng.random() < 0.25:
+            continue
+        db.add(
+            SessionEvaluation(
+                appointment_id=appointment.id,
+                patient_id=appointment.patient_id,
+                professional_id=appointment.professional_id,
+                patient_difficulty=rng.choice([1, 2, 2, 3]),
+                patient_satisfaction=rng.choice([2, 3, 3, 4, 4]),
+                patient_rated_at=_utc(appointment.ends_at),
+                coping=rng.choice([2, 3, 3, 4]),
+                practitioner_rated_at=_utc(appointment.ends_at),
+            )
+        )
+        count += 1
     db.flush()
     return count
 
