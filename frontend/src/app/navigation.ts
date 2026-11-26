@@ -21,6 +21,7 @@ export const NAV_BY_ROLE: Record<Role, NavItem[]> = {
   secretary: [
     { to: paths.reception.board, label: "nav.receptionBoard" },
     { to: paths.reception.planning, label: "nav.planning" },
+    { to: paths.reception.groups, label: "nav.groups" },
     { to: paths.reception.patients, label: "nav.receptionPatients" },
     { to: paths.reception.callBacks, label: "nav.receptionCallBacks" },
     FAQ,
@@ -28,6 +29,7 @@ export const NAV_BY_ROLE: Record<Role, NavItem[]> = {
   professional: [
     { to: paths.pro.schedule, label: "nav.proSchedule" },
     { to: paths.pro.patients, label: "nav.proPatients" },
+    { to: paths.pro.groups, label: "nav.groups" },
     { to: paths.pro.dashboard, label: "nav.dashboard" },
     FAQ,
   ],
@@ -37,6 +39,7 @@ export const NAV_BY_ROLE: Record<Role, NavItem[]> = {
     { to: paths.pro.pathways, label: "nav.proPathways" },
     { to: paths.pro.needs, label: "nav.proNeeds" },
     { to: paths.pro.planning, label: "nav.planning" },
+    { to: paths.pro.groups, label: "nav.groups" },
     { to: paths.pro.dashboard, label: "nav.dashboard" },
     FAQ,
   ],

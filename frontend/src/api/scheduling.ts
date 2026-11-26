@@ -129,3 +129,82 @@ export function useWeekPlanning(monday: string, professionalIds: string[]) {
     enabled: professionalIds.length > 0,
   });
 }
+
+export type GroupSession = Schemas["GroupSessionOut"];
+export type GroupSessionDetail = Schemas["GroupSessionDetail"];
+const GROUPS = [...APPOINTMENTS, "groups"] as const;
+
+/** Upcoming group sessions with how full they are (all for reception and coordinators). */
+export function useGroupSessions() {
+  return useQuery({ queryKey: GROUPS, queryFn: () => unwrap(api.GET("/api/v1/scheduling/group-sessions")) });
+}
+
+export function useMyGroupSessions() {
+  return useQuery({
+    queryKey: [...GROUPS, "mine"],
+    queryFn: () => unwrap(api.GET("/api/v1/scheduling/group-sessions/mine")),
+  });
+}
+
+export function useGroupSession(sessionId: string) {
+  return useQuery({
+    queryKey: [...GROUPS, sessionId],
+    queryFn: () =>
+      unwrap(
+        api.GET("/api/v1/scheduling/group-sessions/{session_id}", { params: { path: { session_id: sessionId } } }),
+      ),
+  });
+}
+
+function useGroupMutation<T>(run: (input: T) => Promise<unknown>) {
+  const queryClient = useQueryClient();
+  return useMutation({ mutationFn: run, onSettled: () => queryClient.invalidateQueries({ queryKey: GROUPS }) });
+}
+
+export function useCreateGroupSession() {
+  return useGroupMutation((body: Schemas["GroupSessionCreate"]) =>
+    unwrap(api.POST("/api/v1/scheduling/group-sessions", { body })),
+  );
+}
+
+export function useEnroll(sessionId: string) {
+  return useGroupMutation((patientId: string) =>
+    unwrap(
+      api.POST("/api/v1/scheduling/group-sessions/{session_id}/enrollments", {
+        params: { path: { session_id: sessionId } },
+        body: { patient_id: patientId },
+      }),
+    ),
+  );
+}
+
+export function useUnenroll(sessionId: string) {
+  return useGroupMutation((patientId: string) =>
+    unwrap(
+      api.DELETE("/api/v1/scheduling/group-sessions/{session_id}/enrollments/{patient_id}", {
+        params: { path: { session_id: sessionId, patient_id: patientId } },
+      }),
+    ),
+  );
+}
+
+export function useRecordAttendance(sessionId: string) {
+  return useGroupMutation(({ patientId, status }: { patientId: string; status: Schemas["EnrollmentStatus"] }) =>
+    unwrap(
+      api.POST("/api/v1/scheduling/group-sessions/{session_id}/enrollments/{patient_id}/attendance", {
+        params: { path: { session_id: sessionId, patient_id: patientId } },
+        body: { status },
+      }),
+    ),
+  );
+}
+
+export function useCancelGroupSession(sessionId: string) {
+  return useGroupMutation(() =>
+    unwrap(
+      api.POST("/api/v1/scheduling/group-sessions/{session_id}/cancel", {
+        params: { path: { session_id: sessionId } },
+      }),
+    ),
+  );
+}

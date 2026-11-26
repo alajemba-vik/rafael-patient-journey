@@ -19,6 +19,7 @@ export const paths = {
     pathways: "/pro/parcours",
     needs: "/pro/besoins",
     planning: "/pro/planning-partage",
+    groups: "/pro/seances-collectives",
     dashboard: "/pro/tableau-de-bord",
   },
   reception: {
@@ -26,6 +27,7 @@ export const paths = {
     patients: "/accueil/patients",
     callBacks: "/accueil/a-rappeler",
     planning: "/accueil/planning",
+    groups: "/accueil/seances-collectives",
     patient: (patientId: string) => `/accueil/patients/${patientId}`,
   },
   admin: {

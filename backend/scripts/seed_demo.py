@@ -17,6 +17,8 @@ What it creates, around today in the Institute's time zone:
 - an open pathway per patient, led by their coordinator, with its intake (and for some a
   three-month review) recorded: care plan goals and disciplines, and the assessment day's
   main test scores;
+- an adapted physical activity class and a yoga class at 18:00 on the next working days,
+  each with a few enrolled patients;
 - a short conversation with the care team for some patients, and patient and practitioner
   ratings for most finished sessions.
 
@@ -56,7 +58,13 @@ from app.modules.pathways.models import (
 )
 from app.modules.patients.models import Patient
 from app.modules.questionnaires.models import SessionEvaluation
-from app.modules.scheduling.models import Appointment, AppointmentStatus, CancelReason
+from app.modules.scheduling.models import (
+    Appointment,
+    AppointmentStatus,
+    CancelReason,
+    GroupEnrollment,
+    GroupSession,
+)
 from app.modules.scheduling.service import institute_time_zone
 
 DEMO_DOMAIN = "demo.rafael.invalid"
@@ -169,6 +177,9 @@ def remove_demo_data(db: Session) -> int:
     if patient_ids:
         _delete_rows_about_patients(db, patient_ids)
     if staff_ids:
+        demo_groups = select(GroupSession.id).where(GroupSession.professional_id.in_(staff_ids))
+        db.execute(delete(GroupEnrollment).where(GroupEnrollment.session_id.in_(demo_groups)))
+        db.execute(delete(GroupSession).where(GroupSession.professional_id.in_(staff_ids)))
         db.execute(delete(Appointment).where(Appointment.professional_id.in_(staff_ids)))
         db.execute(delete(CareAssignment).where(CareAssignment.professional_id.in_(staff_ids)))
         db.execute(delete(User).where(User.id.in_(staff_ids)))
@@ -203,6 +214,7 @@ def seed(db: Session, attach: list[str], rng: random.Random) -> dict[str, int]:
     pathways = _add_pathways(db, teams, rng)
     messages = _add_messages(db, patients, teams, rng)
     ratings = _add_session_ratings(db, rng)
+    groups = _add_group_sessions(db, practitioners, patients, rng)
     return {
         "staff": len(STAFF),
         "patients": len(patients),
@@ -211,6 +223,7 @@ def seed(db: Session, attach: list[str], rng: random.Random) -> dict[str, int]:
         "pathways": pathways,
         "messages": messages,
         "session ratings": ratings,
+        "group sessions": groups,
     }
 
 
@@ -430,6 +443,39 @@ def _add_messages(
             )
         )
         count += 2
+    db.flush()
+    return count
+
+
+def _add_group_sessions(
+    db: Session, practitioners: list[User], patients: list[Patient], rng: random.Random
+) -> int:
+    """Classes at 18:00, after every demo appointment, so nobody is in two places at once."""
+    time_zone = institute_time_zone()
+    today = datetime.now(time_zone).date()
+    leaders = [p for p in practitioners if p.discipline in {"Activité physique adaptée", "Yoga"}]
+    count = 0
+    for offset in (1, 3):
+        day = _working_day(today, offset)
+        starts_at = datetime.combine(day, time(18, 0), tzinfo=time_zone).astimezone(UTC)
+        for leader in leaders:
+            session = GroupSession(
+                professional_id=leader.id,
+                title=leader.discipline or "Atelier",
+                starts_at=starts_at,
+                ends_at=starts_at + timedelta(hours=1),
+                capacity=12,
+                created_by=leader.id,
+            )
+            db.add(session)
+            db.flush()
+            for patient in rng.sample(patients, k=rng.randint(4, 9)):
+                db.add(
+                    GroupEnrollment(
+                        session_id=session.id, patient_id=patient.id, enrolled_at=datetime.now(UTC)
+                    )
+                )
+            count += 1
     db.flush()
     return count
 

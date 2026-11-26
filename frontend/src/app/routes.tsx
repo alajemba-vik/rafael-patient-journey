@@ -46,6 +46,7 @@ export const router = createBrowserRouter([
           page(paths.pro.patients, () => import("../pages/professional/patients/PatientsPage")),
           page(paths.pro.patient(PATIENT_ID_PARAM), () => import("../pages/professional/patients/PatientFilePage")),
           page(paths.pro.dashboard, () => import("../pages/professional/dashboard/DashboardPage")),
+          page(paths.pro.groups, () => import("../pages/professional/groups/GroupSessionsPage")),
         ],
       },
       {
@@ -63,6 +64,8 @@ export const router = createBrowserRouter([
           page(paths.reception.patients, () => import("../pages/reception/patients/ReceptionPatientsPage")),
           page(paths.reception.callBacks, () => import("../pages/reception/call_backs/CallBacksPage")),
           page(paths.reception.planning, () => import("../pages/reception/planning/ReceptionPlanningPage")),
+          // The same page practitioners use: reception plans and fills classes too.
+          page(paths.reception.groups, () => import("../pages/professional/groups/GroupSessionsPage")),
           page(
             paths.reception.patient(PATIENT_ID_PARAM),
             () => import("../pages/reception/patients/ReceptionPatientPage"),

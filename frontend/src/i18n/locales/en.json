@@ -72,7 +72,8 @@
     "patientMessages": "Messages",
     "receptionCallBacks": "To call back",
     "adminAudit": "Access log",
-    "planning": "Shared planning"
+    "planning": "Shared planning",
+    "groups": "Group sessions"
   },
   "feedback": {
     "loading": "Loading",
@@ -738,5 +739,50 @@
     "person": "Practitioner",
     "free": "Free",
     "taken": "Taken"
+  },
+  "groups": {
+    "title": "Group sessions",
+    "intro": "Classes and workshops: plan them, fill their places, record who came.",
+    "new": "New session",
+    "newTitle": "Plan a group session",
+    "titleLabel": "Title",
+    "titleHint": "For example: Adapted physical activity, Healthy cooking workshop.",
+    "leader": "Led by",
+    "chooseLeader": "Choose a practitioner",
+    "day": "Day",
+    "time": "Start time",
+    "duration": "Length",
+    "minutes_one": "{{count}} minute",
+    "minutes_other": "{{count}} minutes",
+    "capacity": "Places",
+    "capacityHint": "12 at most for a physical activity class.",
+    "create": "Plan",
+    "cancelForm": "Cancel",
+    "busy": "This practitioner already has an appointment or a session then.",
+    "createFailed": "The session couldn't be planned.",
+    "empty": "No upcoming group sessions.",
+    "emptyHint": "Planned classes and workshops will appear here.",
+    "cancelled": "Cancelled",
+    "places": "{{enrolled}} enrolled of {{capacity}} places",
+    "open": "See who is enrolled in “{{title}}”",
+    "close": "Close “{{title}}”",
+    "nobody": "Nobody is enrolled yet.",
+    "participants": "Enrolled",
+    "findPatient": "Enrol a patient (name, phone…)",
+    "noMatch": "No patient found.",
+    "enroll": "Enrol {{name}}",
+    "enrollFailed": "The enrolment failed: the session may be full or the patient already enrolled.",
+    "remove": "Unenrol {{name}}",
+    "markAttended": "{{name}} came",
+    "markNoShow": "{{name}} absent",
+    "attendance": {
+      "attended": "Came",
+      "no_show": "Absent"
+    },
+    "cancelSession": "Cancel the session",
+    "cancelQuestion_one": "Cancel the session? {{count}} enrolled patient will be told.",
+    "cancelQuestion_other": "Cancel the session? All {{count}} enrolled patients will be told.",
+    "mineTitle": "My group sessions",
+    "mineWith": "with {{name}}"
   }
 }

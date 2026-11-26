@@ -31,14 +31,26 @@ from app.modules.identity_access.service import CurrentUser, Role
 from app.modules.notifications import service as notifications
 from app.modules.notifications.models import Template
 from app.modules.patients import service as patients
-from app.modules.scheduling.models import Appointment, AppointmentStatus
+from app.modules.scheduling.models import (
+    Appointment,
+    AppointmentStatus,
+    GroupEnrollment,
+    GroupSession,
+    GroupSessionStatus,
+)
 from app.modules.scheduling.schemas import (
     AppointmentCancel,
     AppointmentCreate,
     AppointmentOut,
     AppointmentReschedule,
     AppointmentUpdate,
+    AttendanceChange,
     Availability,
+    EnrollmentCreate,
+    GroupSessionCreate,
+    GroupSessionDetail,
+    GroupSessionOut,
+    Participant,
     PlanningSlot,
     TimeSlot,
 )
@@ -386,6 +398,159 @@ def list_week(
     ]
 
 
+def create_group_session(
+    db: Session, user: CurrentUser, data: GroupSessionCreate
+) -> GroupSessionOut:
+    """Reception and coordinators plan a group session for any practitioner; a practitioner
+    plans their own. The practitioner can't be in another session at the same time."""
+    own = user.role in OWN_AGENDA_ROLES and data.professional_id == user.id
+    if user.role not in BOOKING_ROLES and not own:
+        _deny(db, user, "group_session.create.denied", None)
+    if identity.get_role(db, data.professional_id) not in CARE_ROLES:
+        raise ConflictError("Only a practitioner or coordinator can lead a session")
+    _check_not_before_today(data.starts_at)
+    if _professional_busy(db, data.professional_id, data.starts_at, data.ends_at):
+        raise SlotTakenError()
+    session = GroupSession(**data.model_dump(), created_by=user.id)
+    db.add(session)
+    db.flush()
+    audit.record(db, user.id, "group_session.create", None)
+    db.commit()
+    return _group_out(db, [session])[0]
+
+
+def list_group_sessions(
+    db: Session, user: CurrentUser, start: datetime | None, end: datetime | None
+) -> list[GroupSessionOut]:
+    """Upcoming group sessions with how full they are: all of them for reception and
+    coordinators, their own for a practitioner. No patient names here."""
+    start = start or datetime.now(UTC) - timedelta(days=1)
+    end = end or start + UPCOMING_WINDOW
+    query = select(GroupSession).where(
+        GroupSession.starts_at >= start, GroupSession.starts_at < end
+    )
+    if user.role in OWN_AGENDA_ROLES:
+        query = query.where(GroupSession.professional_id == user.id)
+    elif user.role not in BOOKING_ROLES:
+        raise ForbiddenError("Group sessions are planned by staff")
+    return _group_out(db, list(db.scalars(query.order_by(GroupSession.starts_at))))
+
+
+def get_group_session(db: Session, user: CurrentUser, session_id: uuid.UUID) -> GroupSessionDetail:
+    session = _manage_group(db, user, session_id, "group_session.read.denied")
+    enrollments = _enrollments(db, session.id)
+    audit.record_many(db, user.id, "group_session.read", {e.patient_id for e in enrollments})
+    db.commit()
+    return _group_detail(db, session, enrollments)
+
+
+def enroll_patient(
+    db: Session, user: CurrentUser, session_id: uuid.UUID, data: EnrollmentCreate
+) -> GroupSessionDetail:
+    """Add a patient while places remain. The session row is locked, so two people filling
+    the last place at once can't both get it."""
+    session = _manage_group(db, user, session_id, "group_session.enroll.denied", lock=True)
+    if session.status != GroupSessionStatus.SCHEDULED:
+        raise ConflictError("This session is cancelled")
+    _check_group_not_past(session)
+    if not patients.patient_exists(db, data.patient_id):
+        raise NotFoundError("Patient not found")
+    enrollments = _enrollments(db, session.id)
+    if any(e.patient_id == data.patient_id for e in enrollments):
+        raise ConflictError("This patient is already enrolled")
+    if len(enrollments) >= session.capacity:
+        raise ConflictError("This session is full")
+    db.add(
+        GroupEnrollment(
+            session_id=session.id, patient_id=data.patient_id, enrolled_at=datetime.now(UTC)
+        )
+    )
+    audit.record(db, user.id, "group_session.enroll", data.patient_id)
+    out = _group_out(db, [session])[0]
+    notifications.notify(
+        db,
+        [patients.get_user_id_for_patient(db, data.patient_id)],
+        Template.APPOINTMENT_BOOKED,
+        session.id,
+        {"starts_at": out.starts_at.isoformat(), "professional_name": out.professional_name},
+    )
+    db.commit()
+    return _group_detail(db, session, _enrollments(db, session.id))
+
+
+def remove_enrollment(
+    db: Session, user: CurrentUser, session_id: uuid.UUID, patient_id: uuid.UUID
+) -> GroupSessionDetail:
+    session = _manage_group(db, user, session_id, "group_session.unenroll.denied", lock=True)
+    enrollment = _enrollment(db, session.id, patient_id)
+    db.delete(enrollment)
+    audit.record(db, user.id, "group_session.unenroll", patient_id)
+    db.commit()
+    return _group_detail(db, session, _enrollments(db, session.id))
+
+
+def record_attendance(
+    db: Session,
+    user: CurrentUser,
+    session_id: uuid.UUID,
+    patient_id: uuid.UUID,
+    data: AttendanceChange,
+) -> GroupSessionDetail:
+    """Who came, once the session has begun."""
+    session = _manage_group(db, user, session_id, "group_session.attendance.denied", lock=True)
+    if _aware(session.starts_at) > datetime.now(UTC):
+        raise ConflictError("Attendance is recorded once the session has begun")
+    enrollment = _enrollment(db, session.id, patient_id)
+    enrollment.status = data.status
+    audit.record(db, user.id, "group_session.attendance", patient_id)
+    db.commit()
+    return _group_detail(db, session, _enrollments(db, session.id))
+
+
+def cancel_group_session(
+    db: Session, user: CurrentUser, session_id: uuid.UUID
+) -> GroupSessionDetail:
+    session = _manage_group(db, user, session_id, "group_session.cancel.denied", lock=True)
+    if session.status != GroupSessionStatus.SCHEDULED:
+        raise ConflictError("This session is already cancelled")
+    _check_group_not_past(session)
+    session.status = GroupSessionStatus.CANCELLED
+    enrollments = _enrollments(db, session.id)
+    audit.record_many(db, user.id, "group_session.cancel", {e.patient_id for e in enrollments})
+    out = _group_out(db, [session])[0]
+    notifications.notify(
+        db,
+        [patients.get_user_id_for_patient(db, e.patient_id) for e in enrollments],
+        Template.APPOINTMENT_CANCELLED,
+        session.id,
+        {"starts_at": out.starts_at.isoformat(), "professional_name": out.professional_name},
+    )
+    db.commit()
+    return _group_detail(db, session, enrollments)
+
+
+def list_my_group_sessions(db: Session, user: CurrentUser) -> list[GroupSessionOut]:
+    """The patient's upcoming group sessions."""
+    patient_id = (
+        patients.get_patient_id_for_user(db, user.id) if user.role == Role.PATIENT else None
+    )
+    if patient_id is None:
+        raise ForbiddenError("Only patients have their own group sessions")
+    query = (
+        select(GroupSession)
+        .join(GroupEnrollment, GroupEnrollment.session_id == GroupSession.id)
+        .where(
+            GroupEnrollment.patient_id == patient_id,
+            GroupSession.starts_at >= datetime.now(UTC) - timedelta(days=1),
+        )
+        .order_by(GroupSession.starts_at)
+    )
+    sessions = list(db.scalars(query))
+    audit.record(db, user.id, "group_session.list", patient_id)
+    db.commit()
+    return _group_out(db, sessions)
+
+
 def list_done_sessions(
     db: Session, patient_id: uuid.UUID, since: datetime | None = None
 ) -> list[AppointmentOut]:
@@ -507,6 +672,11 @@ def _check_not_on_past_day(appointment: Appointment) -> None:
         raise ConflictError("This appointment's day has passed: record it as done or absent")
 
 
+def _check_group_not_past(session: GroupSession) -> None:
+    if _aware(session.ends_at) < datetime.now(UTC):
+        raise ConflictError("This session is over")
+
+
 def _check_not_before_today(starts_at: datetime) -> None:
     """New or moved appointments can't land on a past day. Earlier today is fine: walk-ins."""
     time_zone = institute_time_zone()
@@ -555,7 +725,9 @@ def _has_overlap(
     )
     if ignore_id is not None:
         query = query.where(Appointment.id != ignore_id)
-    return db.scalar(query.limit(1)) is not None
+    if db.scalar(query.limit(1)) is not None:
+        return True
+    return _in_group_session(db, professional_id, starts_at, ends_at)
 
 
 def _notified(
@@ -581,6 +753,113 @@ def _params(appointment: AppointmentOut) -> dict[str, str]:
         "starts_at": appointment.starts_at.isoformat(),
         "professional_name": appointment.professional_name,
     }
+
+
+def _professional_busy(
+    db: Session, professional_id: uuid.UUID, starts_at: datetime, ends_at: datetime
+) -> bool:
+    """Whether the practitioner has an appointment or a group session overlapping this time."""
+    appointment = select(Appointment.id).where(
+        Appointment.professional_id == professional_id,
+        Appointment.status != AppointmentStatus.CANCELLED,
+        Appointment.starts_at < ends_at,
+        Appointment.ends_at > starts_at,
+    )
+    if db.scalar(appointment.limit(1)) is not None:
+        return True
+    return _in_group_session(db, professional_id, starts_at, ends_at)
+
+
+def _in_group_session(
+    db: Session, professional_id: uuid.UUID, starts_at: datetime, ends_at: datetime
+) -> bool:
+    query = select(GroupSession.id).where(
+        GroupSession.professional_id == professional_id,
+        GroupSession.status == GroupSessionStatus.SCHEDULED,
+        GroupSession.starts_at < ends_at,
+        GroupSession.ends_at > starts_at,
+    )
+    return db.scalar(query.limit(1)) is not None
+
+
+def _manage_group(
+    db: Session, user: CurrentUser, session_id: uuid.UUID, denied: str, lock: bool = False
+) -> GroupSession:
+    """Reception and coordinators manage any group session; a practitioner only their own."""
+    query = select(GroupSession).where(GroupSession.id == session_id)
+    if lock:
+        query = query.with_for_update().execution_options(populate_existing=True)
+    session = db.scalar(query)
+    allowed = user.role in BOOKING_ROLES or (
+        session is not None and user.role in OWN_AGENDA_ROLES and session.professional_id == user.id
+    )
+    if not allowed:
+        _deny(db, user, denied, None)
+    if session is None:
+        raise NotFoundError("Group session not found")
+    return session
+
+
+def _enrollments(db: Session, session_id: uuid.UUID) -> list[GroupEnrollment]:
+    query = select(GroupEnrollment).where(GroupEnrollment.session_id == session_id)
+    return list(db.scalars(query.order_by(GroupEnrollment.enrolled_at)))
+
+
+def _enrollment(db: Session, session_id: uuid.UUID, patient_id: uuid.UUID) -> GroupEnrollment:
+    enrollment = db.scalar(
+        select(GroupEnrollment).where(
+            GroupEnrollment.session_id == session_id, GroupEnrollment.patient_id == patient_id
+        )
+    )
+    if enrollment is None:
+        raise NotFoundError("This patient isn't enrolled")
+    return enrollment
+
+
+def _group_out(db: Session, sessions: list[GroupSession]) -> list[GroupSessionOut]:
+    ids = [s.id for s in sessions]
+    counts = (
+        dict(
+            db.execute(
+                select(GroupEnrollment.session_id, func.count())
+                .where(GroupEnrollment.session_id.in_(ids))
+                .group_by(GroupEnrollment.session_id)
+            ).all()
+        )
+        if ids
+        else {}
+    )
+    staff_ids = list({s.professional_id for s in sessions})
+    names = {u.id: u.full_name for u in identity.get_users(db, staff_ids)} if staff_ids else {}
+    return [
+        GroupSessionOut(
+            id=s.id,
+            professional_id=s.professional_id,
+            professional_name=names.get(s.professional_id, ""),
+            title=s.title,
+            starts_at=_aware(s.starts_at),
+            ends_at=_aware(s.ends_at),
+            capacity=s.capacity,
+            enrolled=counts.get(s.id, 0),
+            status=s.status,
+        )
+        for s in sessions
+    ]
+
+
+def _group_detail(
+    db: Session, session: GroupSession, enrollments: list[GroupEnrollment]
+) -> GroupSessionDetail:
+    names = patients.get_names(db, {e.patient_id for e in enrollments})
+    return GroupSessionDetail(
+        **_group_out(db, [session])[0].model_dump(),
+        participants=[
+            Participant(
+                patient_id=e.patient_id, patient_name=names.get(e.patient_id, ""), status=e.status
+            )
+            for e in enrollments
+        ],
+    )
 
 
 def _aware(value: datetime) -> datetime:

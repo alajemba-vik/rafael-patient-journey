@@ -72,7 +72,8 @@
     "patientMessages": "Messages",
     "receptionCallBacks": "À rappeler",
     "adminAudit": "Journal d’accès",
-    "planning": "Planning partagé"
+    "planning": "Planning partagé",
+    "groups": "Séances collectives"
   },
   "feedback": {
     "loading": "Chargement en cours",
@@ -738,5 +739,50 @@
     "person": "Praticien",
     "free": "Libre",
     "taken": "Occupé"
+  },
+  "groups": {
+    "title": "Séances collectives",
+    "intro": "Cours et ateliers en groupe : planifiez-les, remplissez les places, notez qui est venu.",
+    "new": "Nouvelle séance",
+    "newTitle": "Planifier une séance collective",
+    "titleLabel": "Intitulé",
+    "titleHint": "Par exemple : Activité physique adaptée, Atelier cuisine santé.",
+    "leader": "Animée par",
+    "chooseLeader": "Choisir un praticien",
+    "day": "Jour",
+    "time": "Heure de début",
+    "duration": "Durée",
+    "minutes_one": "{{count}} minute",
+    "minutes_other": "{{count}} minutes",
+    "capacity": "Places",
+    "capacityHint": "12 au plus pour un cours d’activité physique.",
+    "create": "Planifier",
+    "cancelForm": "Annuler",
+    "busy": "Ce praticien a déjà un rendez-vous ou une séance à ce moment-là.",
+    "createFailed": "La séance n’a pas pu être planifiée.",
+    "empty": "Aucune séance collective à venir.",
+    "emptyHint": "Les cours et ateliers planifiés apparaîtront ici.",
+    "cancelled": "Annulée",
+    "places": "{{enrolled}} inscrit(s) sur {{capacity}} places",
+    "open": "Voir les inscrits de « {{title}} »",
+    "close": "Fermer « {{title}} »",
+    "nobody": "Personne n’est inscrit pour l’instant.",
+    "participants": "Inscrits",
+    "findPatient": "Inscrire un patient (nom, téléphone…)",
+    "noMatch": "Aucun patient trouvé.",
+    "enroll": "Inscrire {{name}}",
+    "enrollFailed": "L’inscription n’a pas pu être faite : la séance est peut-être complète ou le patient déjà inscrit.",
+    "remove": "Désinscrire {{name}}",
+    "markAttended": "{{name}} est venu·e",
+    "markNoShow": "{{name}} absent·e",
+    "attendance": {
+      "attended": "Venu·e",
+      "no_show": "Absent·e"
+    },
+    "cancelSession": "Annuler la séance",
+    "cancelQuestion_one": "Annuler la séance ? {{count}} inscrit sera prévenu.",
+    "cancelQuestion_other": "Annuler la séance ? Les {{count}} inscrits seront prévenus.",
+    "mineTitle": "Mes séances collectives",
+    "mineWith": "avec {{name}}"
   }
 }

@@ -14,7 +14,12 @@ from app.modules.scheduling.schemas import (
     AppointmentOut,
     AppointmentReschedule,
     AppointmentUpdate,
+    AttendanceChange,
     Availability,
+    EnrollmentCreate,
+    GroupSessionCreate,
+    GroupSessionDetail,
+    GroupSessionOut,
     PlanningSlot,
 )
 
@@ -103,3 +108,78 @@ def list_week(
 ) -> list[PlanningSlot]:
     """Up to 12 practitioners' appointments over the week starting on `monday`."""
     return service.list_week(db, user, monday, professional_ids)
+
+
+@router.post("/group-sessions", status_code=status.HTTP_201_CREATED)
+def create_group_session(
+    body: GroupSessionCreate,
+    user: CurrentUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> GroupSessionOut:
+    return service.create_group_session(db, user, body)
+
+
+@router.get("/group-sessions")
+def list_group_sessions(
+    start: AwareDatetime | None = None,
+    end: AwareDatetime | None = None,
+    user: CurrentUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> list[GroupSessionOut]:
+    return service.list_group_sessions(db, user, start, end)
+
+
+@router.get("/group-sessions/mine")
+def list_my_group_sessions(
+    user: CurrentUser = Depends(get_current_user), db: Session = Depends(get_db)
+) -> list[GroupSessionOut]:
+    return service.list_my_group_sessions(db, user)
+
+
+@router.get("/group-sessions/{session_id}")
+def get_group_session(
+    session_id: uuid.UUID,
+    user: CurrentUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> GroupSessionDetail:
+    return service.get_group_session(db, user, session_id)
+
+
+@router.post("/group-sessions/{session_id}/enrollments")
+def enroll_patient(
+    session_id: uuid.UUID,
+    body: EnrollmentCreate,
+    user: CurrentUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> GroupSessionDetail:
+    return service.enroll_patient(db, user, session_id, body)
+
+
+@router.delete("/group-sessions/{session_id}/enrollments/{patient_id}")
+def remove_enrollment(
+    session_id: uuid.UUID,
+    patient_id: uuid.UUID,
+    user: CurrentUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> GroupSessionDetail:
+    return service.remove_enrollment(db, user, session_id, patient_id)
+
+
+@router.post("/group-sessions/{session_id}/enrollments/{patient_id}/attendance")
+def record_attendance(
+    session_id: uuid.UUID,
+    patient_id: uuid.UUID,
+    body: AttendanceChange,
+    user: CurrentUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> GroupSessionDetail:
+    return service.record_attendance(db, user, session_id, patient_id, body)
+
+
+@router.post("/group-sessions/{session_id}/cancel")
+def cancel_group_session(
+    session_id: uuid.UUID,
+    user: CurrentUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> GroupSessionDetail:
+    return service.cancel_group_session(db, user, session_id)

@@ -6,7 +6,15 @@ from typing import Annotated, Self
 
 from pydantic import AwareDatetime, BaseModel, Field, StringConstraints, model_validator
 
-from app.modules.scheduling.models import NOTE_MAX_LENGTH, AppointmentStatus, CancelReason
+from app.modules.scheduling.models import (
+    GROUP_TITLE_MAX_LENGTH,
+    MAX_GROUP_CAPACITY,
+    NOTE_MAX_LENGTH,
+    AppointmentStatus,
+    CancelReason,
+    EnrollmentStatus,
+    GroupSessionStatus,
+)
 
 
 class _TimeRange(BaseModel):
@@ -88,3 +96,44 @@ class PlanningSlot(BaseModel):
     status: AppointmentStatus
     patient_id: uuid.UUID | None
     patient_name: str | None
+
+
+class GroupSessionCreate(_TimeRange):
+    professional_id: uuid.UUID
+    title: Annotated[
+        str,
+        StringConstraints(strip_whitespace=True, min_length=1, max_length=GROUP_TITLE_MAX_LENGTH),
+    ]
+    capacity: int = Field(default=12, ge=1, le=MAX_GROUP_CAPACITY)
+
+
+class EnrollmentCreate(BaseModel):
+    patient_id: uuid.UUID
+
+
+class AttendanceChange(BaseModel):
+    """attended or no_show once the session has begun; enrolled to undo a mistake."""
+
+    status: EnrollmentStatus
+
+
+class GroupSessionOut(BaseModel):
+    id: uuid.UUID
+    professional_id: uuid.UUID
+    professional_name: str
+    title: str
+    starts_at: datetime
+    ends_at: datetime
+    capacity: int
+    enrolled: int
+    status: GroupSessionStatus
+
+
+class Participant(BaseModel):
+    patient_id: uuid.UUID
+    patient_name: str
+    status: EnrollmentStatus
+
+
+class GroupSessionDetail(GroupSessionOut):
+    participants: list[Participant]
