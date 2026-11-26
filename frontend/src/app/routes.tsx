@@ -36,6 +36,7 @@ export const router = createBrowserRouter([
           page(paths.patient.appointments, () => import("../pages/patient/appointments/PatientAppointmentsPage")),
           page(paths.patient.pathway, () => import("../pages/patient/pathway/PatientPathwayPage")),
           page(paths.patient.questionnaires, () => import("../pages/patient/questionnaires/PatientQuestionnairesPage")),
+          page(paths.patient.messages, () => import("../pages/patient/messages/PatientMessagesPage")),
         ],
       },
       {

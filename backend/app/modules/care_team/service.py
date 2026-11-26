@@ -40,6 +40,12 @@ def patient_ids_for(db: Session, professional_id: uuid.UUID) -> list[uuid.UUID]:
     return list(db.scalars(query))
 
 
+def member_ids(db: Session, patient_id: uuid.UUID) -> list[uuid.UUID]:
+    """For other modules: everyone in a patient's care team. Callers check access."""
+    query = select(CareAssignment.professional_id).where(CareAssignment.patient_id == patient_id)
+    return list(db.scalars(query))
+
+
 def coordinated_patient_ids(db: Session) -> set[uuid.UUID]:
     """For other modules: patients who already have a coordinator in their care team."""
     coordinator_ids = identity.list_ids_with_role(db, Role.COORDINATOR)

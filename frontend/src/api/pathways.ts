@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, unwrap, type Schemas } from "./core/client";
 
 export type Pathway = Schemas["PathwayOut"];
+export type Message = Schemas["MessageOut"];
 
 const PATHWAYS = ["pathways"] as const;
 
@@ -89,5 +90,39 @@ export function useResolveNeed() {
     mutationFn: (needId: string) =>
       unwrap(api.POST("/api/v1/pathways/needs/{need_id}/resolve", { params: { path: { need_id: needId } } })),
     onSuccess,
+  });
+}
+
+const MESSAGES = ["messages"] as const;
+// Answers can come in while the conversation is open.
+const MESSAGES_REFRESH_MS = 30_000;
+
+/** A patient's conversation with their care team, oldest first. `patientId` null = my own. */
+export function useMessages(patientId: string | null) {
+  return useQuery({
+    queryKey: [...MESSAGES, patientId ?? "mine"],
+    queryFn: () =>
+      patientId
+        ? unwrap(
+            api.GET("/api/v1/pathways/patients/{patient_id}/messages", { params: { path: { patient_id: patientId } } }),
+          )
+        : unwrap(api.GET("/api/v1/pathways/messages/mine")),
+    refetchInterval: MESSAGES_REFRESH_MS,
+  });
+}
+
+export function useSendMessage(patientId: string | null) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (body: string) =>
+      patientId
+        ? unwrap(
+            api.POST("/api/v1/pathways/patients/{patient_id}/messages", {
+              params: { path: { patient_id: patientId } },
+              body: { body },
+            }),
+          )
+        : unwrap(api.POST("/api/v1/pathways/messages/mine", { body: { body } })),
+    onSuccess: () => void queryClient.invalidateQueries({ queryKey: [...MESSAGES, patientId ?? "mine"] }),
   });
 }

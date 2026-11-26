@@ -15,6 +15,7 @@ export const NAV_BY_ROLE: Record<Role, NavItem[]> = {
     { to: paths.patient.appointments, label: "nav.patientAppointments" },
     { to: paths.patient.pathway, label: "nav.patientPathway" },
     { to: paths.patient.questionnaires, label: "nav.patientQuestionnaires" },
+    { to: paths.patient.messages, label: "nav.patientMessages" },
     FAQ,
   ],
   secretary: [

@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import StrEnum
 
 from sqlalchemy import (
@@ -102,3 +102,25 @@ class PathwayNeed(Base):
     # Open while these are empty.
     resolved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     resolved_by: Mapped[uuid.UUID | None] = mapped_column(Uuid)
+
+
+MESSAGE_MAX_LENGTH = 2000
+
+
+class Message(Base):
+    """One message in the conversation between a patient and their care team.
+
+    A single thread per patient: the patient writes to their whole team, and any member of
+    the team can read and answer.
+    """
+
+    __tablename__ = "messages"
+    __table_args__ = (Index("ix_messages_patient_sent", "patient_id", "sent_at"),)
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    patient_id: Mapped[uuid.UUID] = mapped_column(Uuid)  # id only: no cross-module FK
+    sender_id: Mapped[uuid.UUID] = mapped_column(Uuid)
+    body: Mapped[str] = mapped_column(Text)
+    sent_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(UTC)
+    )

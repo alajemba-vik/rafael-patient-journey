@@ -68,7 +68,8 @@
     "proNeeds": "Besoins signalés",
     "dashboard": "Tableau de bord",
     "adminAccounts": "Comptes",
-    "adminFaq": "Gérer la FAQ"
+    "adminFaq": "Gérer la FAQ",
+    "patientMessages": "Messages"
   },
   "feedback": {
     "loading": "Chargement en cours",
@@ -506,5 +507,20 @@
       "message_received": "Nouveau message.",
       "session_to_rate": "Comment s’est passée votre séance du {{date}} avec {{name}} ? Donnez votre avis."
     }
+  },
+  "messages": {
+    "title": "Messages",
+    "intro": "Écrivez à votre équipe de soins. Pour une urgence, appelez le 15.",
+    "thread": "Conversation",
+    "empty": "Aucun message pour l’instant.",
+    "emptyHintPatient": "Votre coordinatrice et vos praticiens liront votre message et vous répondront ici.",
+    "emptyHintTeam": "Les messages échangés avec le patient apparaîtront ici.",
+    "meta": "{{name}} · {{date}} à {{time}}",
+    "you": "Vous",
+    "writeToTeam": "Votre message à l’équipe de soins",
+    "writeToPatient": "Votre message au patient",
+    "hint": "Toute l’équipe de soins du patient peut lire ce message.",
+    "send": "Envoyer",
+    "sendError": "Le message n’a pas pu être envoyé. Réessayez."
   }
 }

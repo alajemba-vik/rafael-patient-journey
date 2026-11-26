@@ -7,6 +7,8 @@ from app.db import get_db
 from app.modules.identity_access.service import CurrentUser, get_current_user
 from app.modules.pathways import service
 from app.modules.pathways.schemas import (
+    MessageCreate,
+    MessageOut,
     MilestoneCreate,
     NeedCreate,
     NeedOut,
@@ -96,3 +98,38 @@ def resolve_need(
     db: Session = Depends(get_db),
 ) -> NeedOut:
     return service.resolve_need(db, user, need_id)
+
+
+@router.get("/messages/mine")
+def list_my_messages(
+    user: CurrentUser = Depends(get_current_user), db: Session = Depends(get_db)
+) -> list[MessageOut]:
+    return service.list_my_messages(db, user)
+
+
+@router.post("/messages/mine", status_code=status.HTTP_201_CREATED)
+def send_my_message(
+    body: MessageCreate,
+    user: CurrentUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> MessageOut:
+    return service.send_my_message(db, user, body)
+
+
+@router.get("/patients/{patient_id}/messages")
+def list_messages(
+    patient_id: uuid.UUID,
+    user: CurrentUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> list[MessageOut]:
+    return service.list_messages(db, user, patient_id)
+
+
+@router.post("/patients/{patient_id}/messages", status_code=status.HTTP_201_CREATED)
+def send_message(
+    patient_id: uuid.UUID,
+    body: MessageCreate,
+    user: CurrentUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> MessageOut:
+    return service.send_message(db, user, patient_id, body)

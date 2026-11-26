@@ -68,7 +68,8 @@
     "proNeeds": "Reported needs",
     "dashboard": "Dashboard",
     "adminAccounts": "Accounts",
-    "adminFaq": "Manage the FAQ"
+    "adminFaq": "Manage the FAQ",
+    "patientMessages": "Messages"
   },
   "feedback": {
     "loading": "Loading",
@@ -506,5 +507,20 @@
       "message_received": "New message.",
       "session_to_rate": "How did your session on {{date}} with {{name}} go? Give your feedback."
     }
+  },
+  "messages": {
+    "title": "Messages",
+    "intro": "Write to your care team. In an emergency, call 15.",
+    "thread": "Conversation",
+    "empty": "No messages yet.",
+    "emptyHintPatient": "Your coordinator and practitioners will read your message and answer here.",
+    "emptyHintTeam": "Messages exchanged with the patient will appear here.",
+    "meta": "{{name}} · {{date}} at {{time}}",
+    "you": "You",
+    "writeToTeam": "Your message to the care team",
+    "writeToPatient": "Your message to the patient",
+    "hint": "The patient's whole care team can read this message.",
+    "send": "Send",
+    "sendError": "The message couldn't be sent. Try again."
   }
 }

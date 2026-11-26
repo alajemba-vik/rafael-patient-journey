@@ -7,6 +7,9 @@ Access policy:
                                            flag a new need to the referent coordinator
 - patient                                → their own pathways, without the coordinator's notes
 - secretary, admin                       → no access (clinical data)
+
+Messages: one conversation per patient with their care team. The patient and every member
+of the team read and write it; nobody else does. Reading and writing are audited.
 """
 
 import uuid
@@ -22,14 +25,19 @@ from app.errors import ConflictError, ForbiddenError, NotFoundError
 from app.modules.care_team import service as care_team
 from app.modules.identity_access import service as identity
 from app.modules.identity_access.service import CurrentUser, Role
+from app.modules.notifications import service as notifications
+from app.modules.notifications.models import Template
 from app.modules.pathways.models import (
     CarePathway,
+    Message,
     MilestoneKind,
     PathwayMilestone,
     PathwayNeed,
     PathwayStatus,
 )
 from app.modules.pathways.schemas import (
+    MessageCreate,
+    MessageOut,
     Milestone,
     MilestoneCreate,
     NeedCreate,
@@ -235,6 +243,48 @@ def _needs_out(db: Session, rows: list[tuple[PathwayNeed, CarePathway]]) -> list
     ]
 
 
+def list_messages(db: Session, user: CurrentUser, patient_id: uuid.UUID) -> list[MessageOut]:
+    """The patient's conversation with their care team, oldest first."""
+    if not _in_conversation(db, user, patient_id):
+        _deny(db, user, "message.read.denied", patient_id)
+    messages = list(
+        db.scalars(
+            select(Message).where(Message.patient_id == patient_id).order_by(Message.sent_at)
+        )
+    )
+    audit.record(db, user.id, "message.read", patient_id)
+    db.commit()
+    return _messages_out(db, patient_id, messages)
+
+
+def send_message(
+    db: Session, user: CurrentUser, patient_id: uuid.UUID, data: MessageCreate
+) -> MessageOut:
+    """The patient's message reaches the whole team; a team member's reaches the patient."""
+    if not _in_conversation(db, user, patient_id):
+        _deny(db, user, "message.send.denied", patient_id)
+    message = Message(patient_id=patient_id, sender_id=user.id, body=data.body)
+    db.add(message)
+    db.flush()
+    audit.record(db, user.id, "message.send", patient_id)
+    recipients = (
+        care_team.member_ids(db, patient_id)
+        if user.role == Role.PATIENT
+        else [patients.get_user_id_for_patient(db, patient_id)]
+    )
+    notifications.notify(db, recipients, Template.MESSAGE_RECEIVED, patient_id)
+    db.commit()
+    return _messages_out(db, patient_id, [message])[0]
+
+
+def list_my_messages(db: Session, user: CurrentUser) -> list[MessageOut]:
+    return list_messages(db, user, _own_patient_id(db, user))
+
+
+def send_my_message(db: Session, user: CurrentUser, data: MessageCreate) -> MessageOut:
+    return send_message(db, user, _own_patient_id(db, user), data)
+
+
 def get_open_pathway_id(db: Session, patient_id: uuid.UUID) -> uuid.UUID | None:
     """For other modules: the patient's open pathway, if any. No access check."""
     query = select(CarePathway.id).where(
@@ -294,6 +344,42 @@ def _summary(
         next_milestone=next_kind,
         next_due_on=due.date() if due else None,
     )
+
+
+def _in_conversation(db: Session, user: CurrentUser, patient_id: uuid.UUID) -> bool:
+    if user.role == Role.PATIENT:
+        return patients.get_patient_id_for_user(db, user.id) == patient_id
+    return user.role in CARE_ROLES and care_team.is_in_care_team(db, user.id, patient_id)
+
+
+def _own_patient_id(db: Session, user: CurrentUser) -> uuid.UUID:
+    patient_id = (
+        patients.get_patient_id_for_user(db, user.id) if user.role == Role.PATIENT else None
+    )
+    if patient_id is None:
+        raise NotFoundError("No patient record is linked to this account")
+    return patient_id
+
+
+def _messages_out(db: Session, patient_id: uuid.UUID, messages: list[Message]) -> list[MessageOut]:
+    patient_user_id = patients.get_user_id_for_patient(db, patient_id)
+    staff_ids = list({m.sender_id for m in messages if m.sender_id != patient_user_id})
+    names = {u.id: u.full_name for u in identity.get_users(db, staff_ids)} if staff_ids else {}
+    patient_name = patients.get_names(db, {patient_id}).get(patient_id, "")
+    return [
+        MessageOut(
+            id=m.id,
+            patient_id=m.patient_id,
+            sender_id=m.sender_id,
+            sender_name=patient_name
+            if m.sender_id == patient_user_id
+            else names.get(m.sender_id, ""),
+            from_patient=m.sender_id == patient_user_id,
+            body=m.body,
+            sent_at=m.sent_at if m.sent_at.tzinfo else m.sent_at.replace(tzinfo=UTC),
+        )
+        for m in messages
+    ]
 
 
 def _is_team_coordinator(db: Session, user: CurrentUser, patient_id: uuid.UUID) -> bool:

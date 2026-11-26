@@ -11,6 +11,7 @@ import { formatDate } from "../../../lib/format";
 import { PageHeader } from "../../../components/layout/PageHeader";
 import { AppointmentsSection } from "../../../components/patient/AppointmentsSection";
 import { CareTeamSection } from "../../../components/patient/CareTeamSection";
+import { MessagesSection } from "./MessagesSection";
 import { PathwaySection } from "./PathwaySection";
 import { ScoresSection } from "./ScoresSection";
 
@@ -57,6 +58,7 @@ export function PatientFilePage() {
             <>
               <PathwaySection patientId={record.id} />
               <AppointmentsSection patientId={record.id} />
+              <MessagesSection patientId={record.id} />
             </>
           ) : (
             <div className="rf-banner rf-stack">

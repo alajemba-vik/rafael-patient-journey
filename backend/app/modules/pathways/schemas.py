@@ -4,9 +4,9 @@ import uuid
 from datetime import date, datetime
 from typing import Annotated
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints
 
-from app.modules.pathways.models import MilestoneKind, PathwayStatus
+from app.modules.pathways.models import MESSAGE_MAX_LENGTH, MilestoneKind, PathwayStatus
 
 Score = Annotated[int, Field(ge=0, le=4)]
 
@@ -105,3 +105,20 @@ class NeedOut(BaseModel):
     raised_at: datetime
     note: str
     resolved_at: datetime | None
+
+
+class MessageCreate(BaseModel):
+    body: Annotated[
+        str, StringConstraints(strip_whitespace=True, min_length=1, max_length=MESSAGE_MAX_LENGTH)
+    ]
+
+
+class MessageOut(BaseModel):
+    id: uuid.UUID
+    patient_id: uuid.UUID
+    sender_id: uuid.UUID
+    sender_name: str
+    # True when the patient wrote it, false when a member of the care team did.
+    from_patient: bool
+    body: str
+    sent_at: datetime

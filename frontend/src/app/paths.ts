@@ -10,6 +10,7 @@ export const paths = {
     appointments: "/patient/rendez-vous",
     pathway: "/patient/parcours",
     questionnaires: "/patient/questionnaires",
+    messages: "/patient/messages",
   },
   pro: {
     schedule: "/pro",
