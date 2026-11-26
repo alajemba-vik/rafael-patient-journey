@@ -113,3 +113,19 @@ export function useAvailability(
     enabled: Boolean(professionalId && day),
   });
 }
+
+export type PlanningSlot = Schemas["PlanningSlot"];
+
+/** Several practitioners' appointments over the week starting on `monday`. */
+export function useWeekPlanning(monday: string, professionalIds: string[]) {
+  return useQuery({
+    queryKey: [...APPOINTMENTS, "planning", monday, [...professionalIds].sort()],
+    queryFn: () =>
+      unwrap(
+        api.GET("/api/v1/scheduling/planning", {
+          params: { query: { monday, professional_ids: professionalIds } },
+        }),
+      ),
+    enabled: professionalIds.length > 0,
+  });
+}

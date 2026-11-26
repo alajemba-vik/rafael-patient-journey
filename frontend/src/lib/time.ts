@@ -63,3 +63,9 @@ const clockFormat = new Intl.DateTimeFormat("en-GB", {
 export function instituteClock(value: string): string {
   return clockFormat.format(new Date(value));
 }
+
+/** The Monday of the week a "YYYY-MM-DD" date falls in, as "YYYY-MM-DD". */
+export function mondayOf(date: string): string {
+  const weekday = new Date(`${date}T12:00:00Z`).getUTCDay(); // 0 = Sunday
+  return addDays(date, weekday === 0 ? -6 : 1 - weekday);
+}

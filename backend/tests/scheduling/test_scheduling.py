@@ -764,3 +764,65 @@ def test_no_free_slots_are_suggested_at_the_weekend(db, client_as, team):
     )
 
     assert body["free"] == []
+
+
+MONDAY = datetime(2030, 1, 7, tzinfo=UTC)
+
+
+def test_reception_sees_several_practitioners_week_with_patient_names(db, client_as):
+    first, second, other = (add_account(db, Role.PROFESSIONAL) for _ in range(3))
+    patient = add_patient(db)
+    add_appointment(db, patient.id, first.id, MONDAY.replace(hour=9))
+    add_appointment(db, patient.id, second.id, MONDAY.replace(hour=11) + timedelta(days=2))
+    add_appointment(db, patient.id, other.id, MONDAY.replace(hour=14))
+    add_appointment(db, patient.id, first.id, MONDAY + timedelta(days=8))  # next week
+
+    response = client_as(Role.SECRETARY).get(
+        "/api/v1/scheduling/planning",
+        params={"monday": "2030-01-07", "professional_ids": [str(first.id), str(second.id)]},
+    )
+
+    assert response.status_code == 200
+    assert [s["professional_id"] for s in response.json()] == [str(first.id), str(second.id)]
+    assert {s["patient_name"] for s in response.json()} == {"Alex Synthetic"}
+    assert "planning.read" in audit_actions(db)
+
+
+def test_coordinator_sees_only_their_teams_patients_by_name_in_the_planning(db, client_as):
+    coordinator = add_account(db, Role.COORDINATOR)
+    practitioner = add_account(db, Role.PROFESSIONAL)
+    mine, not_mine = add_patient(db), add_patient(db)
+    assign(db, coordinator.id, mine.id)
+    add_appointment(db, mine.id, practitioner.id, MONDAY.replace(hour=9))
+    add_appointment(db, not_mine.id, practitioner.id, MONDAY.replace(hour=11))
+
+    slots = (
+        client_as(Role.COORDINATOR, coordinator.id)
+        .get(
+            "/api/v1/scheduling/planning",
+            params={"monday": "2030-01-07", "professional_ids": [str(practitioner.id)]},
+        )
+        .json()
+    )
+
+    assert [s["patient_id"] for s in slots] == [str(mine.id), None]
+    assert slots[1]["patient_name"] is None
+
+
+@pytest.mark.parametrize("role", [Role.PROFESSIONAL, Role.PATIENT, Role.ADMIN])
+def test_other_roles_cannot_read_the_shared_planning(db, client_as, role):
+    response = client_as(role).get(
+        "/api/v1/scheduling/planning",
+        params={"monday": "2030-01-07", "professional_ids": [str(uuid.uuid4())]},
+    )
+
+    assert response.status_code == 403
+
+
+def test_the_planning_shows_twelve_people_at_most(db, client_as):
+    response = client_as(Role.SECRETARY).get(
+        "/api/v1/scheduling/planning",
+        params={"monday": "2030-01-07", "professional_ids": [str(uuid.uuid4()) for _ in range(13)]},
+    )
+
+    assert response.status_code == 400

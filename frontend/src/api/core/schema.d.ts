@@ -933,6 +933,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/scheduling/planning": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Week
+         * @description Up to 12 practitioners' appointments over the week starting on `monday`.
+         */
+        get: operations["list_week_api_v1_scheduling_planning_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1805,6 +1825,40 @@ export interface components {
             phone?: string | null;
             /** User Id */
             user_id?: string | null;
+        };
+        /**
+         * PlanningSlot
+         * @description One appointment in the shared week planning. The patient is left out (None) for a
+         *     coordinator who isn't in that patient's care team: they see the time is taken, not by whom.
+         */
+        PlanningSlot: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Professional Id
+             * Format: uuid
+             */
+            professional_id: string;
+            /** Professional Name */
+            professional_name: string;
+            /**
+             * Starts At
+             * Format: date-time
+             */
+            starts_at: string;
+            /**
+             * Ends At
+             * Format: date-time
+             */
+            ends_at: string;
+            status: components["schemas"]["AppointmentStatus"];
+            /** Patient Id */
+            patient_id: string | null;
+            /** Patient Name */
+            patient_name: string | null;
         };
         /**
          * PractitionerRating
@@ -3824,6 +3878,38 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Availability"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_week_api_v1_scheduling_planning_get: {
+        parameters: {
+            query: {
+                monday: string;
+                professional_ids: string[];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlanningSlot"][];
                 };
             };
             /** @description Validation Error */

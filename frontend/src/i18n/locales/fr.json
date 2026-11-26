@@ -71,7 +71,8 @@
     "adminFaq": "Gérer la FAQ",
     "patientMessages": "Messages",
     "receptionCallBacks": "À rappeler",
-    "adminAudit": "Journal d’accès"
+    "adminAudit": "Journal d’accès",
+    "planning": "Planning partagé"
   },
   "feedback": {
     "loading": "Chargement en cours",
@@ -721,5 +722,21 @@
       "low": "Sédentarité faible",
       "high": "Sédentarité élevée"
     }
+  },
+  "planning": {
+    "title": "Planning partagé",
+    "intro": "Choisissez jusqu’à 12 praticiens pour voir leur semaine côte à côte.",
+    "whoTitle": "Qui afficher ?",
+    "chosen": "{{count}} sur {{max}} affichés",
+    "search": "Chercher un praticien ou une discipline",
+    "chooseWeek": "Choisir la semaine",
+    "previousWeek": "Semaine précédente",
+    "thisWeek": "Cette semaine",
+    "nextWeek": "Semaine suivante",
+    "chooseSomeone": "Choisissez au moins une personne à gauche.",
+    "caption": "Rendez-vous de la semaine, un praticien par ligne",
+    "person": "Praticien",
+    "free": "Libre",
+    "taken": "Occupé"
   }
 }

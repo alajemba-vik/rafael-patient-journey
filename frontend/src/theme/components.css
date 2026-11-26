@@ -1333,3 +1333,43 @@ body {
   max-height: 320px;
   overflow-y: auto;
 }
+
+/* Shared week planning: people on the left, a grid of weekdays on the right */
+.rf-planning {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) 1fr;
+  gap: var(--space-5);
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .rf-planning {
+    grid-template-columns: 1fr;
+  }
+}
+.rf-planning__grid td {
+  vertical-align: top;
+  min-width: 140px;
+}
+.rf-planning__slots {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.rf-planning__slot {
+  padding: var(--space-1) var(--space-2);
+  background: var(--secondary-blue);
+  border-radius: var(--radius-xs);
+  font-size: 13px;
+}
+.rf-planning__slot--done {
+  background: var(--surface-tint);
+}
+.rf-planning__slot--no_show {
+  border: 2px solid var(--ink);
+}
+.rf-planning__time {
+  font-weight: 700;
+}

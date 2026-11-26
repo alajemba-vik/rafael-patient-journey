@@ -74,3 +74,17 @@ class Availability(BaseModel):
     minutes: int = Field(description="Length of the session the free slots were computed for")
     busy: list[TimeSlot]
     free: list[TimeSlot]
+
+
+class PlanningSlot(BaseModel):
+    """One appointment in the shared week planning. The patient is left out (None) for a
+    coordinator who isn't in that patient's care team: they see the time is taken, not by whom."""
+
+    id: uuid.UUID
+    professional_id: uuid.UUID
+    professional_name: str
+    starts_at: datetime
+    ends_at: datetime
+    status: AppointmentStatus
+    patient_id: uuid.UUID | None
+    patient_name: str | None

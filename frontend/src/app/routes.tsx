@@ -53,6 +53,7 @@ export const router = createBrowserRouter([
         children: [
           page(paths.pro.pathways, () => import("../pages/professional/pathways/LedPathwaysPage")),
           page(paths.pro.needs, () => import("../pages/professional/needs/NeedsPage")),
+          page(paths.pro.planning, () => import("../pages/professional/planning/PlanningPage")),
         ],
       },
       {
@@ -61,6 +62,7 @@ export const router = createBrowserRouter([
           page(paths.reception.board, () => import("../pages/reception/board/ReceptionBoardPage")),
           page(paths.reception.patients, () => import("../pages/reception/patients/ReceptionPatientsPage")),
           page(paths.reception.callBacks, () => import("../pages/reception/call_backs/CallBacksPage")),
+          page(paths.reception.planning, () => import("../pages/reception/planning/ReceptionPlanningPage")),
           page(
             paths.reception.patient(PATIENT_ID_PARAM),
             () => import("../pages/reception/patients/ReceptionPatientPage"),

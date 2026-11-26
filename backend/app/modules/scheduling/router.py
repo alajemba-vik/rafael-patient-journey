@@ -15,6 +15,7 @@ from app.modules.scheduling.schemas import (
     AppointmentReschedule,
     AppointmentUpdate,
     Availability,
+    PlanningSlot,
 )
 
 router = APIRouter(prefix="/scheduling", tags=["scheduling"])
@@ -91,3 +92,14 @@ def get_availability(
     db: Session = Depends(get_db),
 ) -> Availability:
     return service.get_availability(db, user, professional_id, day, minutes, patient_id, ignore_id)
+
+
+@router.get("/planning")
+def list_week(
+    monday: date,
+    professional_ids: list[uuid.UUID] = Query(),
+    user: CurrentUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> list[PlanningSlot]:
+    """Up to 12 practitioners' appointments over the week starting on `monday`."""
+    return service.list_week(db, user, monday, professional_ids)

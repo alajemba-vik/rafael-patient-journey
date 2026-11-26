@@ -18,12 +18,14 @@ export const paths = {
     patient: (patientId: string) => `/pro/patients/${patientId}`,
     pathways: "/pro/parcours",
     needs: "/pro/besoins",
+    planning: "/pro/planning-partage",
     dashboard: "/pro/tableau-de-bord",
   },
   reception: {
     board: "/accueil",
     patients: "/accueil/patients",
     callBacks: "/accueil/a-rappeler",
+    planning: "/accueil/planning",
     patient: (patientId: string) => `/accueil/patients/${patientId}`,
   },
   admin: {

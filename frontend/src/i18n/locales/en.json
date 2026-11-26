@@ -71,7 +71,8 @@
     "adminFaq": "Manage the FAQ",
     "patientMessages": "Messages",
     "receptionCallBacks": "To call back",
-    "adminAudit": "Access log"
+    "adminAudit": "Access log",
+    "planning": "Shared planning"
   },
   "feedback": {
     "loading": "Loading",
@@ -721,5 +722,21 @@
       "low": "Low sedentariness",
       "high": "High sedentariness"
     }
+  },
+  "planning": {
+    "title": "Shared planning",
+    "intro": "Choose up to 12 practitioners to see their weeks side by side.",
+    "whoTitle": "Who to show?",
+    "chosen": "{{count}} of {{max}} shown",
+    "search": "Search a practitioner or discipline",
+    "chooseWeek": "Choose the week",
+    "previousWeek": "Previous week",
+    "thisWeek": "This week",
+    "nextWeek": "Next week",
+    "chooseSomeone": "Choose at least one person on the left.",
+    "caption": "The week's appointments, one practitioner per row",
+    "person": "Practitioner",
+    "free": "Free",
+    "taken": "Taken"
   }
 }

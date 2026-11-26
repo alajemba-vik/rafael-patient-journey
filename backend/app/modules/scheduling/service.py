@@ -39,6 +39,7 @@ from app.modules.scheduling.schemas import (
     AppointmentReschedule,
     AppointmentUpdate,
     Availability,
+    PlanningSlot,
     TimeSlot,
 )
 
@@ -51,6 +52,8 @@ BOOKING_ROLES = {Role.COORDINATOR, Role.SECRETARY}
 OWN_AGENDA_ROLES = {Role.PROFESSIONAL}
 CARE_ROLES = {Role.PROFESSIONAL, Role.COORDINATOR}
 UPCOMING_WINDOW = timedelta(days=90)
+# The shared planning shows this many practitioners at once: beyond that nobody can read it.
+MAX_PLANNING_PEOPLE = 12
 # Patients are reminded of appointments starting within this window.
 REMINDER_WINDOW = timedelta(hours=24)
 
@@ -344,6 +347,43 @@ def send_appointment_reminders(db: Session, now: datetime | None = None) -> int:
         sent += 1
     db.commit()
     return sent
+
+
+def list_week(
+    db: Session, user: CurrentUser, monday: date, professional_ids: list[uuid.UUID]
+) -> list[PlanningSlot]:
+    """Several practitioners' appointments over one week (Monday to Sunday), side by side, so
+    reception and coordinators find a slot and see who works when. Cancelled ones are left out.
+    """
+    if user.role not in BOOKING_ROLES:
+        _deny(db, user, "planning.read.denied", None)
+    if not professional_ids or len(professional_ids) > MAX_PLANNING_PEOPLE:
+        raise AppError(f"Choose between 1 and {MAX_PLANNING_PEOPLE} people")
+    start, _ = day_window(monday, institute_time_zone())
+    _, end = day_window(monday + timedelta(days=6), institute_time_zone())
+    query = select(Appointment).where(
+        Appointment.professional_id.in_(professional_ids),
+        Appointment.starts_at >= start,
+        Appointment.starts_at < end,
+        Appointment.status != AppointmentStatus.CANCELLED,
+    )
+    appointments = _to_out(db, db.scalars(query.order_by(Appointment.starts_at)))
+    visible = {a.patient_id for a in appointments if _can_see_patient(db, user, a.patient_id)}
+    audit.record_many(db, user.id, "planning.read", visible)
+    db.commit()
+    return [
+        PlanningSlot(
+            id=a.id,
+            professional_id=a.professional_id,
+            professional_name=a.professional_name,
+            starts_at=a.starts_at,
+            ends_at=a.ends_at,
+            status=a.status,
+            patient_id=a.patient_id if a.patient_id in visible else None,
+            patient_name=a.patient_name if a.patient_id in visible else None,
+        )
+        for a in appointments
+    ]
 
 
 def list_done_sessions(

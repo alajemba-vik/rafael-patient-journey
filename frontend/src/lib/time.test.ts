@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { addDays, instituteDateTime } from "./time";
+import { addDays, instituteDateTime, mondayOf } from "./time";
 
 describe("the Institute's clock", () => {
   it("reads entered times as Paris time in winter and summer", () => {
@@ -16,5 +16,13 @@ describe("the Institute's clock", () => {
 
   it("adds days across months", () => {
     expect(addDays("2026-10-28", 7)).toBe("2026-11-04");
+  });
+});
+
+describe("mondayOf", () => {
+  it("finds the Monday of any day of the week, Sunday included", () => {
+    expect(mondayOf("2030-01-07")).toBe("2030-01-07");
+    expect(mondayOf("2030-01-10")).toBe("2030-01-07");
+    expect(mondayOf("2030-01-13")).toBe("2030-01-07");
   });
 });
