@@ -84,7 +84,7 @@ def test_non_admin_cannot_list_accounts(db, client_as, role):
 # --- care staff -----------------------------------------------------------
 
 
-@pytest.mark.parametrize("role", [Role.COORDINATOR, Role.SECRETARY, Role.ADMIN])
+@pytest.mark.parametrize("role", [Role.COORDINATOR, Role.PROFESSIONAL, Role.SECRETARY, Role.ADMIN])
 def test_care_staff_list_shows_practitioners_and_coordinators(db, client_as, role):
     add_user(db, Role.PROFESSIONAL, "pro@example.com")
     add_user(db, Role.COORDINATOR, "coord@example.com")
@@ -95,8 +95,8 @@ def test_care_staff_list_shows_practitioners_and_coordinators(db, client_as, rol
     assert sorted(u["email"] for u in body) == ["coord@example.com", "pro@example.com"]
 
 
-@pytest.mark.parametrize("role", [Role.PATIENT, Role.PROFESSIONAL])
-def test_care_staff_list_is_refused_to_others(db, client_as, role):
+def test_care_staff_list_is_refused_to_patients(db, client_as):
+    role = Role.PATIENT
     response = client_as(role).get("/api/v1/auth/care-staff")
 
     assert response.status_code == 403

@@ -56,7 +56,7 @@ def test_coordinator_or_admin_adds_professional_and_it_is_audited(db, client_as,
 
 
 @pytest.mark.parametrize("role", [Role.PROFESSIONAL, Role.SECRETARY, Role.PATIENT])
-def test_other_roles_cannot_add_and_it_is_audited(db, client_as, role):
+def test_roles_outside_the_team_cannot_add_and_it_is_audited(db, client_as, role):
     professional = add_account(db, Role.PROFESSIONAL)
 
     response = client_as(role).post(
@@ -222,3 +222,37 @@ def test_older_assignments_without_a_reason_still_list(db, client_as):
     )
 
     assert member["reason"] is None and member["added_by_name"] is None
+
+
+def test_a_practitioner_in_the_team_shares_the_file_with_a_colleague(db, client_as):
+    practitioner = add_account(db, Role.PROFESSIONAL, "Nadia Diététique")
+    colleague = add_account(db, Role.PROFESSIONAL, "Sam Sophrologie")
+    assign(db, practitioner.id)
+
+    response = client_as(Role.PROFESSIONAL, practitioner.id).post(
+        "/api/v1/care-team/assignments",
+        json={
+            "patient_id": str(PATIENT_ID),
+            "professional_id": str(colleague.id),
+            "reason": "medical_opinion",
+        },
+    )
+
+    assert response.status_code == 201
+    assert "care_team.assign" in audit_actions(db)
+    sent = db.scalars(select(Notification).where(Notification.recipient_id == colleague.id))
+    assert [n.template for n in sent] == [Template.FILE_SHARED]
+
+
+def test_a_practitioner_in_the_team_still_cannot_remove_anyone(db, client_as):
+    practitioner = add_account(db, Role.PROFESSIONAL)
+    colleague = add_account(db, Role.PROFESSIONAL)
+    assign(db, practitioner.id)
+    assignment = assign(db, colleague.id)
+
+    response = client_as(Role.PROFESSIONAL, practitioner.id).delete(
+        f"/api/v1/care-team/assignments/{assignment.id}"
+    )
+
+    assert response.status_code == 403
+    assert "care_team.remove.denied" in audit_actions(db)

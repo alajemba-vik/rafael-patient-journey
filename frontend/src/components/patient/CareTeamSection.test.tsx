@@ -82,4 +82,17 @@ describe("CareTeamSection", () => {
       note: "Avis sur le sommeil",
     });
   });
+
+  it("lets a practitioner in the team share the file but not remove anyone", async () => {
+    vi.spyOn(globalThis, "fetch").mockImplementation(async (input) => {
+      const request = input as Request;
+      if (request.url.endsWith("/auth/me")) return Response.json({ ...ME, role: "professional" });
+      if (request.url.includes("/care-staff")) return Response.json(STAFF);
+      return Response.json(TEAM);
+    });
+    renderSection();
+
+    expect(await screen.findByLabelText("Motif du partage")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Retirer" })).not.toBeInTheDocument();
+  });
 });

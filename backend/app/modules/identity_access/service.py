@@ -118,8 +118,9 @@ def list_audit_events(
 
 
 def list_care_staff(db: Session, user: CurrentUser) -> list[UserOut]:
-    """Practitioners and coordinators, to choose from when building a care team or booking."""
-    if user.role not in {Role.COORDINATOR, Role.SECRETARY, Role.ADMIN}:
+    """Practitioners and coordinators, to choose from when building a care team, sharing a
+    patient's file with a colleague, or booking."""
+    if user.role not in {Role.COORDINATOR, Role.PROFESSIONAL, Role.SECRETARY, Role.ADMIN}:
         raise ForbiddenError("You are not allowed to list staff")
     query = select(User).where(User.role.in_([Role.PROFESSIONAL, Role.COORDINATOR]))
     return [UserOut.model_validate(u) for u in db.scalars(query.order_by(User.full_name))]

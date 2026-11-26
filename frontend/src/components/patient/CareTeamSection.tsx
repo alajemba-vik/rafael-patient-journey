@@ -16,7 +16,8 @@ type Reason = (typeof REASONS)[number];
 export function CareTeamSection({ patientId }: { patientId: string }) {
   const { t } = useTranslation();
   const team = useCareTeam(patientId);
-  const canManage = usePermissions().manageCareTeam;
+  const can = usePermissions();
+  const canManage = can.manageCareTeam;
   const remove = useRemoveFromCareTeam();
 
   return (
@@ -69,7 +70,7 @@ export function CareTeamSection({ patientId }: { patientId: string }) {
           </ul>
         )}
       </QueryState>
-      {canManage && team.data && (
+      {can.shareFiles && team.data && (
         <AddMemberForm patientId={patientId} memberIds={new Set(team.data.map((m) => m.user_id))} />
       )}
     </section>

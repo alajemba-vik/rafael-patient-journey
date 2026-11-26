@@ -2,7 +2,9 @@
 
 Access policy:
 - coordinator, admin → add or remove anyone in any patient's team, and see any team
-- professional       → see the team of patients they are part of
+- professional       → see the team of patients they are part of, and share those patients'
+                       files with a colleague (add them to the team); removing stays with
+                       coordinators
 - secretary          → see any team (names and roles), to book appointments with its members
 - patient            → no access here
 """
@@ -66,7 +68,10 @@ def create_assignment(db: Session, user: CurrentUser, data: AssignmentCreate) ->
     The patient id isn't checked against the patients module: patients already depends on
     care_team, and an assignment to an unknown id grants access to nothing.
     """
-    if user.role not in MANAGER_ROLES:
+    sharing_member = user.role == Role.PROFESSIONAL and is_in_care_team(
+        db, user.id, data.patient_id
+    )
+    if user.role not in MANAGER_ROLES and not sharing_member:
         _deny(db, user, "care_team.assign.denied", data.patient_id)
     if identity.get_role(db, data.professional_id) not in CARE_ROLES:
         raise NotFoundError("No professional or coordinator account with this id")
