@@ -6,6 +6,7 @@ import { paths } from "./paths";
 /** `label` is a translation key: menus are translated where they are shown. */
 type NavItem = { to: string; label: ParseKeys };
 
+// The FAQ is written for patients; staff still reach the public page by its address.
 const FAQ: NavItem = { to: paths.faq, label: "nav.faq" };
 const TASKS: NavItem = { to: paths.tasks, label: "nav.tasks" };
 
@@ -26,7 +27,6 @@ export const NAV_BY_ROLE: Record<Role, NavItem[]> = {
     { to: paths.reception.patients, label: "nav.receptionPatients" },
     { to: paths.reception.callBacks, label: "nav.receptionCallBacks" },
     TASKS,
-    FAQ,
   ],
   professional: [
     { to: paths.pro.home, label: "nav.staffHome" },
@@ -35,7 +35,6 @@ export const NAV_BY_ROLE: Record<Role, NavItem[]> = {
     TASKS,
     { to: paths.pro.groups, label: "nav.groups" },
     { to: paths.pro.dashboard, label: "nav.dashboard" },
-    FAQ,
   ],
   coordinator: [
     { to: paths.pro.home, label: "nav.staffHome" },
@@ -47,14 +46,12 @@ export const NAV_BY_ROLE: Record<Role, NavItem[]> = {
     { to: paths.pro.planning, label: "nav.planning" },
     { to: paths.pro.groups, label: "nav.groups" },
     { to: paths.pro.dashboard, label: "nav.dashboard" },
-    FAQ,
   ],
   admin: [
     { to: paths.admin.accounts, label: "nav.adminAccounts" },
     { to: paths.admin.faq, label: "nav.adminFaq" },
     { to: paths.admin.audit, label: "nav.adminAudit" },
     { to: paths.admin.dashboard, label: "nav.dashboard" },
-    FAQ,
   ],
 };
 
