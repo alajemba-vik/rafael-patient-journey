@@ -17,6 +17,7 @@ function useNotificationText() {
       date: startsAt ? formatDate(startsAt) : "",
       time: startsAt ? formatTime(startsAt) : "",
       name: notification.params.professional_name ?? "",
+      reason: notification.params.reason ? t(`careTeam.reasons.${notification.params.reason as "care_team"}`) : "",
     });
   };
 }

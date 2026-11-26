@@ -157,7 +157,19 @@
     "addLabel": "Add to the team",
     "choosePerson": "Choose a person",
     "addFailed": "The person wasn’t added. Try again.",
-    "add": "Add"
+    "add": "Add",
+    "reason": "Reason for sharing",
+    "note": "Note (optional)",
+    "noteHint": "Visible to the care team. No sensitive medical information.",
+    "sharedBy": "Added by {{name}} on {{date}}",
+    "reasons": {
+      "care_team": "Joins the care team",
+      "convocation": "To call the patient in",
+      "booking": "To book appointments",
+      "medical_opinion": "For a medical opinion",
+      "administrative": "For paperwork",
+      "file_merge": "To merge duplicate files"
+    }
   },
   "milestones": {
     "caption": "Self-assessment, from 0 to 4",
@@ -516,7 +528,8 @@
       "missed_appointment": "A patient missed their appointment on {{date}} at {{time}}. Check they are still following their pathway.",
       "message_received": "New message.",
       "session_to_rate": "How did your session on {{date}} with {{name}} go? Give your feedback.",
-      "task_assigned": "A task was given to you."
+      "task_assigned": "A task was given to you.",
+      "file_shared": "A patient file was shared with you ({{reason}})."
     }
   },
   "messages": {

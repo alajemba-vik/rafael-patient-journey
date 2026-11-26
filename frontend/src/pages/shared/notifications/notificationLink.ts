@@ -10,6 +10,7 @@ export function notificationLink(notification: Notification, role: Role): string
   switch (notification.template) {
     case "missed_appointment":
     case "message_received":
+    case "file_shared":
       if (staff && notification.subject_id) return paths.pro.patient(notification.subject_id);
       return role === "patient" ? paths.patient.messages : null;
     case "task_assigned":

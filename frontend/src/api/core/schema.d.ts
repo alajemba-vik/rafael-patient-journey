@@ -1328,6 +1328,10 @@ export interface components {
              * Format: uuid
              */
             professional_id: string;
+            /** @default care_team */
+            reason: components["schemas"]["ShareReason"];
+            /** Note */
+            note?: string | null;
         };
         /** AssignmentOut */
         AssignmentOut: {
@@ -1471,6 +1475,13 @@ export interface components {
             role: components["schemas"]["Role"];
             /** Discipline */
             discipline: string | null;
+            reason?: components["schemas"]["ShareReason"] | null;
+            /** Note */
+            note?: string | null;
+            /** Added By Name */
+            added_by_name?: string | null;
+            /** Added At */
+            added_at?: string | null;
         };
         /** CategoryCreate */
         CategoryCreate: {
@@ -2460,6 +2471,12 @@ export interface components {
             average: number | null;
         };
         /**
+         * ShareReason
+         * @description Why someone was given the patient's file, as in the Institute's current tool.
+         * @enum {string}
+         */
+        ShareReason: "care_team" | "convocation" | "booking" | "medical_opinion" | "administrative" | "file_merge";
+        /**
          * Status
          * @enum {string}
          */
@@ -2572,7 +2589,7 @@ export interface components {
          * @description What happened. The interface turns the template and its parameters into a sentence.
          * @enum {string}
          */
-        Template: "appointment_booked" | "appointment_moved" | "appointment_cancelled" | "appointment_reminder" | "missed_appointment" | "message_received" | "session_to_rate" | "task_assigned";
+        Template: "appointment_booked" | "appointment_moved" | "appointment_cancelled" | "appointment_reminder" | "missed_appointment" | "message_received" | "session_to_rate" | "task_assigned" | "file_shared";
         /** TimeSlot */
         TimeSlot: {
             /**

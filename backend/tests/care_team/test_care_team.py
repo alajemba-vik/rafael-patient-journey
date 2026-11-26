@@ -10,6 +10,7 @@ from app.audit import AuditEvent
 from app.modules.care_team.models import CareAssignment
 from app.modules.identity_access.models import User
 from app.modules.identity_access.service import Role
+from app.modules.notifications.models import Notification, Template
 
 PATIENT_ID = uuid.uuid4()
 
@@ -161,3 +162,63 @@ def test_outsiders_cannot_see_team_and_it_is_audited(db, client_as, role):
 
     assert response.status_code == 403
     assert audit_actions(db) == ["care_team.read.denied"]
+
+
+# --- sharing with a reason ------------------------------------------------
+
+
+def test_sharing_records_reason_note_and_who_and_tells_the_new_member(db, client_as):
+
+    coordinator = add_account(db, Role.COORDINATOR, "Claire Coordination")
+    dietitian = add_account(db, Role.PROFESSIONAL, "Nadia Diététique")
+
+    response = client_as(Role.COORDINATOR, coordinator.id).post(
+        "/api/v1/care-team/assignments",
+        json={
+            "patient_id": str(PATIENT_ID),
+            "professional_id": str(dietitian.id),
+            "reason": "convocation",
+            "note": "Bilan nutrition en janvier",
+        },
+    )
+    assert response.status_code == 201
+
+    sent = list(db.scalars(select(Notification).where(Notification.recipient_id == dietitian.id)))
+    assert [(n.template, n.subject_id, n.params) for n in sent] == [
+        (Template.FILE_SHARED, PATIENT_ID, {"reason": "convocation"})
+    ]
+    member = (
+        client_as(Role.COORDINATOR, coordinator.id)
+        .get(f"/api/v1/care-team/patients/{PATIENT_ID}/members")
+        .json()[0]
+    )
+    assert member["reason"] == "convocation"
+    assert member["note"] == "Bilan nutrition en janvier"
+    assert member["added_by_name"] == "Claire Coordination"
+    assert member["added_at"] is not None
+
+
+def test_a_coordinator_taking_a_patient_on_is_not_notified_and_defaults_to_care_team(db, client_as):
+
+    coordinator = add_account(db, Role.COORDINATOR)
+
+    client_as(Role.COORDINATOR, coordinator.id).post(
+        "/api/v1/care-team/assignments",
+        json={"patient_id": str(PATIENT_ID), "professional_id": str(coordinator.id)},
+    )
+
+    assert db.scalars(select(Notification)).all() == []
+    assert db.scalar(select(CareAssignment.reason)) == "care_team"
+
+
+def test_older_assignments_without_a_reason_still_list(db, client_as):
+    professional = add_account(db, Role.PROFESSIONAL)
+    assign(db, professional.id)
+
+    member = (
+        client_as(Role.COORDINATOR)
+        .get(f"/api/v1/care-team/patients/{PATIENT_ID}/members")
+        .json()[0]
+    )
+
+    assert member["reason"] is None and member["added_by_name"] is None

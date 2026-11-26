@@ -82,7 +82,9 @@ export function PatientFilePage() {
                 <div>
                   <Button
                     pending={takeOn.isPending}
-                    onClick={() => takeOn.mutate({ patient_id: record.id, professional_id: me.id })}
+                    onClick={() =>
+                      takeOn.mutate({ patient_id: record.id, professional_id: me.id, reason: "care_team" })
+                    }
                   >
                     {t("patientFile.takeOn")}
                   </Button>

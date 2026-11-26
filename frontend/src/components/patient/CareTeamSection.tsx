@@ -7,6 +7,11 @@ import { QueryState } from "../feedback/QueryState";
 import { Button } from "../forms/Button";
 import { ConfirmButton } from "../forms/ConfirmButton";
 import { SelectField } from "../forms/SelectField";
+import { TextField } from "../forms/TextField";
+import { formatDate } from "../../lib/format";
+
+const REASONS = ["care_team", "convocation", "booking", "medical_opinion", "administrative", "file_merge"] as const;
+type Reason = (typeof REASONS)[number];
 
 export function CareTeamSection({ patientId }: { patientId: string }) {
   const { t } = useTranslation();
@@ -28,6 +33,26 @@ export function CareTeamSection({ patientId }: { patientId: string }) {
                   {m.full_name}
                   <br />
                   <span className="rf-muted">{m.discipline ?? t(`labels.role.${m.role}`)}</span>
+                  {m.reason && m.reason !== "care_team" && (
+                    <>
+                      <br />
+                      <span className="rf-chip">{t(`careTeam.reasons.${m.reason}`)}</span>
+                    </>
+                  )}
+                  {m.added_by_name && m.added_at && (
+                    <>
+                      <br />
+                      <span className="rf-muted">
+                        {t("careTeam.sharedBy", { name: m.added_by_name, date: formatDate(m.added_at) })}
+                      </span>
+                    </>
+                  )}
+                  {m.note && (
+                    <>
+                      <br />
+                      <span className="rf-muted">« {m.note} »</span>
+                    </>
+                  )}
                 </span>
                 {canManage && (
                   <ConfirmButton
@@ -56,13 +81,24 @@ function AddMemberForm({ patientId, memberIds }: { patientId: string; memberIds:
   const staff = useCareStaff();
   const add = useAddToCareTeam();
   const [chosen, setChosen] = useState("");
+  const [reason, setReason] = useState<Reason>("care_team");
+  const [note, setNote] = useState("");
   const available = (staff.data ?? [])
     .filter((s) => !memberIds.has(s.id))
     .sort((a, b) => (a.discipline ?? "").localeCompare(b.discipline ?? "") || a.full_name.localeCompare(b.full_name));
 
   function submit(event: FormEvent) {
     event.preventDefault();
-    add.mutate({ patient_id: patientId, professional_id: chosen }, { onSuccess: () => setChosen("") });
+    add.mutate(
+      { patient_id: patientId, professional_id: chosen, reason, note: note || null },
+      {
+        onSuccess: () => {
+          setChosen("");
+          setReason("care_team");
+          setNote("");
+        },
+      },
+    );
   }
 
   return (
@@ -75,6 +111,20 @@ function AddMemberForm({ patientId, memberIds }: { patientId: string; memberIds:
           </option>
         ))}
       </SelectField>
+      <SelectField label={t("careTeam.reason")} value={reason} onChange={(e) => setReason(e.target.value as Reason)}>
+        {REASONS.map((r) => (
+          <option key={r} value={r}>
+            {t(`careTeam.reasons.${r}`)}
+          </option>
+        ))}
+      </SelectField>
+      <TextField
+        label={t("careTeam.note")}
+        hint={t("careTeam.noteHint")}
+        value={note}
+        maxLength={500}
+        onChange={(e) => setNote(e.target.value)}
+      />
       {add.isError && (
         <p className="rf-field__error" role="alert">
           {t("careTeam.addFailed")}

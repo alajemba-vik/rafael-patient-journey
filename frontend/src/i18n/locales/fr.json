@@ -157,7 +157,19 @@
     "addLabel": "Ajouter à l’équipe",
     "choosePerson": "Choisir une personne",
     "addFailed": "L’ajout n’a pas abouti. Réessayez.",
-    "add": "Ajouter"
+    "add": "Ajouter",
+    "reason": "Motif du partage",
+    "note": "Note (facultatif)",
+    "noteHint": "Visible par l’équipe de soins. Pas d’information médicale sensible.",
+    "sharedBy": "Ajouté par {{name}} le {{date}}",
+    "reasons": {
+      "care_team": "Ajout à l’équipe soignante",
+      "convocation": "Pour convocation",
+      "booking": "Pour prise de rendez-vous",
+      "medical_opinion": "Pour avis médical",
+      "administrative": "Pour gestion administrative",
+      "file_merge": "Pour fusion de dossiers"
+    }
   },
   "milestones": {
     "caption": "Auto-évaluation, de 0 à 4",
@@ -516,7 +528,8 @@
       "missed_appointment": "Un patient n’est pas venu à son rendez-vous du {{date}} à {{time}}. Confirmez qu’il poursuit son parcours.",
       "message_received": "Nouveau message.",
       "session_to_rate": "Comment s’est passée votre séance du {{date}} avec {{name}} ? Donnez votre avis.",
-      "task_assigned": "Une tâche vous a été confiée."
+      "task_assigned": "Une tâche vous a été confiée.",
+      "file_shared": "Un dossier patient a été partagé avec vous ({{reason}})."
     }
   },
   "messages": {

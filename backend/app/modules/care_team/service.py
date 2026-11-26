@@ -8,6 +8,7 @@ Access policy:
 """
 
 import uuid
+from datetime import UTC, datetime
 from typing import NoReturn
 
 from sqlalchemy import select
@@ -19,6 +20,8 @@ from app.modules.care_team.models import CareAssignment
 from app.modules.care_team.schemas import AssignmentCreate, AssignmentOut, CareTeamMember
 from app.modules.identity_access import service as identity
 from app.modules.identity_access.service import CurrentUser, Role
+from app.modules.notifications import service as notifications
+from app.modules.notifications.models import Template
 
 # Coordinators (and admins) record who is in a patient's care team, for any patient.
 MANAGER_ROLES = {Role.COORDINATOR, Role.ADMIN}
@@ -70,10 +73,19 @@ def create_assignment(db: Session, user: CurrentUser, data: AssignmentCreate) ->
     if is_in_care_team(db, data.professional_id, data.patient_id):
         raise ConflictError("Already in this patient's care team")
 
-    assignment = CareAssignment(patient_id=data.patient_id, professional_id=data.professional_id)
+    assignment = CareAssignment(**data.model_dump(), added_by=user.id, added_at=datetime.now(UTC))
     db.add(assignment)
     db.flush()
     audit.record(db, user.id, "care_team.assign", data.patient_id)
+    if data.professional_id != user.id:
+        # The reason goes along (no medical content); the patient is the subject, for the link.
+        notifications.notify(
+            db,
+            [data.professional_id],
+            Template.FILE_SHARED,
+            subject_id=data.patient_id,
+            params={"reason": data.reason.value},
+        )
     db.commit()
     return AssignmentOut.model_validate(assignment)
 
@@ -99,19 +111,30 @@ def list_members(db: Session, user: CurrentUser, patient_id: uuid.UUID) -> list[
         _deny(db, user, "care_team.read.denied", patient_id)
 
     assignments = db.scalars(select(CareAssignment).where(CareAssignment.patient_id == patient_id))
-    assignment_by_member = {a.professional_id: a.id for a in assignments}
+    assignment_by_member = {a.professional_id: a for a in assignments}
     # Skip the names query when the team is empty: one database round trip less.
-    accounts = identity.get_users(db, list(assignment_by_member)) if assignment_by_member else []
+    people = set(assignment_by_member) | {
+        a.added_by for a in assignment_by_member.values() if a.added_by
+    }
+    accounts = {u.id: u for u in identity.get_users(db, list(people))} if people else {}
     members = [
         CareTeamMember(
-            assignment_id=assignment_by_member[account.id],
-            user_id=account.id,
-            full_name=account.full_name,
-            role=account.role,
-            discipline=account.discipline,
+            assignment_id=assignment.id,
+            user_id=member_id,
+            full_name=accounts[member_id].full_name,
+            role=accounts[member_id].role,
+            discipline=accounts[member_id].discipline,
+            reason=assignment.reason,
+            note=assignment.note,
+            added_by_name=accounts[assignment.added_by].full_name
+            if assignment.added_by in accounts
+            else None,
+            added_at=assignment.added_at,
         )
-        for account in accounts
+        for member_id, assignment in assignment_by_member.items()
+        if member_id in accounts
     ]
+    members.sort(key=lambda m: m.full_name)
     audit.record(db, user.id, "care_team.read", patient_id)
     db.commit()
     return members

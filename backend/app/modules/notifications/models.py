@@ -21,6 +21,7 @@ class Template(StrEnum):
     MESSAGE_RECEIVED = "message_received"
     SESSION_TO_RATE = "session_to_rate"
     TASK_ASSIGNED = "task_assigned"
+    FILE_SHARED = "file_shared"
 
 
 class Channel(StrEnum):
