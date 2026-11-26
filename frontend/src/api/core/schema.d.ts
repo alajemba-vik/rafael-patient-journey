@@ -253,6 +253,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/auth/audit-events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Audit Events
+         * @description The audit trail, newest first. `before`: the oldest time already shown, for more.
+         */
+        get: operations["list_audit_events_api_v1_auth_audit_events_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/notifications": {
         parameters: {
             query?: never;
@@ -1030,6 +1050,34 @@ export interface components {
             no_show: number | null;
             /** No Show Rate */
             no_show_rate: number | null;
+        };
+        /**
+         * AuditEventOut
+         * @description Who did what, when, to which patient's data. Denied attempts end in ".denied".
+         */
+        AuditEventOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Occurred At
+             * Format: date-time
+             */
+            occurred_at: string;
+            /**
+             * Actor Id
+             * Format: uuid
+             */
+            actor_id: string;
+            /** Actor Name */
+            actor_name: string;
+            actor_role: components["schemas"]["Role"] | null;
+            /** Action */
+            action: string;
+            /** Patient Id */
+            patient_id: string | null;
         };
         /**
          * Availability
@@ -2452,6 +2500,38 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["UserOut"][];
+                };
+            };
+        };
+    };
+    list_audit_events_api_v1_auth_audit_events_get: {
+        parameters: {
+            query?: {
+                patient_id?: string | null;
+                before?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuditEventOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

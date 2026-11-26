@@ -7,7 +7,7 @@ Rows are only ever inserted, never updated or deleted.
 import uuid
 from datetime import UTC, datetime
 
-from sqlalchemy import DateTime, String, Uuid
+from sqlalchemy import DateTime, String, Uuid, select
 from sqlalchemy.orm import Mapped, Session, mapped_column
 
 from app.db import Base
@@ -33,3 +33,15 @@ def record(db: Session, actor_id: uuid.UUID, action: str, patient_id: uuid.UUID 
 def record_many(db: Session, actor_id: uuid.UUID, action: str, patient_ids: set[uuid.UUID]) -> None:
     """One event per patient shown in a list, so "who saw this patient" stays answerable."""
     db.add_all(AuditEvent(actor_id=actor_id, action=action, patient_id=p) for p in patient_ids)
+
+
+def list_events(
+    db: Session, limit: int, patient_id: uuid.UUID | None = None, before: datetime | None = None
+) -> list[AuditEvent]:
+    """The newest events, optionally for one patient. Callers check that only admins read it."""
+    query = select(AuditEvent)
+    if patient_id is not None:
+        query = query.where(AuditEvent.patient_id == patient_id)
+    if before is not None:
+        query = query.where(AuditEvent.occurred_at < before)
+    return list(db.scalars(query.order_by(AuditEvent.occurred_at.desc()).limit(limit)))

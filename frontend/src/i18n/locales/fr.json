@@ -70,7 +70,8 @@
     "adminAccounts": "Comptes",
     "adminFaq": "Gérer la FAQ",
     "patientMessages": "Messages",
-    "receptionCallBacks": "À rappeler"
+    "receptionCallBacks": "À rappeler",
+    "adminAudit": "Journal d’accès"
   },
   "feedback": {
     "loading": "Chargement en cours",
@@ -587,5 +588,23 @@
     "noPhone": "Pas de téléphone enregistré",
     "call": "Appeler {{name}}",
     "open": "Fiche de {{name}}"
+  },
+  "audit": {
+    "title": "Journal d’accès",
+    "intro": "Chaque lecture ou modification des données d’un patient, y compris les tentatives refusées. Les événements sont conservés au moins un an et ne peuvent pas être modifiés.",
+    "patientFilter": "Filtrer par identifiant de patient",
+    "patientFilterHint": "Laissez vide pour tout voir.",
+    "filter": "Filtrer",
+    "clear": "Tout afficher",
+    "invalidId": "Cet identifiant n’est pas valide.",
+    "empty": "Aucun événement.",
+    "when": "Date",
+    "who": "Qui",
+    "action": "Action",
+    "patient": "Patient",
+    "denied": "Refusé",
+    "more": "Événements plus anciens",
+    "newest": "Revenir aux plus récents",
+    "unknown": "Compte inconnu"
   }
 }

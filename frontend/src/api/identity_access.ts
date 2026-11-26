@@ -90,3 +90,18 @@ export function useCreateAccount() {
     },
   });
 }
+
+export type AuditEvent = Schemas["AuditEventOut"];
+
+/** The audit trail for admins, newest first; `before` asks for older events. */
+export function useAuditEvents(patientId: string | null, before: string | null) {
+  return useQuery({
+    queryKey: ["audit-events", patientId, before],
+    queryFn: () =>
+      unwrap(
+        api.GET("/api/v1/auth/audit-events", {
+          params: { query: { patient_id: patientId ?? undefined, before: before ?? undefined } },
+        }),
+      ),
+  });
+}

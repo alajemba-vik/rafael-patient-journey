@@ -2,6 +2,7 @@
 
 import uuid
 from dataclasses import dataclass
+from datetime import UTC, datetime
 
 from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
@@ -12,7 +13,7 @@ from app import audit, auth
 from app.db import get_db
 from app.errors import ConflictError, ForbiddenError, UnauthorizedError
 from app.modules.identity_access.models import Role, User
-from app.modules.identity_access.schemas import UserCreate, UserOut
+from app.modules.identity_access.schemas import AuditEventOut, UserCreate, UserOut
 
 __all__ = [
     "CurrentUser",
@@ -75,6 +76,45 @@ def list_users(db: Session, user: CurrentUser) -> list[UserOut]:
         raise ForbiddenError("Only admins can list accounts")
     users = db.scalars(select(User).order_by(User.full_name))
     return [UserOut.model_validate(u) for u in users]
+
+
+AUDIT_PAGE_SIZE = 200
+
+
+def list_audit_events(
+    db: Session,
+    user: CurrentUser,
+    patient_id: uuid.UUID | None = None,
+    before: datetime | None = None,
+) -> list[AuditEventOut]:
+    """The audit trail for admins: newest first, a page at a time, optionally one patient's.
+
+    Reading the trail is itself recorded, so who looked at it stays answerable.
+    """
+    if user.role != Role.ADMIN:
+        audit.record(db, user.id, "audit.read.denied", patient_id)
+        db.commit()
+        raise ForbiddenError("Only admins can read the audit trail")
+    events = audit.list_events(db, AUDIT_PAGE_SIZE, patient_id, before)
+    actors = {
+        u.id: u for u in db.scalars(select(User).where(User.id.in_({e.actor_id for e in events})))
+    }
+    audit.record(db, user.id, "audit.read", patient_id)
+    db.commit()
+    return [
+        AuditEventOut(
+            id=e.id,
+            occurred_at=e.occurred_at
+            if e.occurred_at.tzinfo
+            else e.occurred_at.replace(tzinfo=UTC),
+            actor_id=e.actor_id,
+            actor_name=actors[e.actor_id].full_name if e.actor_id in actors else "",
+            actor_role=actors[e.actor_id].role if e.actor_id in actors else None,
+            action=e.action,
+            patient_id=e.patient_id,
+        )
+        for e in events
+    ]
 
 
 def list_care_staff(db: Session, user: CurrentUser) -> list[UserOut]:

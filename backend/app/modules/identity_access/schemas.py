@@ -1,4 +1,5 @@
 import uuid
+from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
@@ -33,3 +34,15 @@ class UserOut(BaseModel):
     full_name: str
     role: Role
     discipline: str | None = None
+
+
+class AuditEventOut(BaseModel):
+    """Who did what, when, to which patient's data. Denied attempts end in ".denied"."""
+
+    id: uuid.UUID
+    occurred_at: datetime
+    actor_id: uuid.UUID
+    actor_name: str
+    actor_role: Role | None
+    action: str
+    patient_id: uuid.UUID | None

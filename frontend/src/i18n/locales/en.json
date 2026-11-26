@@ -70,7 +70,8 @@
     "adminAccounts": "Accounts",
     "adminFaq": "Manage the FAQ",
     "patientMessages": "Messages",
-    "receptionCallBacks": "To call back"
+    "receptionCallBacks": "To call back",
+    "adminAudit": "Access log"
   },
   "feedback": {
     "loading": "Loading",
@@ -587,5 +588,23 @@
     "noPhone": "No phone on file",
     "call": "Call {{name}}",
     "open": "{{name}}'s file"
+  },
+  "audit": {
+    "title": "Access log",
+    "intro": "Every read or change of a patient's data, denied attempts included. Events are kept for at least a year and can't be changed.",
+    "patientFilter": "Filter by patient id",
+    "patientFilterHint": "Leave empty to see everything.",
+    "filter": "Filter",
+    "clear": "Show everything",
+    "invalidId": "This id isn't valid.",
+    "empty": "No events.",
+    "when": "Date",
+    "who": "Who",
+    "action": "Action",
+    "patient": "Patient",
+    "denied": "Denied",
+    "more": "Older events",
+    "newest": "Back to the newest",
+    "unknown": "Unknown account"
   }
 }

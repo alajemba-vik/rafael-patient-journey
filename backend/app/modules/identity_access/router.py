@@ -1,9 +1,18 @@
+import uuid
+from datetime import datetime
+
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
 from app.db import get_db
 from app.modules.identity_access import service
-from app.modules.identity_access.schemas import LoginRequest, LoginResponse, UserCreate, UserOut
+from app.modules.identity_access.schemas import (
+    AuditEventOut,
+    LoginRequest,
+    LoginResponse,
+    UserCreate,
+    UserOut,
+)
 from app.modules.identity_access.service import CurrentUser, get_current_user
 
 router = APIRouter(prefix="/auth", tags=["identity_access"])
@@ -40,3 +49,14 @@ def list_users(
     user: CurrentUser = Depends(get_current_user), db: Session = Depends(get_db)
 ) -> list[UserOut]:
     return service.list_users(db, user)
+
+
+@router.get("/audit-events")
+def list_audit_events(
+    patient_id: uuid.UUID | None = None,
+    before: datetime | None = None,
+    user: CurrentUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> list[AuditEventOut]:
+    """The audit trail, newest first. `before`: the oldest time already shown, for more."""
+    return service.list_audit_events(db, user, patient_id, before)

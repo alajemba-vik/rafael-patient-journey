@@ -73,7 +73,7 @@ URLs are per role), and most pages draw on several modules, so this table is the
 
 | Backend module (`backend/app/modules/`) | Data hooks (`src/api/`) | Used by                                                                                                                                               |
 | --------------------------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `identity_access`                       | `identity_access.ts`    | `pages/public/login`, `pages/admin/users`, app shell and menus, `usePermissions` everywhere                                                           |
+| `identity_access`                       | `identity_access.ts`    | `pages/public/login`, `pages/admin/users`, `audit`, app shell and menus, `usePermissions` everywhere                                                  |
 | `patients`                              | `patients.ts`           | `pages/reception/patients`, `pages/professional/patients`, `pages/admin/users`                                                                        |
 | `care_team`                             | `care_team.ts`          | `components/patient` (care team section), `pages/professional/patients`                                                                               |
 | `pathways`                              | `pathways.ts`           | `pages/professional/patients`, `pathways`, `needs` · `pages/patient/home`, `pathway`, `messages` · `components/messaging`                             |

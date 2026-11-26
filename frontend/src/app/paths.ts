@@ -29,6 +29,7 @@ export const paths = {
   admin: {
     accounts: "/admin",
     faq: "/admin/faq",
+    audit: "/admin/journal",
     dashboard: "/admin/tableau-de-bord",
   },
 } as const;

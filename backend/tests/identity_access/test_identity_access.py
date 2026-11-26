@@ -100,3 +100,31 @@ def test_care_staff_list_is_refused_to_others(db, client_as, role):
     response = client_as(role).get("/api/v1/auth/care-staff")
 
     assert response.status_code == 403
+
+
+def test_admin_reads_the_audit_trail_newest_first_and_it_is_audited(db, client_as):
+    actor = add_user(db, Role.PROFESSIONAL, "pro@example.com")
+    patient_id = uuid.uuid4()
+    db.add(AuditEvent(actor_id=actor.id, action="patient.read", patient_id=patient_id))
+    db.add(AuditEvent(actor_id=actor.id, action="message.read.denied", patient_id=uuid.uuid4()))
+    db.commit()
+
+    everything = client_as(Role.ADMIN).get("/api/v1/auth/audit-events").json()
+    one_patient = client_as(Role.ADMIN).get(
+        "/api/v1/auth/audit-events", params={"patient_id": str(patient_id)}
+    )
+
+    assert {e["action"] for e in everything} == {"patient.read", "message.read.denied"}
+    assert everything[0]["actor_role"] == "professional"
+    assert [e["action"] for e in one_patient.json()] == ["patient.read"]
+    assert db.scalars(select(AuditEvent.action).where(AuditEvent.action == "audit.read")).all()
+
+
+@pytest.mark.parametrize(
+    "role", [Role.PATIENT, Role.PROFESSIONAL, Role.COORDINATOR, Role.SECRETARY]
+)
+def test_only_admins_read_the_audit_trail_and_attempts_are_audited(db, client_as, role):
+    response = client_as(role).get("/api/v1/auth/audit-events")
+
+    assert response.status_code == 403
+    assert db.scalar(select(AuditEvent.action)) == "audit.read.denied"
