@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -53,5 +54,25 @@ describe("CallBacksPage", () => {
     renderPage();
 
     expect(await screen.findByText("Personne à rappeler.")).toBeInTheDocument();
+  });
+
+  it("exports the list as a spreadsheet file", async () => {
+    vi.spyOn(globalThis, "fetch").mockImplementation(async () => Response.json(CALL_BACKS));
+    let saved: Blob | undefined;
+    URL.createObjectURL = vi.fn((blob: Blob) => {
+      saved = blob;
+      return "blob:x";
+    });
+    URL.revokeObjectURL = vi.fn();
+    const click = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => {});
+    renderPage();
+
+    await userEvent.click(await screen.findByRole("button", { name: "Exporter (Excel)" }));
+
+    expect(click).toHaveBeenCalled();
+    const text = await saved!.text();
+    expect(text).toContain("Patient;Téléphone;Absences;Dernière absence;Prochain rendez-vous");
+    expect(text).toContain("Alex Synthetic;06 12 34 56 78;2;");
+    expect(text).toContain("Rien de prévu");
   });
 });

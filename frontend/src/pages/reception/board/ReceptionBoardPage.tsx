@@ -5,8 +5,10 @@ import { useSearchParams } from "react-router";
 import { useDayBoard } from "../../../api/reception";
 import type { Appointment } from "../../../api/scheduling";
 import { QueryState } from "../../../components/feedback/QueryState";
-import { formatWeekday } from "../../../lib/format";
+import { formatTime, formatWeekday } from "../../../lib/format";
+import { Button } from "../../../components/forms/Button";
 import { PageHeader } from "../../../components/layout/PageHeader";
+import { downloadCsv } from "../../../lib/csv";
 import { instituteDateTime, instituteToday } from "../../../lib/time";
 import { useNow } from "../../../lib/hooks/useNow";
 import { AppointmentCard } from "./AppointmentCard";
@@ -45,6 +47,26 @@ export function ReceptionBoardPage() {
     <>
       <PageHeader title={isToday ? t("board.titleToday") : t("board.title")}>
         <DayNavigator day={day} today={today} onChange={goTo} />
+        {board.data && board.data.length > 0 && (
+          <Button
+            variant="secondary"
+            onClick={() =>
+              downloadCsv(
+                `rendez-vous-${day}.csv`,
+                [t("export.start"), t("export.end"), t("export.patient"), t("export.practitioner"), t("export.status")],
+                board.data.map((a) => [
+                  formatTime(a.starts_at),
+                  formatTime(a.ends_at),
+                  a.patient_name,
+                  a.professional_name,
+                  t(`labels.status.${a.status}`),
+                ]),
+              )
+            }
+          >
+            {t("export.csv")}
+          </Button>
+        )}
       </PageHeader>
       <p className="rf-muted rf-section">
         <span className="rf-capitalize">{dayLabel}</span>

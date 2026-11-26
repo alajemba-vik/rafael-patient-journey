@@ -4,7 +4,9 @@ import { useDashboard } from "../../../api/analytics";
 import { QueryState } from "../../../components/feedback/QueryState";
 import { formatChange, formatMonthShort, formatNumber } from "../../../lib/format";
 import { DIMENSIONS } from "../../../lib/labels";
+import { Button } from "../../../components/forms/Button";
 import { PageHeader } from "../../../components/layout/PageHeader";
+import { downloadCsv, type Cell } from "../../../lib/csv";
 
 // Composant de statistique (KPI)
 function StatCard({
@@ -104,7 +106,33 @@ export function DashboardPage() {
 
   return (
     <div style={{ maxWidth: "1080px", margin: "0 auto" }}>
-      <PageHeader title={t("dashboard.title")} />
+      <PageHeader title={t("dashboard.title")}>
+        {dashboard.data && (
+          <Button
+            variant="secondary"
+            onClick={() => {
+              const data = dashboard.data;
+              const rows: Cell[][] = [
+                [t("dashboard.activePathways"), data.active_pathways],
+                [t("dashboard.noShowRate"), data.attendance.no_show_rate ?? hidden],
+                [t("dashboard.satisfaction"), data.satisfaction.average ?? hidden],
+                [t("dashboard.sessionSatisfaction"), data.session_satisfaction.average ?? hidden],
+                ...data.quality_of_life.map((m): Cell[] => [
+                  `${t("dashboard.qualityOfLife")} · ${m.period}`,
+                  m.average ?? hidden,
+                ]),
+              ];
+              downloadCsv(
+                `tableau-de-bord-${data.generated_at.slice(0, 10)}.csv`,
+                [t("export.indicator"), t("export.value")],
+                rows,
+              );
+            }}
+          >
+            {t("export.csv")}
+          </Button>
+        )}
+      </PageHeader>
 
       <QueryState query={dashboard}>
         {(data) => (

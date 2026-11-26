@@ -969,5 +969,20 @@
     "needs_zero": "No flagged need waiting",
     "needs_one": "{{count}} flagged need waiting",
     "needs_other": "{{count}} flagged needs waiting"
+  },
+  "export": {
+    "csv": "Export (Excel)",
+    "patient": "Patient",
+    "phone": "Phone",
+    "missed": "Missed",
+    "lastMissed": "Last missed",
+    "next": "Next appointment",
+    "nothingBooked": "Nothing booked",
+    "start": "Start",
+    "end": "End",
+    "practitioner": "Practitioner",
+    "status": "Status",
+    "indicator": "Indicator",
+    "value": "Value"
   }
 }

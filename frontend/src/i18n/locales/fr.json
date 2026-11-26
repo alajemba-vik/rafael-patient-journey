@@ -969,5 +969,20 @@
     "needs_zero": "Aucun besoin signalé en attente",
     "needs_one": "{{count}} besoin signalé en attente",
     "needs_other": "{{count}} besoins signalés en attente"
+  },
+  "export": {
+    "csv": "Exporter (Excel)",
+    "patient": "Patient",
+    "phone": "Téléphone",
+    "missed": "Absences",
+    "lastMissed": "Dernière absence",
+    "next": "Prochain rendez-vous",
+    "nothingBooked": "Rien de prévu",
+    "start": "Début",
+    "end": "Fin",
+    "practitioner": "Praticien",
+    "status": "Statut",
+    "indicator": "Indicateur",
+    "value": "Valeur"
   }
 }

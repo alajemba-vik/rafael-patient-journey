@@ -4,7 +4,9 @@ import { Link } from "react-router";
 import { useCallBacks } from "../../../api/reception";
 import { paths } from "../../../app/paths";
 import { QueryState } from "../../../components/feedback/QueryState";
+import { Button } from "../../../components/forms/Button";
 import { PageHeader } from "../../../components/layout/PageHeader";
+import { downloadCsv } from "../../../lib/csv";
 import { formatDate, formatPhone, formatTime } from "../../../lib/format";
 
 export function CallBacksPage() {
@@ -13,7 +15,30 @@ export function CallBacksPage() {
 
   return (
     <div className="rf-narrow">
-      <PageHeader title={t("callBacks.title")} />
+      <PageHeader title={t("callBacks.title")}>
+        {callBacks.data && callBacks.data.length > 0 && (
+          <Button
+            variant="secondary"
+            onClick={() =>
+              downloadCsv(
+                "a-rappeler.csv",
+                [t("export.patient"), t("export.phone"), t("export.missed"), t("export.lastMissed"), t("export.next")],
+                callBacks.data.map((c) => [
+                  c.patient_name,
+                  c.phone ? formatPhone(c.phone) : null,
+                  c.missed,
+                  `${formatDate(c.last_missed_at)} ${formatTime(c.last_missed_at)}`,
+                  c.next_appointment_at
+                    ? `${formatDate(c.next_appointment_at)} ${formatTime(c.next_appointment_at)}`
+                    : t("export.nothingBooked"),
+                ]),
+              )
+            }
+          >
+            {t("export.csv")}
+          </Button>
+        )}
+      </PageHeader>
       <p className="rf-muted rf-section">{t("callBacks.intro")}</p>
       <QueryState
         query={callBacks}
