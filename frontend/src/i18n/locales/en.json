@@ -884,5 +884,23 @@
       "ongoing": "Ongoing",
       "finished": "Finished"
     }
+  },
+  "report": {
+    "open": "Report (PDF)",
+    "back": "← Back to the file",
+    "print": "Print or save as PDF",
+    "brand": "AI Clinic × Institut Rafaël",
+    "title": "Pathway report",
+    "patient": "Patient",
+    "coordinator": "Coordinator",
+    "pathway": "Pathway",
+    "openedOn": "opened on {{date}}",
+    "closedOn": "closed on {{date}}",
+    "printedOn": "Printed on",
+    "careTeam": "Care team",
+    "milestones": "Pathway reviews",
+    "noMilestone": "No review recorded.",
+    "notAllowed": "Only the patient’s care team can produce this report.",
+    "confidential": "Confidential: health data. Do not share outside the care team."
   }
 }

@@ -51,13 +51,14 @@ export type ClinicalProfile = Schemas["ClinicalProfileOut"];
 export type ClinicalProfileInput = Schemas["ClinicalProfileIn"];
 
 /** Disease, treatments, social life and habits. The patient and their care team only. */
-export function useClinicalProfile(patientId: string) {
+export function useClinicalProfile(patientId: string, enabled = true) {
   return useQuery({
     queryKey: [...PATIENTS, patientId, "clinical"],
     queryFn: () =>
       unwrap(
         api.GET("/api/v1/patients/{patient_id}/clinical-profile", { params: { path: { patient_id: patientId } } }),
       ),
+    enabled,
   });
 }
 

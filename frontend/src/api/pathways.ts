@@ -131,13 +131,14 @@ export type Assessment = Schemas["AssessmentOut"];
 const ASSESSMENTS = ["assessments"] as const;
 
 /** The scored tests of the patient's current or latest pathway, for their care team. */
-export function usePatientAssessments(patientId: string) {
+export function usePatientAssessments(patientId: string, enabled = true) {
   return useQuery({
     queryKey: [...ASSESSMENTS, patientId],
     queryFn: () =>
       unwrap(
         api.GET("/api/v1/pathways/patients/{patient_id}/assessments", { params: { path: { patient_id: patientId } } }),
       ),
+    enabled,
   });
 }
 

@@ -92,6 +92,40 @@ function ScoreCell({ score }: { score: Assessment | undefined }) {
   );
 }
 
+/** One row per test, one column per milestone: how each score moved. */
+export function AssessmentTable({ scores }: { scores: Assessment[] }) {
+  const { t } = useTranslation();
+  const tests = ASSESSMENT_TESTS.filter((r) => scores.some((s) => s.test === r.test));
+  return (
+    <div className="rf-table-wrap">
+      <table className="rf-table">
+        <thead>
+          <tr>
+            <th scope="col">{t("assessments.test")}</th>
+            {KINDS.map((k) => (
+              <th key={k} scope="col">
+                {t(`labels.milestone.${k}`)}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {tests.map((r) => (
+            <tr key={r.test}>
+              <th scope="row">{t(`assessments.tests.${r.test}`)}</th>
+              {KINDS.map((k) => (
+                <td key={k}>
+                  <ScoreCell score={scores.find((s) => s.test === r.test && s.kind === k)} />
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 /** The assessment day's scored tests, one row per test and one column per milestone. */
 export function AssessmentSection({ patientId }: { patientId: string }) {
   const { t } = useTranslation();
@@ -106,37 +140,7 @@ export function AssessmentSection({ patientId }: { patientId: string }) {
       </h2>
       <p className="rf-muted">{t("assessments.intro")}</p>
       <QueryState query={scores} empty={{ isEmpty: (list) => list.length === 0, title: t("assessments.empty") }}>
-        {(list) => {
-          const tests = ASSESSMENT_TESTS.filter((r) => list.some((s) => s.test === r.test));
-          return (
-            <div className="rf-table-wrap">
-              <table className="rf-table">
-                <thead>
-                  <tr>
-                    <th scope="col">{t("assessments.test")}</th>
-                    {KINDS.map((k) => (
-                      <th key={k} scope="col">
-                        {t(`labels.milestone.${k}`)}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {tests.map((r) => (
-                    <tr key={r.test}>
-                      <th scope="row">{t(`assessments.tests.${r.test}`)}</th>
-                      {KINDS.map((k) => (
-                        <td key={k}>
-                          <ScoreCell score={list.find((s) => s.test === r.test && s.kind === k)} />
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          );
-        }}
+        {(list) => <AssessmentTable scores={list} />}
       </QueryState>
       {open ? (
         <RecordForm pathwayId={open.id} />

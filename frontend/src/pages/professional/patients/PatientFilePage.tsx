@@ -1,5 +1,7 @@
 import { useTranslation } from "react-i18next";
-import { useParams } from "react-router";
+import { Link, useParams } from "react-router";
+
+import { paths } from "../../../app/paths";
 
 import { useAddToCareTeam } from "../../../api/care_team";
 import { useMe } from "../../../api/identity_access";
@@ -34,6 +36,13 @@ export function PatientFilePage() {
             title={`${record.first_name} ${record.last_name}`}
             documentTitle={t("patientFile.documentTitle")}
           />
+          {isDetail(record) && (
+            <p>
+              <Link className="rf-btn rf-btn--secondary" to={paths.pro.report(record.id)}>
+                {t("report.open")}
+              </Link>
+            </p>
+          )}
           <div className="rf-grid rf-section">
             <section className="rf-panel" aria-labelledby="info-title">
               <h2 id="info-title" className="rf-title">

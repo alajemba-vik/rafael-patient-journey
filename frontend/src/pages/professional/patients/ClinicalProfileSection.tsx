@@ -33,7 +33,8 @@ function YesNo({ value }: { value: boolean | null | undefined }) {
   return <>—</>;
 }
 
-function Summary({ profile }: { profile: ClinicalProfile }) {
+/** The profile in words, for the patient file and the printed report. */
+export function ClinicalSummary({ profile }: { profile: ClinicalProfile }) {
   const { t } = useTranslation();
   const bmi = bodyMassIndex(profile.height_cm, profile.weight_kg);
   const site = profile.cancer_site ? t(`clinical.sites.${profile.cancer_site as CancerSite}`) : "—";
@@ -465,7 +466,7 @@ export function ClinicalProfileSection({ patientId }: { patientId: string }) {
             <ProfileForm patientId={patientId} profile={data} onDone={() => setEditing(false)} />
           ) : data.updated_at ? (
             <>
-              <Summary profile={data} />
+              <ClinicalSummary profile={data} />
               <p className="rf-muted">{t("clinical.updatedAt", { date: formatDate(data.updated_at) })}</p>
             </>
           ) : (

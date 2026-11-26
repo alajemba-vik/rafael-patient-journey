@@ -45,6 +45,7 @@ export const router = createBrowserRouter([
           page(paths.pro.schedule, () => import("../pages/professional/schedule/SchedulePage")),
           page(paths.pro.patients, () => import("../pages/professional/patients/PatientsPage")),
           page(paths.pro.patient(PATIENT_ID_PARAM), () => import("../pages/professional/patients/PatientFilePage")),
+          page(paths.pro.report(PATIENT_ID_PARAM), () => import("../pages/professional/patients/PatientReportPage")),
           page(paths.pro.dashboard, () => import("../pages/professional/dashboard/DashboardPage")),
           page(paths.pro.groups, () => import("../pages/professional/groups/GroupSessionsPage")),
         ],

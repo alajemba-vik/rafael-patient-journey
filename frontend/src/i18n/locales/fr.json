@@ -884,5 +884,23 @@
       "ongoing": "En cours",
       "finished": "Terminé"
     }
+  },
+  "report": {
+    "open": "Compte rendu (PDF)",
+    "back": "← Retour à la fiche",
+    "print": "Imprimer ou enregistrer en PDF",
+    "brand": "AI Clinic × Institut Rafaël",
+    "title": "Compte rendu de parcours",
+    "patient": "Patient(e)",
+    "coordinator": "Coordinateur·rice",
+    "pathway": "Parcours",
+    "openedOn": "ouvert le {{date}}",
+    "closedOn": "clôturé le {{date}}",
+    "printedOn": "Édité le",
+    "careTeam": "Équipe de soins",
+    "milestones": "Bilans du parcours",
+    "noMilestone": "Aucun bilan enregistré.",
+    "notAllowed": "Seule l’équipe de soins du patient peut éditer ce compte rendu.",
+    "confidential": "Document confidentiel : données de santé. Ne pas transmettre en dehors de l’équipe de soins."
   }
 }

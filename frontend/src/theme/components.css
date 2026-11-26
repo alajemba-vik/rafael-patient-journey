@@ -1406,3 +1406,56 @@ body {
   display: grid;
   gap: var(--space-2);
 }
+
+/* Pathway report: reads like a letter on screen, prints without the app around it. */
+.rf-report {
+  max-width: 820px;
+  margin: 0 auto;
+  display: grid;
+  gap: var(--space-5);
+}
+.rf-report__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+.rf-report__header {
+  border-bottom: 3px solid var(--accent);
+  padding-bottom: var(--space-4);
+}
+.rf-report__brand {
+  color: var(--ink-muted);
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin: 0;
+}
+.rf-report__section {
+  break-inside: avoid-page;
+}
+.rf-report__milestone {
+  border-top: 1px solid var(--hairline);
+  margin-top: var(--space-4);
+}
+.rf-report__footer {
+  border-top: 1px solid var(--hairline);
+  color: var(--ink-muted);
+  font-size: 13px;
+  padding-top: var(--space-3);
+}
+
+@media print {
+  .rf-no-print,
+  .rf-shell__header,
+  .rf-skip-link {
+    display: none !important;
+  }
+  .rf-report {
+    max-width: none;
+  }
+  .rf-report .rf-table-wrap {
+    overflow: visible;
+  }
+}
