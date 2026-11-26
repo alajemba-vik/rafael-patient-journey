@@ -1,15 +1,17 @@
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 
 import { PageHeader } from "../../../components/layout/PageHeader";
 import { paths } from "../../../app/paths";
 
 export function NotFoundPage() {
+  const { t } = useTranslation();
   return (
     <div className="rf-narrow">
-      <PageHeader title="Page introuvable" />
-      <p>Cette adresse ne correspond à aucune page.</p>
+      <PageHeader title={t("notFound.title")} />
+      <p>{t("notFound.text")}</p>
       <Link to={paths.home} className="rf-btn">
-        Retour à ma page de départ
+        {t("feedback.backHome")}
       </Link>
     </div>
   );

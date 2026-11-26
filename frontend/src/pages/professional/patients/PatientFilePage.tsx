@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
 import { useAddToCareTeam } from "../../../api/care_team";
@@ -14,6 +15,7 @@ import { PathwaySection } from "./PathwaySection";
 import { ScoresSection } from "./ScoresSection";
 
 export function PatientFilePage() {
+  const { t } = useTranslation();
   const { patientId = "" } = useParams();
   const patient = usePatient(patientId);
   const me = useMe().data;
@@ -24,22 +26,25 @@ export function PatientFilePage() {
     <QueryState query={patient}>
       {(record) => (
         <>
-          <PageHeader title={`${record.first_name} ${record.last_name}`} documentTitle="Dossier patient" />
+          <PageHeader
+            title={`${record.first_name} ${record.last_name}`}
+            documentTitle={t("patientFile.documentTitle")}
+          />
           <div className="rf-grid rf-section">
             <section className="rf-panel" aria-labelledby="info-title">
               <h2 id="info-title" className="rf-title">
-                Informations
+                {t("patientFile.info")}
               </h2>
               <dl className="rf-dl">
-                <dt>Date de naissance</dt>
+                <dt>{t("patientFile.birthDate")}</dt>
                 <dd>{formatDate(record.birth_date)}</dd>
-                <dt>E-mail</dt>
+                <dt>{t("patientFile.email")}</dt>
                 <dd>{record.email ?? "—"}</dd>
-                <dt>Téléphone</dt>
+                <dt>{t("patientFile.phone")}</dt>
                 <dd>{record.phone ?? "—"}</dd>
                 {isDetail(record) && record.medical_summary && (
                   <>
-                    <dt>Résumé médical</dt>
+                    <dt>{t("patientFile.medicalSummary")}</dt>
                     <dd>{record.medical_summary}</dd>
                   </>
                 )}
@@ -55,14 +60,14 @@ export function PatientFilePage() {
             </>
           ) : (
             <div className="rf-banner rf-stack">
-              <p>Ce patient n’a pas encore de coordinatrice ou de coordinateur.</p>
+              <p>{t("patientFile.noCoordinator")}</p>
               {can.takeOnPatients && me && (
                 <div>
                   <Button
                     pending={takeOn.isPending}
                     onClick={() => takeOn.mutate({ patient_id: record.id, professional_id: me.id })}
                   >
-                    Prendre en charge
+                    {t("patientFile.takeOn")}
                   </Button>
                 </div>
               )}

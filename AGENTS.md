@@ -127,7 +127,7 @@ New modules need no registration: any `app/modules/<name>/models.py` is picked u
 - `api/` mirrors the backend: one file per module, named like it (`modules/care_team/` → `api/care_team.ts`). Shared plumbing lives in `api/core/`. `frontend/README.md` maps each module to the pages that use it; update it when you add a page or module.
 - No permission logic. If the API returns 403, show a "not allowed" state.
 - Every page handles loading, empty and error states.
-- UI text is in French; code and comments are in English.
+- UI text is in French and English, from the locale files in `frontend/src/i18n/locales/` (never written in a page); code and comments are in English.
 - The look is our own design: don't copy the Institute's website (its fonts, colours or layouts). Colours, fonts and spacing come from `theme/tokens.css`, never raw values in a page.
 - Accessible by default: every input has a label, buttons say what they do (to whom, when there are several), touch targets are at least 44px.
 

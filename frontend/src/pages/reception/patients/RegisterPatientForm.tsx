@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { Trans, useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router";
 
 import { ApiError } from "../../../api/core/client";
@@ -12,9 +13,8 @@ import { paths } from "../../../app/paths";
 const EMPTY = { first_name: "", last_name: "", birth_date: "", email: "", phone: "" };
 type Fields = typeof EMPTY;
 
-export const PHONE_HINT = "Chiffres, espaces ou points, avec l’indicatif +33 si besoin.";
-
 export function RegisterPatientForm() {
+  const { t } = useTranslation();
   const [fields, setFields] = useState(EMPTY);
   const register = useRegisterPatient();
   const navigate = useNavigate();
@@ -45,17 +45,17 @@ export function RegisterPatientForm() {
 
   return (
     <form className="rf-form rf-narrow" onSubmit={submit}>
-      <p className="rf-muted">Pour une personne dont l’admission à l’Institut est confirmée.</p>
+      <p className="rf-muted">{t("register.intro")}</p>
       <div className="rf-row">
         <TextField
-          label="Prénom"
+          label={t("patientForm.firstName")}
           required
           autoComplete="off"
           value={fields.first_name}
           onChange={(e) => set("first_name", e.target.value)}
         />
         <TextField
-          label="Nom"
+          label={t("patientForm.lastName")}
           required
           autoComplete="off"
           value={fields.last_name}
@@ -63,7 +63,7 @@ export function RegisterPatientForm() {
         />
       </div>
       <TextField
-        label="Date de naissance"
+        label={t("patientForm.birthDate")}
         type="date"
         required
         min="1900-01-01"
@@ -73,17 +73,17 @@ export function RegisterPatientForm() {
       />
       <div className="rf-row">
         <TextField
-          label="E-mail (facultatif)"
+          label={t("patientForm.emailOptional")}
           type="email"
           autoComplete="off"
           value={fields.email}
           onChange={(e) => set("email", e.target.value)}
         />
         <TextField
-          label="Téléphone (facultatif)"
+          label={t("patientForm.phoneOptional")}
           type="tel"
           autoComplete="off"
-          hint={PHONE_HINT}
+          hint={t("patientForm.phoneHint")}
           value={fields.phone}
           onChange={(e) => set("phone", e.target.value)}
         />
@@ -93,13 +93,13 @@ export function RegisterPatientForm() {
       ) : (
         register.isError && (
           <p className="rf-field__error" role="alert">
-            L’enregistrement n’a pas abouti. Vérifiez les informations, puis réessayez.
+            {t("register.failed")}
           </p>
         )
       )}
       {!duplicate && (
         <Button type="submit" pending={register.isPending}>
-          Enregistrer le patient
+          {t("register.submit")}
         </Button>
       )}
     </form>
@@ -111,6 +111,7 @@ export function RegisterPatientForm() {
  * reception opens the existing record; a true namesake can still be registered on purpose.
  */
 function DuplicateWarning(props: { fields: Fields; pending: boolean; onConfirm: () => void }) {
+  const { t } = useTranslation();
   const { fields } = props;
   const matches = usePatients(fields.last_name).data?.filter(
     (p) =>
@@ -122,14 +123,17 @@ function DuplicateWarning(props: { fields: Fields; pending: boolean; onConfirm: 
   return (
     <div className="rf-panel rf-panel--highlight" role="alert">
       <p>
-        <strong>Ce patient semble déjà enregistré</strong> : même nom, même prénom, même date de naissance.
+        <Trans i18nKey="register.duplicate" components={{ strong: <strong /> }} />
       </p>
       {matches && matches.length > 0 && (
         <ul className="rf-list">
           {matches.map((p) => (
             <li key={p.id}>
               <Link className="rf-link" to={paths.reception.patient(p.id)}>
-                Ouvrir la fiche de {p.first_name} {p.last_name}, né·e le {formatDate(p.birth_date)}
+                {t("register.openExisting", {
+                  name: `${p.first_name} ${p.last_name}`,
+                  date: formatDate(p.birth_date),
+                })}
               </Link>
             </li>
           ))}
@@ -137,7 +141,7 @@ function DuplicateWarning(props: { fields: Fields; pending: boolean; onConfirm: 
       )}
       <div className="rf-actions">
         <Button variant="secondary" pending={props.pending} onClick={props.onConfirm}>
-          C’est une autre personne : enregistrer quand même
+          {t("register.registerAnyway")}
         </Button>
       </div>
     </div>

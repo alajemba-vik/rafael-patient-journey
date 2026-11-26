@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useParams } from "react-router";
 
 import { usePatient } from "../../../api/patients";
@@ -9,6 +10,7 @@ import { PatientDetailsSection } from "./PatientDetailsSection";
 
 /** What reception needs about a patient: contact details, who follows them, and appointments. */
 export function ReceptionPatientPage() {
+  const { t } = useTranslation();
   const { patientId = "" } = useParams();
   const patient = usePatient(patientId);
 
@@ -16,7 +18,10 @@ export function ReceptionPatientPage() {
     <QueryState query={patient}>
       {(record) => (
         <>
-          <PageHeader title={`${record.first_name} ${record.last_name}`} documentTitle="Fiche patient" />
+          <PageHeader
+            title={`${record.first_name} ${record.last_name}`}
+            documentTitle={t("receptionPatient.documentTitle")}
+          />
           <div className="rf-grid rf-section">
             <PatientDetailsSection patient={record} />
             <CareTeamSection patientId={record.id} />

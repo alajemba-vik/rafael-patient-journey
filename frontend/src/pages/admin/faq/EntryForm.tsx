@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { useTranslation } from "react-i18next";
 
 import type { FaqCategory, FaqEntry } from "../../../api/faq";
 import { Button } from "../../../components/forms/Button";
@@ -20,6 +21,7 @@ type Props = {
 
 /** Writing or editing a question and its answer. */
 export function EntryForm({ categories, initial, submitLabel, pending, failed, onSubmit, onCancel }: Props) {
+  const { t } = useTranslation();
   const [fields, setFields] = useState<EntryFields>({
     category_id: initial?.category_id ?? categories[0]?.id ?? "",
     question: initial?.question ?? "",
@@ -34,7 +36,7 @@ export function EntryForm({ categories, initial, submitLabel, pending, failed, o
   return (
     <form className="rf-form" onSubmit={submit}>
       <SelectField
-        label="Catégorie"
+        label={t("faqAdmin.category")}
         required
         value={fields.category_id}
         onChange={(e) => setFields({ ...fields, category_id: e.target.value })}
@@ -46,14 +48,14 @@ export function EntryForm({ categories, initial, submitLabel, pending, failed, o
         ))}
       </SelectField>
       <TextField
-        label="Question"
+        label={t("faqAdmin.question")}
         required
         maxLength={300}
         value={fields.question}
         onChange={(e) => setFields({ ...fields, question: e.target.value })}
       />
       <TextArea
-        label="Réponse"
+        label={t("faqAdmin.answer")}
         required
         rows={6}
         value={fields.answer}
@@ -61,7 +63,7 @@ export function EntryForm({ categories, initial, submitLabel, pending, failed, o
       />
       {failed && (
         <p className="rf-field__error" role="alert">
-          L’enregistrement n’a pas abouti. Votre texte est conservé : réessayez.
+          {t("faqAdmin.saveFailed")}
         </p>
       )}
       <div className="rf-actions">
@@ -70,7 +72,7 @@ export function EntryForm({ categories, initial, submitLabel, pending, failed, o
         </Button>
         {onCancel && (
           <Button variant="secondary" onClick={onCancel}>
-            Annuler
+            {t("common.cancel")}
           </Button>
         )}
       </div>

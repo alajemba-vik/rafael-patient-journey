@@ -1,4 +1,5 @@
 import { useId } from "react";
+import { useTranslation } from "react-i18next";
 
 import { useAvailability, type AvailabilityFor } from "../../api/scheduling";
 import { formatTime } from "../../lib/format";
@@ -19,31 +20,32 @@ const NOON = "12:00";
 
 /** The practitioner's free times that day, as large tappable choices: no phoning around. */
 export function SlotPicker({ professionalId, day, minutes, value, onChange, context }: Props) {
+  const { t } = useTranslation();
   const availability = useAvailability(professionalId, day, minutes, context);
   const name = useId();
 
   if (!professionalId || !day) {
-    return <p className="rf-muted">Choisissez la personne et la date pour voir les créneaux libres.</p>;
+    return <p className="rf-muted">{t("slots.chooseFirst")}</p>;
   }
   if (availability.isPending) {
     return (
       <p className="rf-muted" role="status">
-        Recherche des créneaux libres…
+        {t("slots.searching")}
       </p>
     );
   }
   if (availability.isError) {
-    return <p className="rf-muted">Créneaux indisponibles pour le moment : saisissez l’heure ci-dessous.</p>;
+    return <p className="rf-muted">{t("slots.unavailable")}</p>;
   }
 
   const slots = availability.data.free.map((slot) => ({ time: instituteClock(slot.starts_at), at: slot.starts_at }));
   if (slots.length === 0) {
-    return <p className="rf-muted">Aucun créneau libre de {minutes} min ce jour-là. Essayez une autre date.</p>;
+    return <p className="rf-muted">{t("slots.none", { minutes })}</p>;
   }
 
   const groups = [
-    { label: "Matin", slots: slots.filter((s) => s.time < NOON) },
-    { label: "Après-midi", slots: slots.filter((s) => s.time >= NOON) },
+    { label: t("slots.morning"), slots: slots.filter((s) => s.time < NOON) },
+    { label: t("slots.afternoon"), slots: slots.filter((s) => s.time >= NOON) },
   ].filter((group) => group.slots.length > 0);
 
   return (
@@ -51,7 +53,7 @@ export function SlotPicker({ professionalId, day, minutes, value, onChange, cont
       {groups.map((group) => (
         <fieldset key={group.label} className="rf-question">
           <legend>
-            {group.label} <span className="rf-muted">· créneaux libres de {minutes} min</span>
+            {group.label} <span className="rf-muted">{t("slots.freeOf", { minutes })}</span>
           </legend>
           <div className="rf-choices">
             {group.slots.map((slot) => (

@@ -1,42 +1,45 @@
+import type { ParseKeys } from "i18next";
+
 import type { Role } from "../api/identity_access";
 import { paths } from "./paths";
 
-type NavItem = { to: string; label: string };
+/** `label` is a translation key: menus are translated where they are shown. */
+type NavItem = { to: string; label: ParseKeys };
 
-const FAQ: NavItem = { to: paths.faq, label: "Questions fréquentes" };
+const FAQ: NavItem = { to: paths.faq, label: "nav.faq" };
 
 /** Menu per role. */
 export const NAV_BY_ROLE: Record<Role, NavItem[]> = {
   patient: [
-    { to: paths.patient.home, label: "Mon espace" },
-    { to: paths.patient.appointments, label: "Mes rendez-vous" },
-    { to: paths.patient.pathway, label: "Mon parcours" },
-    { to: paths.patient.questionnaires, label: "Questionnaires" },
+    { to: paths.patient.home, label: "nav.patientHome" },
+    { to: paths.patient.appointments, label: "nav.patientAppointments" },
+    { to: paths.patient.pathway, label: "nav.patientPathway" },
+    { to: paths.patient.questionnaires, label: "nav.patientQuestionnaires" },
     FAQ,
   ],
   secretary: [
-    { to: paths.reception.board, label: "Accueil du jour" },
-    { to: paths.reception.patients, label: "Patients" },
+    { to: paths.reception.board, label: "nav.receptionBoard" },
+    { to: paths.reception.patients, label: "nav.receptionPatients" },
     FAQ,
   ],
   professional: [
-    { to: paths.pro.schedule, label: "Mon planning" },
-    { to: paths.pro.patients, label: "Mes patients" },
-    { to: paths.pro.dashboard, label: "Tableau de bord" },
+    { to: paths.pro.schedule, label: "nav.proSchedule" },
+    { to: paths.pro.patients, label: "nav.proPatients" },
+    { to: paths.pro.dashboard, label: "nav.dashboard" },
     FAQ,
   ],
   coordinator: [
-    { to: paths.pro.schedule, label: "Mon planning" },
-    { to: paths.pro.patients, label: "Mes patients" },
-    { to: paths.pro.pathways, label: "Mes parcours" },
-    { to: paths.pro.needs, label: "Besoins signalés" },
-    { to: paths.pro.dashboard, label: "Tableau de bord" },
+    { to: paths.pro.schedule, label: "nav.proSchedule" },
+    { to: paths.pro.patients, label: "nav.proPatients" },
+    { to: paths.pro.pathways, label: "nav.proPathways" },
+    { to: paths.pro.needs, label: "nav.proNeeds" },
+    { to: paths.pro.dashboard, label: "nav.dashboard" },
     FAQ,
   ],
   admin: [
-    { to: paths.admin.accounts, label: "Comptes" },
-    { to: paths.admin.faq, label: "Gérer la FAQ" },
-    { to: paths.admin.dashboard, label: "Tableau de bord" },
+    { to: paths.admin.accounts, label: "nav.adminAccounts" },
+    { to: paths.admin.faq, label: "nav.adminFaq" },
+    { to: paths.admin.dashboard, label: "nav.dashboard" },
     FAQ,
   ],
 };

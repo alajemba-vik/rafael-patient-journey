@@ -1,13 +1,16 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router";
 
 import { useMe } from "../../api/identity_access";
 import { session } from "../../api/core/session";
 import { NAV_BY_ROLE } from "../../app/navigation";
 import { paths } from "../../app/paths";
+import { LanguageSwitcher } from "./LanguageSwitcher";
 
 export function AppShell() {
+  const { t } = useTranslation();
   const { data: me } = useMe();
   const location = useLocation();
   const navigate = useNavigate();
@@ -33,7 +36,7 @@ export function AppShell() {
   return (
     <div className="rf-root rf-shell">
       <a className="rf-skip-link" href="#contenu">
-        Aller au contenu
+        {t("shell.skipToContent")}
       </a>
       <header className="rf-shell__header">
         <div className="rf-shell__bar">
@@ -41,7 +44,7 @@ export function AppShell() {
             Institut Rafaël
           </Link>
           {me && (
-            <nav className="rf-nav" aria-label="Navigation principale">
+            <nav className="rf-nav" aria-label={t("shell.mainNav")}>
               {NAV_BY_ROLE[me.role].map((item, _, items) => (
                 <NavLink
                   key={item.to}
@@ -50,23 +53,24 @@ export function AppShell() {
                   // A section's first item must not also light up on a sibling item's deeper page.
                   end={items.some((other) => other.to.startsWith(`${item.to}/`))}
                 >
-                  {item.label}
+                  {t(item.label)}
                 </NavLink>
               ))}
             </nav>
           )}
           <div className="rf-shell__account">
+            <LanguageSwitcher />
             {me ? (
               <>
                 <span className="rf-shell__user">{me.full_name}</span>
                 <button type="button" className="rf-btn rf-btn--secondary" onClick={signOut}>
-                  Se déconnecter
+                  {t("shell.signOut")}
                 </button>
               </>
             ) : (
               location.pathname !== paths.login && (
                 <Link to={paths.login} className="rf-btn rf-btn--secondary">
-                  Se connecter
+                  {t("shell.signIn")}
                 </Link>
               )
             )}

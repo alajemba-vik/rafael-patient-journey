@@ -1,4 +1,6 @@
+import type { TFunction } from "i18next";
 import { useId, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 
 import { ApiError } from "../../../api/core/client";
@@ -7,7 +9,6 @@ import type { Appointment } from "../../../api/scheduling";
 import { ManageAppointment } from "../../../components/appointments/ManageAppointment";
 import { Button } from "../../../components/forms/Button";
 import { formatMinutes, formatTime } from "../../../lib/format";
-import { CANCEL_REASON_LABELS } from "../../../lib/labels";
 import { minutesBetween } from "../../../lib/time";
 import { paths } from "../../../app/paths";
 import { LONG_WAIT_MINUTES, minutesLate, type StatusAction } from "./board";
@@ -26,8 +27,9 @@ type Props = {
 /** One appointment on the board: who, when, how long they've waited, and the next step. */
 export function AppointmentCard({ appointment: a, now, live, actions, manageable }: Props) {
   // One status change per card: clicks on two cards never cancel each other's progress.
+  const { t } = useTranslation();
   const change = useChangeStatus();
-  const signal = live ? timeSignal(a, now) : null;
+  const signal = live ? timeSignal(a, now, t) : null;
   // Move, cancel and note stay one click away so the board reads as names and next steps.
   const [managing, setManaging] = useState(false);
   const manageId = useId();
@@ -48,7 +50,7 @@ export function AppointmentCard({ appointment: a, now, live, actions, manageable
         disabled={change.isPending}
         onClick={() => change.mutate({ appointmentId: a.id, status: action.status })}
       >
-        {action.label}
+        {t(action.label)}
         <span className="rf-visually-hidden"> · {a.patient_name}</span>
       </Button>
     ));
@@ -73,18 +75,18 @@ export function AppointmentCard({ appointment: a, now, live, actions, manageable
         <Link to={paths.reception.patient(a.patient_id)}>{a.patient_name}</Link>
       </span>
       <p className="rf-card__meta">
-        avec {a.professional_name}
-        {a.cancel_reason && ` · ${CANCEL_REASON_LABELS[a.cancel_reason]}`}
+        {t("board.with", { name: a.professional_name })}
+        {a.cancel_reason && ` · ${t(`labels.cancelReason.${a.cancel_reason}`)}`}
       </p>
       {a.note && (
         <p className="rf-note">
-          <span className="rf-visually-hidden">Note : </span>
+          <span className="rf-visually-hidden">{t("board.notePrefix")}</span>
           {a.note}
         </p>
       )}
       {change.isError && (
         <p className="rf-field__error" role="alert">
-          {statusErrorMessage(change.error)}
+          {statusErrorMessage(change.error, t)}
         </p>
       )}
       {direct && <ManageAppointment appointment={a} />}
@@ -99,7 +101,7 @@ export function AppointmentCard({ appointment: a, now, live, actions, manageable
               aria-controls={managing ? manageId : undefined}
               onClick={() => setManaging(!managing)}
             >
-              {managing ? "Moins d’options" : "Plus d’options"}
+              {managing ? t("board.fewerOptions") : t("board.moreOptions")}
               <span className="rf-visually-hidden"> · {a.patient_name}</span>
             </Button>
           )}
@@ -115,22 +117,23 @@ export function AppointmentCard({ appointment: a, now, live, actions, manageable
   );
 }
 
-function statusErrorMessage(error: Error): string {
-  return error instanceof ApiError && error.status === 409
-    ? "Pas enregistré : ce rendez-vous venait de changer. La carte est à jour, vérifiez avant de recommencer."
-    : "Pas enregistré. Réessayez.";
+function statusErrorMessage(error: Error, t: TFunction): string {
+  return error instanceof ApiError && error.status === 409 ? t("board.statusConflict") : t("board.statusFailed");
 }
 
 /** What the clock says about this appointment, if anything worth reading at a glance. */
-function timeSignal(a: Appointment, now: Date): { text: string; attention: boolean } | null {
+function timeSignal(a: Appointment, now: Date, t: TFunction): { text: string; attention: boolean } | null {
   if (a.status === "arrived" && a.arrived_at) {
     const waited = minutesBetween(a.arrived_at, now);
-    return { text: `Attend depuis ${formatMinutes(waited)}`, attention: waited >= LONG_WAIT_MINUTES };
+    return { text: t("board.waitingFor", { duration: formatMinutes(waited) }), attention: waited >= LONG_WAIT_MINUTES };
   }
   if (a.status === "in_session" && a.called_in_at) {
-    return { text: `En séance depuis ${formatMinutes(minutesBetween(a.called_in_at, now))}`, attention: false };
+    return {
+      text: t("board.inSessionFor", { duration: formatMinutes(minutesBetween(a.called_in_at, now)) }),
+      attention: false,
+    };
   }
   const late = minutesLate(a, now);
-  if (late > 0) return { text: `En retard · ${formatMinutes(late)}`, attention: true };
+  if (late > 0) return { text: t("board.late", { duration: formatMinutes(late) }), attention: true };
   return null;
 }

@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+
 import { useMe, usePermissions } from "../../api/identity_access";
 import { usePatientAppointments, type Appointment } from "../../api/scheduling";
 import { ManageAppointment } from "../appointments/ManageAppointment";
@@ -5,7 +7,6 @@ import { QueryState } from "../feedback/QueryState";
 import { StatusBadge } from "../feedback/StatusBadge";
 import { BookingForm } from "../forms/BookingForm";
 import { formatTime, formatWeekday } from "../../lib/format";
-import { CANCEL_REASON_LABELS } from "../../lib/labels";
 
 /** Split into what's still ahead (soonest first) and the history (latest first). */
 export function splitAppointments(list: Appointment[], now: Date) {
@@ -25,6 +26,7 @@ export function splitAppointments(list: Appointment[], now: Date) {
  * them; a practitioner books follow-ups with themselves and manages their own sessions.
  */
 export function AppointmentsSection({ patientId }: { patientId: string }) {
+  const { t } = useTranslation();
   const appointments = usePatientAppointments(patientId);
   const can = usePermissions();
   const me = useMe().data;
@@ -35,11 +37,11 @@ export function AppointmentsSection({ patientId }: { patientId: string }) {
   return (
     <section className="rf-section" aria-labelledby="appointments-title">
       <h2 id="appointments-title" className="rf-title">
-        Rendez-vous
+        {t("appointments.title")}
       </h2>
       {canBook && (
         <details className="rf-disclosure rf-section">
-          <summary>Prendre un rendez-vous</summary>
+          <summary>{t("appointments.book")}</summary>
           <div className="rf-disclosure__body">
             <BookingForm
               patientId={patientId}
@@ -48,17 +50,14 @@ export function AppointmentsSection({ patientId }: { patientId: string }) {
           </div>
         </details>
       )}
-      <QueryState
-        query={appointments}
-        empty={{ isEmpty: (list) => list.length === 0, title: "Aucun rendez-vous pour ce patient." }}
-      >
+      <QueryState query={appointments} empty={{ isEmpty: (list) => list.length === 0, title: t("appointments.empty") }}>
         {(list) => {
           const { upcoming, history } = splitAppointments(list, new Date());
           return (
             <>
-              <h3 className="rf-label">À venir</h3>
+              <h3 className="rf-label">{t("appointments.upcoming")}</h3>
               {upcoming.length === 0 ? (
-                <p className="rf-muted rf-section">Aucun rendez-vous à venir.</p>
+                <p className="rf-muted rf-section">{t("appointments.noUpcoming")}</p>
               ) : (
                 <ul className="rf-cards rf-section">
                   {upcoming.map((a) => (
@@ -68,7 +67,7 @@ export function AppointmentsSection({ patientId }: { patientId: string }) {
               )}
               {history.length > 0 && (
                 <details className="rf-disclosure rf-collapsible">
-                  <summary>Historique · {history.length}</summary>
+                  <summary>{t("appointments.history", { count: history.length })}</summary>
                   <ul className="rf-cards rf-disclosure__body">
                     {history.map((a) => (
                       <AppointmentItem key={a.id} appointment={a} manageable={false} />
@@ -85,6 +84,7 @@ export function AppointmentsSection({ patientId }: { patientId: string }) {
 }
 
 function AppointmentItem({ appointment: a, manageable }: { appointment: Appointment; manageable: boolean }) {
+  const { t } = useTranslation();
   return (
     <li className="rf-card">
       <div className="rf-card__head">
@@ -94,12 +94,12 @@ function AppointmentItem({ appointment: a, manageable }: { appointment: Appointm
         <StatusBadge status={a.status} />
       </div>
       <p className="rf-card__meta">
-        avec {a.professional_name}
-        {a.cancel_reason && ` · ${CANCEL_REASON_LABELS[a.cancel_reason]}`}
+        {t("appointments.with", { name: a.professional_name })}
+        {a.cancel_reason && ` · ${t(`labels.cancelReason.${a.cancel_reason}`)}`}
       </p>
       {a.note && (
         <p className="rf-note">
-          <span className="rf-visually-hidden">Note : </span>
+          <span className="rf-visually-hidden">{t("appointments.notePrefix")}</span>
           {a.note}
         </p>
       )}

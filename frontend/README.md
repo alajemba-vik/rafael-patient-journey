@@ -29,7 +29,9 @@ The API it calls comes from `.env.development` (a local backend at `http://local
 - Page addresses live in `src/app/paths.ts` only: routes, menus and links all use it. Never type a path in a page.
 - Which buttons a role sees is decided in `usePermissions` (`src/api/identity_access.ts`) only. The API still decides and enforces every permission.
 - Dates and times entered or compared go through `src/lib/time.ts`, which uses the Institute's clock (Paris), whatever the browser's time zone.
-- UI text is in French, written where it's used; repeated vocabulary (statuses, roles, milestones) lives in `src/lib/labels.ts`. Code and comments are in English.
+- UI text is never written in a page: it lives in `src/i18n/locales/` (French `fr.json`, English `en.json`) and pages show it with `t("…")` from `useTranslation()` (react-i18next). Keys are typed from `fr.json`, so a missing key fails the typecheck, and a test checks every language has the same keys. Repeated vocabulary (statuses, roles, milestones) sits under `labels.*`. French is the default and the fallback. Code and comments are in English.
+- Dates and numbers go through `src/lib/format.ts`, which follows the interface's language (still on Paris time).
+- Adding a language: add `src/i18n/locales/<code>.json` with every key, and an entry in `LANGUAGES` (`src/i18n/index.ts`). The switcher in the header lists it by itself.
 - Synthetic data only.
 
 ## Layout
@@ -44,7 +46,8 @@ src/
   theme/                   design tokens and shared styles
   api/                     data hooks, one file per backend module (same names)
     core/                  generated API types (schema.d.ts), HTTP client, session, query cache
-  lib/                     non-UI helpers: formatting, Paris time, French labels
+  i18n/                    translations setup and locale files (fr, en)
+  lib/                     non-UI helpers: formatting, Paris time, label keys
     hooks/                 shared React hooks (clock, debounce, page title)
   components/
     layout/                app shell, header, login guard

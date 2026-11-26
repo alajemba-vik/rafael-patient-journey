@@ -1,3 +1,4 @@
+import { Trans, useTranslation } from "react-i18next";
 import { Link } from "react-router";
 
 import { useMe } from "../../../api/identity_access";
@@ -12,6 +13,7 @@ import { paths } from "../../../app/paths";
 const UPCOMING_SHOWN = 3;
 
 export function PatientHomePage() {
+  const { t } = useTranslation();
   const me = useMe();
   const due = useDueQuestionnaires();
   const appointments = useMyAppointments();
@@ -21,7 +23,7 @@ export function PatientHomePage() {
 
   return (
     <>
-      <PageHeader title="Mon espace" />
+      <PageHeader title={t("patientHome.title")} />
 
       {/* Message d'accueil personnalisé et chaleureux */}
       {firstName && (
@@ -35,7 +37,11 @@ export function PatientHomePage() {
             letterSpacing: "-0.5px",
           }}
         >
-          Bonjour <span style={{ color: "var(--accent)" }}>{firstName}</span> 👋
+          <Trans
+            i18nKey="patientHome.greeting"
+            values={{ name: firstName }}
+            components={{ name: <span style={{ color: "var(--accent)" }} /> }}
+          />
         </h2>
       )}
 
@@ -44,11 +50,11 @@ export function PatientHomePage() {
         {due.data && due.data.length > 0 && (
           <section className="rf-panel rf-panel--highlight" aria-labelledby="due-title">
             <h2 id="due-title" className="rf-title" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              <span aria-hidden="true">📝</span> Un questionnaire vous attend
+              <span aria-hidden="true">📝</span> {t("patientHome.dueTitle")}
             </h2>
-            <p style={{ margin: "var(--space-3) 0" }}>{due.data[0].title}. Quelques minutes suffisent.</p>
+            <p style={{ margin: "var(--space-3) 0" }}>{t("patientHome.dueText", { title: due.data[0].title })}</p>
             <Link to={paths.patient.questionnaires} className="rf-btn">
-              Répondre maintenant
+              {t("patientHome.answerNow")}
             </Link>
           </section>
         )}
@@ -56,11 +62,11 @@ export function PatientHomePage() {
         {/* 2. PROCHAINS RENDEZ-VOUS */}
         <section className="rf-panel" aria-labelledby="next-title">
           <h2 id="next-title" className="rf-title" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <span aria-hidden="true">📅</span> Vos prochains rendez-vous
+            <span aria-hidden="true">📅</span> {t("patientHome.nextTitle")}
           </h2>
           <QueryState
             query={appointments}
-            empty={{ isEmpty: (list) => list.length === 0, title: "Aucun rendez-vous prévu." }}
+            empty={{ isEmpty: (list) => list.length === 0, title: t("patientHome.noAppointments") }}
           >
             {(list) => (
               <div
@@ -71,15 +77,18 @@ export function PatientHomePage() {
                     <li key={a.id} style={{ padding: "var(--space-4) 0" }}>
                       <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
                         <span style={{ fontWeight: 600, fontSize: "15px" }}>
-                          {formatWeekday(a.starts_at)} à {formatTime(a.starts_at)}
+                          {t("patientHome.appointmentAt", {
+                            day: formatWeekday(a.starts_at),
+                            time: formatTime(a.starts_at),
+                          })}
                         </span>
-                        <span className="rf-muted">Avec {a.professional_name}</span>
+                        <span className="rf-muted">{t("patientHome.with", { name: a.professional_name })}</span>
                       </div>
                     </li>
                   ))}
                 </ul>
                 <Link to={paths.patient.appointments} className="rf-link" style={{ marginTop: "auto" }}>
-                  Voir tous vos rendez-vous →
+                  {t("patientHome.allAppointments")}
                 </Link>
               </div>
             )}
@@ -89,24 +98,24 @@ export function PatientHomePage() {
         {/* 3. PARCOURS */}
         <section className="rf-panel" aria-labelledby="pathway-title">
           <h2 id="pathway-title" className="rf-title" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <span aria-hidden="true">🧭</span> Votre parcours
+            <span aria-hidden="true">🧭</span> {t("patientHome.pathwayTitle")}
           </h2>
           <QueryState
             query={pathways}
-            empty={{ isEmpty: (list) => list.length === 0, title: "Votre parcours n’a pas encore commencé." }}
+            empty={{ isEmpty: (list) => list.length === 0, title: t("patientHome.pathwayNotStarted") }}
           >
             {([current]) => (
               <div
                 style={{ display: "flex", flexDirection: "column", height: "100%", justifyContent: "space-between" }}
               >
                 <dl className="rf-dl" style={{ marginBottom: "var(--space-4)" }}>
-                  <dt>Votre coordinateur·rice</dt>
+                  <dt>{t("patientHome.coordinator")}</dt>
                   <dd>{current.coordinator_name}</dd>
-                  <dt>Commencé le</dt>
+                  <dt>{t("patientHome.startedOn")}</dt>
                   <dd>{formatDate(current.opened_at)}</dd>
                 </dl>
                 <Link to={paths.patient.pathway} className="rf-link" style={{ marginTop: "auto" }}>
-                  Voir votre parcours →
+                  {t("patientHome.seePathway")}
                 </Link>
               </div>
             )}
@@ -116,13 +125,13 @@ export function PatientHomePage() {
         {/* 4. QUALITÉ DE VIE */}
         <section className="rf-panel" aria-labelledby="score-title">
           <h2 id="score-title" className="rf-title" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <span aria-hidden="true">📊</span> Votre qualité de vie
+            <span aria-hidden="true">📊</span> {t("patientHome.scoreTitle")}
           </h2>
           <QueryState
             query={scores}
             empty={{
               isEmpty: (list) => list.length === 0,
-              title: "Vos résultats apparaîtront après votre premier questionnaire.",
+              title: t("patientHome.scoreEmpty"),
             }}
           >
             {(list) => {
@@ -133,7 +142,7 @@ export function PatientHomePage() {
                     <span className="rf-figure" style={{ color: "var(--accent)", fontSize: "42px" }}>
                       {formatNumber(latest.score)}
                     </span>
-                    <span className="rf-muted">/ 100</span>
+                    <span className="rf-muted">{t("patientHome.outOf100")}</span>
                   </p>
 
                   {/* Petite barre visuelle pour le score */}
@@ -150,7 +159,7 @@ export function PatientHomePage() {
 
                   {latest.change !== null && (
                     <p className="rf-muted" style={{ margin: 0, fontSize: "13px" }}>
-                      {formatChange(latest.change)} depuis le mois précédent
+                      {t("patientHome.changeSinceLastMonth", { change: formatChange(latest.change) })}
                     </p>
                   )}
                 </div>

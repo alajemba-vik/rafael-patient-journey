@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { useTranslation } from "react-i18next";
 import { Navigate, useLocation, useNavigate, useSearchParams } from "react-router";
 
 import { useLogin } from "../../../api/identity_access";
@@ -9,6 +10,7 @@ import { TextField } from "../../../components/forms/TextField";
 import { paths } from "../../../app/paths";
 
 export function LoginPage() {
+  const { t } = useTranslation();
   const [params] = useSearchParams();
   const location = useLocation();
   const navigate = useNavigate();
@@ -28,11 +30,11 @@ export function LoginPage() {
   const status = login.error instanceof ApiError ? login.error.status : undefined;
   const error =
     status === 401
-      ? "E-mail ou mot de passe incorrect."
+      ? t("login.errorCredentials")
       : status === 429
-        ? "Trop de tentatives. Patientez une minute, puis réessayez."
+        ? t("login.errorTooMany")
         : login.isError
-          ? "Connexion impossible pour le moment. Réessayez dans un instant."
+          ? t("login.errorUnavailable")
           : undefined;
 
   return (
@@ -62,18 +64,18 @@ export function LoginPage() {
             marginBottom: "var(--space-6)",
           }}
         >
-          Connexion
+          {t("login.title")}
         </h1>
 
         {params.get("session") === "expiree" && (
           <p className="rf-banner" role="status" style={{ background: "var(--accent-doux)" }}>
-            Votre session a expiré. Reconnectez-vous.
+            {t("login.expired")}
           </p>
         )}
 
         <form className="rf-form" onSubmit={submit} style={{ width: "100%" }}>
           <TextField
-            label="Adresse e-mail"
+            label={t("login.email")}
             type="email"
             autoComplete="username"
             required
@@ -82,7 +84,7 @@ export function LoginPage() {
             onChange={(event) => setEmail(event.target.value)}
           />
           <TextField
-            label="Mot de passe"
+            label={t("login.password")}
             type="password"
             autoComplete="current-password"
             required
@@ -93,7 +95,7 @@ export function LoginPage() {
 
           <div style={{ width: "100%", marginTop: "var(--space-4)" }}>
             <Button type="submit" pending={login.isPending} style={{ width: "100%" }}>
-              Se connecter
+              {t("login.submit")}
             </Button>
           </div>
         </form>

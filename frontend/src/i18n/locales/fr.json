@@ -1,0 +1,490 @@
+{
+  "common": {
+    "back": "Retour",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "retry": "Réessayer"
+  },
+  "format": {
+    "time": "{{hours}} h {{minutes}}",
+    "minutes": "{{minutes}} min",
+    "hoursMinutes": "{{hours}} h {{minutes}}"
+  },
+  "labels": {
+    "milestone": {
+      "intake": "Premier bilan",
+      "review": "Bilan à mi-parcours",
+      "final": "Bilan final"
+    },
+    "dimension": {
+      "physical": "Physique et sportif",
+      "psychological": "Psychologique",
+      "emotional": "Émotionnel",
+      "sexual": "Sexuel",
+      "socio_professional": "Socio-professionnel"
+    },
+    "role": {
+      "patient": "Patient·e",
+      "secretary": "Chargé·e d’accueil",
+      "professional": "Praticien·ne",
+      "coordinator": "Coordinateur·rice",
+      "admin": "Administrateur·rice"
+    },
+    "status": {
+      "scheduled": "Prévu",
+      "arrived": "En salle d’attente",
+      "in_session": "En séance",
+      "done": "Terminé",
+      "no_show": "Absent·e",
+      "cancelled": "Annulé"
+    },
+    "cancelReason": {
+      "patient_request": "Le patient a prévenu",
+      "practitioner_unavailable": "Praticien·ne indisponible",
+      "other": "Autre raison"
+    }
+  },
+  "shell": {
+    "skipToContent": "Aller au contenu",
+    "mainNav": "Navigation principale",
+    "signOut": "Se déconnecter",
+    "signIn": "Se connecter",
+    "language": "Langue"
+  },
+  "nav": {
+    "faq": "Questions fréquentes",
+    "patientHome": "Mon espace",
+    "patientAppointments": "Mes rendez-vous",
+    "patientPathway": "Mon parcours",
+    "patientQuestionnaires": "Questionnaires",
+    "receptionBoard": "Accueil du jour",
+    "receptionPatients": "Patients",
+    "proSchedule": "Mon planning",
+    "proPatients": "Mes patients",
+    "proPathways": "Mes parcours",
+    "proNeeds": "Besoins signalés",
+    "dashboard": "Tableau de bord",
+    "adminAccounts": "Comptes",
+    "adminFaq": "Gérer la FAQ"
+  },
+  "feedback": {
+    "loading": "Chargement en cours",
+    "errorTitle": "Impossible de charger ces informations.",
+    "errorHint": "Vérifiez votre connexion, puis réessayez.",
+    "notAllowedTitle": "Vous n’avez pas accès à cette page.",
+    "notAllowedHint": "Si vous pensez que c’est une erreur, contactez l’administrateur de la plateforme.",
+    "routeErrorTitle": "Une erreur est survenue",
+    "routeErrorText": "La page n’a pas pu s’afficher. Rechargez-la ; si le problème continue, revenez à votre page de départ.",
+    "reload": "Recharger la page",
+    "backHome": "Retour à ma page de départ"
+  },
+  "booking": {
+    "errorTaken": "Ce créneau n’est pas libre pour le patient ou pour la personne choisie.",
+    "errorPast": "Ce jour est déjà passé : choisissez aujourd’hui ou une date à venir.",
+    "errorGeneric": "La prise de rendez-vous n’a pas abouti. Réessayez.",
+    "withYou": "Séance avec vous ({{name}}).",
+    "with": "Avec",
+    "emptyTeamHint": "Ajoutez d’abord quelqu’un à l’équipe de soins.",
+    "chooseMember": "Choisir dans l’équipe de soins",
+    "date": "Date",
+    "duration": "Durée",
+    "time": "Heure",
+    "timeHint": "Heure de Paris. Choisissez un créneau ci-dessus ou saisissez une autre heure.",
+    "note": "Note pour l’équipe (facultatif)",
+    "noteHint": "Visible par l’équipe, pas par le patient. Aucune information médicale.",
+    "booked": "Rendez-vous enregistré.",
+    "submit": "Prendre le rendez-vous"
+  },
+  "slots": {
+    "chooseFirst": "Choisissez la personne et la date pour voir les créneaux libres.",
+    "searching": "Recherche des créneaux libres…",
+    "unavailable": "Créneaux indisponibles pour le moment : saisissez l’heure ci-dessous.",
+    "none": "Aucun créneau libre de {{minutes}} min ce jour-là. Essayez une autre date.",
+    "morning": "Matin",
+    "afternoon": "Après-midi",
+    "freeOf": "· créneaux libres de {{minutes}} min"
+  },
+  "manage": {
+    "move": "Déplacer",
+    "cancel": "Annuler",
+    "editNote": "Modifier la note",
+    "addNote": "Ajouter une note",
+    "moveFormLabel": "Déplacer le rendez-vous de {{name}}",
+    "moveIntro": "Même durée ({{minutes}} min), avec {{professional}}. Actuellement à {{time}}.",
+    "newDate": "Nouvelle date",
+    "newTime": "Nouvelle heure",
+    "parisTime": "Heure de Paris.",
+    "moveTaken": "Ce créneau n’est plus libre. Choisissez-en un autre.",
+    "moveFailed": "Le rendez-vous n’a pas été déplacé. Réessayez.",
+    "moveSubmit": "Déplacer le rendez-vous",
+    "cancelFormLabel": "Annuler le rendez-vous de {{name}}",
+    "cancelQuestion": "Pourquoi ce rendez-vous est-il annulé ?",
+    "cancelFailed": "L’annulation n’a pas abouti. Réessayez.",
+    "cancelSubmit": "Annuler le rendez-vous",
+    "keep": "Garder le rendez-vous",
+    "noteFormLabel": "Note sur le rendez-vous de {{name}}",
+    "noteLabel": "Note pour l’équipe",
+    "noteHint": "Visible par l’équipe, pas par le patient. Aucune information médicale. {{length}}/{{max}}",
+    "noteFailed": "La note n’a pas été enregistrée. Réessayez.",
+    "noteSave": "Enregistrer la note",
+    "noteClear": "Effacer la note"
+  },
+  "appointments": {
+    "title": "Rendez-vous",
+    "book": "Prendre un rendez-vous",
+    "empty": "Aucun rendez-vous pour ce patient.",
+    "upcoming": "À venir",
+    "noUpcoming": "Aucun rendez-vous à venir.",
+    "history": "Historique · {{count}}",
+    "with": "avec {{name}}",
+    "notePrefix": "Note : "
+  },
+  "careTeam": {
+    "title": "Équipe de soins",
+    "empty": "Aucun membre pour le moment.",
+    "removeQuestion": "Retirer {{name}} ?",
+    "remove": "Retirer",
+    "addLabel": "Ajouter à l’équipe",
+    "choosePerson": "Choisir une personne",
+    "addFailed": "L’ajout n’a pas abouti. Réessayez.",
+    "add": "Ajouter"
+  },
+  "milestones": {
+    "caption": "Auto-évaluation, de 0 à 4",
+    "dimension": "Dimension"
+  },
+  "faq": {
+    "title": "Questions fréquentes",
+    "intro": "Retrouvez ici les réponses aux questions les plus courantes. Cliquez sur une question pour afficher la réponse.",
+    "empty": "Aucune question publiée pour le moment."
+  },
+  "login": {
+    "title": "Connexion",
+    "errorCredentials": "E-mail ou mot de passe incorrect.",
+    "errorTooMany": "Trop de tentatives. Patientez une minute, puis réessayez.",
+    "errorUnavailable": "Connexion impossible pour le moment. Réessayez dans un instant.",
+    "expired": "Votre session a expiré. Reconnectez-vous.",
+    "email": "Adresse e-mail",
+    "password": "Mot de passe",
+    "submit": "Se connecter"
+  },
+  "notFound": {
+    "title": "Page introuvable",
+    "text": "Cette adresse ne correspond à aucune page."
+  },
+  "patientHome": {
+    "title": "Mon espace",
+    "greeting": "Bonjour <name>{{name}}</name> 👋",
+    "dueTitle": "Un questionnaire vous attend",
+    "dueText": "{{title}}. Quelques minutes suffisent.",
+    "answerNow": "Répondre maintenant",
+    "nextTitle": "Vos prochains rendez-vous",
+    "noAppointments": "Aucun rendez-vous prévu.",
+    "appointmentAt": "{{day}} à {{time}}",
+    "with": "Avec {{name}}",
+    "allAppointments": "Voir tous vos rendez-vous →",
+    "pathwayTitle": "Votre parcours",
+    "pathwayNotStarted": "Votre parcours n’a pas encore commencé.",
+    "coordinator": "Votre coordinateur·rice",
+    "startedOn": "Commencé le",
+    "seePathway": "Voir votre parcours →",
+    "scoreTitle": "Votre qualité de vie",
+    "scoreEmpty": "Vos résultats apparaîtront après votre premier questionnaire.",
+    "outOf100": "/ 100",
+    "changeSinceLastMonth": "{{change}} depuis le mois précédent"
+  },
+  "patientAppointments": {
+    "title": "Mes rendez-vous",
+    "empty": "Aucun rendez-vous prévu.",
+    "emptyHint": "Votre coordinatrice ou coordinateur fixe vos premiers rendez-vous ; ensuite, vous convenez des suivants avec vos praticiens ou avec l’accueil.",
+    "intro": "Voici vos rendez-vous pour les trois prochains mois :",
+    "with": "Avec"
+  },
+  "patientPathway": {
+    "title": "Mon parcours",
+    "notStarted": "Votre parcours n’a pas encore commencé.",
+    "notStartedHint": "Il commencera avec votre premier bilan auprès de votre coordinatrice ou coordinateur.",
+    "coordinator": "Votre coordinateur·rice",
+    "start": "Début du parcours",
+    "end": "Fin du parcours",
+    "noMilestones": "Vos bilans apparaîtront ici au fur et à mesure.",
+    "scoresTitle": "📊 Votre auto-évaluation",
+    "stepsTitle": "🗓️ Les étapes de votre parcours",
+    "goals": "🎯 Vos objectifs",
+    "plan": "🩺 Soins convenus",
+    "symptoms": "⚡ Symptômes (intensité sur 10)",
+    "symptom": "{{name}} : "
+  },
+  "patientQuestionnaires": {
+    "title": "Questionnaires",
+    "thanks": "Merci, vos réponses sont enregistrées. Résultat : {{score}} / 100.",
+    "empty": "Aucun questionnaire à remplir pour le moment.",
+    "emptyHint": "Le prochain vous attendra ici au début du mois.",
+    "resultsTitle": "Vos résultats de qualité de vie",
+    "noResults": "Pas encore de résultat.",
+    "caption": "Sur 100 : plus le résultat est élevé, mieux c’est.",
+    "month": "Mois",
+    "score": "Résultat",
+    "change": "Évolution"
+  },
+  "questionnaire": {
+    "progress": "Votre progression",
+    "answered_one": "{{count}} réponse sur {{total}}",
+    "answered_other": "{{count}} réponses sur {{total}}",
+    "failed": "L’envoi n’a pas abouti. Vos réponses sont conservées : réessayez.",
+    "submit": "Envoyer mes réponses"
+  },
+  "schedule": {
+    "title": "Mon planning",
+    "empty": "Aucun rendez-vous dans les sept prochains jours."
+  },
+  "proPatients": {
+    "titleMine": "Mes patients",
+    "titleUnassigned": "Nouveaux patients",
+    "whichPatients": "Quels patients afficher",
+    "mine": "Mes patients",
+    "unassigned": "Sans coordination",
+    "search": "Rechercher par nom",
+    "noMatch": "Aucun patient ne correspond à cette recherche.",
+    "allAssigned": "Tous les patients ont une coordinatrice ou un coordinateur.",
+    "noneActive": "Aucun patient dans votre file active pour le moment.",
+    "bornOn": "né·e le {{date}}"
+  },
+  "patientFile": {
+    "documentTitle": "Dossier patient",
+    "info": "Informations",
+    "birthDate": "Date de naissance",
+    "email": "E-mail",
+    "phone": "Téléphone",
+    "medicalSummary": "Résumé médical",
+    "noCoordinator": "Ce patient n’a pas encore de coordinatrice ou de coordinateur.",
+    "takeOn": "Prendre en charge"
+  },
+  "scores": {
+    "title": "Qualité de vie",
+    "empty": "Pas encore de questionnaire.",
+    "caption": "Sur 100, derniers mois"
+  },
+  "need": {
+    "label": "Signaler un besoin à {{name}}",
+    "hint": "Par exemple : une nouvelle douleur, une difficulté à évoquer en coordination.",
+    "failed": "L’envoi n’a pas abouti. Votre texte est conservé : réessayez.",
+    "sent": "Besoin transmis à {{name}}.",
+    "submit": "Signaler"
+  },
+  "pathway": {
+    "title": "Parcours",
+    "lastClosed": "Dernier parcours terminé le {{date}}.",
+    "noneOpen": "Aucun parcours ouvert.",
+    "open": "Ouvrir un parcours",
+    "coordination": "Coordination : <strong>{{name}}</strong> · ouvert le {{date}}",
+    "closedOn": " · terminé le {{date}}",
+    "symptoms": "Symptômes (sur 10)",
+    "goals": "Objectifs",
+    "plan": "Soins convenus",
+    "note": "Note de coordination",
+    "record": {
+      "intake": "Enregistrer le premier bilan",
+      "review": "Enregistrer le bilan à mi-parcours",
+      "final": "Enregistrer le bilan final"
+    },
+    "closeWithoutSaving": "Fermer sans enregistrer",
+    "closeQuestion": "Clore ce parcours ? Le questionnaire de satisfaction sera proposé au patient.",
+    "close": "Clore le parcours"
+  },
+  "milestoneForm": {
+    "intro": "Auto-évaluation du patient, de 0 à 4, sans justification.",
+    "symptoms": "Symptômes et intensité (0 à 10)",
+    "symptom": "Symptôme {{number}}",
+    "intensity": "Intensité",
+    "addSymptom": "Ajouter un symptôme",
+    "goals": "Attentes et objectifs du patient",
+    "plan": "Soins convenus ensemble",
+    "note": "Note de coordination",
+    "noteHint": "Visible par l’équipe de soins, pas par le patient.",
+    "failed": "L’enregistrement n’a pas abouti. Vos saisies sont conservées : réessayez.",
+    "submit": "Enregistrer le bilan"
+  },
+  "ledPathways": {
+    "title": "Mes parcours",
+    "empty": "Vous ne coordonnez aucun parcours en cours.",
+    "seeUnassigned": "Voir les patients sans coordination",
+    "patient": "Patient",
+    "openedOn": "Ouvert le",
+    "nextMilestone": "Prochain bilan",
+    "dueAround": "Prévu vers le",
+    "allDone": "Tous les bilans sont faits",
+    "late": "En retard"
+  },
+  "needs": {
+    "title": "Besoins signalés",
+    "empty": "Aucun besoin en attente.",
+    "emptyHint": "Les besoins signalés par les praticiens sur vos parcours apparaîtront ici.",
+    "raisedBy": "· {{name}}, le {{date}}",
+    "resolve": "Marquer comme traité"
+  },
+  "dashboard": {
+    "title": "Tableau de bord",
+    "hidden": "Masqué",
+    "privacy": "🔒 Données anonymisées. Les chiffres portant sur moins de {{count}} patients sont masqués.",
+    "activePathways": "Parcours actifs",
+    "noShowRate": "Taux d’absence",
+    "recentNoShows_one": "{{count}} absence récente",
+    "recentNoShows_other": "{{count}} absences récentes",
+    "recentNoShowsFew": "moins de 5 absences récentes",
+    "satisfaction": "Satisfaction",
+    "outOf100": "/ 100",
+    "atPathwayEnd": "En fin de parcours",
+    "participation": "Participation aux questionnaires",
+    "responseRate": "Taux de réponse global estimé",
+    "basedOn_one": "Basé sur {{count}} réponse en fin de parcours.",
+    "basedOn_other": "Basé sur {{count}} réponses en fin de parcours.",
+    "basedOnFew": "Basé sur moins de 5 réponses en fin de parcours.",
+    "qualityOfLife": "Évolution de la qualité de vie",
+    "qualityCaption": "Sur 100 (6 derniers mois)",
+    "selfAssessment": "🌱 Auto-évaluation (Début vs Fin)",
+    "symptoms": "⚡ Symptômes signalés fréquents",
+    "symptomFatigue": "Fatigue",
+    "symptomJointPain": "Douleurs articulaires",
+    "symptomSleep": "Troubles du sommeil"
+  },
+  "board": {
+    "titleToday": "Accueil du jour",
+    "title": "Accueil",
+    "autoUpdated": " · mis à jour automatiquement",
+    "emptyToday": "Aucun rendez-vous aujourd’hui.",
+    "emptyDay": "Aucun rendez-vous ce jour-là.",
+    "summary": "Résumé de la journée",
+    "count": {
+      "waiting": "en salle d’attente",
+      "inSession": "en séance",
+      "upcoming": "à venir",
+      "unresolved": "sans suite",
+      "done": "terminés",
+      "noShow": "absents",
+      "cancelled": "annulés"
+    },
+    "lane": {
+      "waiting": "En salle d’attente",
+      "waitingEmpty": "Personne n’attend.",
+      "inSession": "En séance",
+      "inSessionEmpty": "Aucune séance en cours.",
+      "upcoming": "À venir",
+      "upcomingEmpty": "Plus rien de prévu.",
+      "planned": "Rendez-vous prévus",
+      "plannedEmpty": "Aucun rendez-vous prévu.",
+      "unresolved": "Sans suite",
+      "done": "Terminés",
+      "noShow": "Absents",
+      "cancelled": "Annulés"
+    },
+    "laneCount_one": "{{count}} rendez-vous",
+    "laneCount_other": "{{count}} rendez-vous",
+    "action": {
+      "attended": "Venu·e",
+      "noShow": "Absent·e",
+      "finished": "Terminé",
+      "undoNoShow": "Annuler l’absence",
+      "arrived": "Arrivé·e",
+      "callIn": "Appeler",
+      "undoArrival": "Annuler l’arrivée",
+      "finish": "Terminer",
+      "backToWaiting": "Remettre en attente"
+    },
+    "with": "avec {{name}}",
+    "notePrefix": "Note : ",
+    "fewerOptions": "Moins d’options",
+    "moreOptions": "Plus d’options",
+    "statusConflict": "Pas enregistré : ce rendez-vous venait de changer. La carte est à jour, vérifiez avant de recommencer.",
+    "statusFailed": "Pas enregistré. Réessayez.",
+    "waitingFor": "Attend depuis {{duration}}",
+    "inSessionFor": "En séance depuis {{duration}}",
+    "late": "En retard · {{duration}}",
+    "chooseDay": "Choisir le jour",
+    "previousDay": "Veille",
+    "today": "Aujourd’hui",
+    "nextDay": "Lendemain",
+    "day": "Jour"
+  },
+  "patientForm": {
+    "firstName": "Prénom",
+    "lastName": "Nom",
+    "birthDate": "Date de naissance",
+    "email": "E-mail",
+    "emailOptional": "E-mail (facultatif)",
+    "phone": "Téléphone",
+    "phoneOptional": "Téléphone (facultatif)",
+    "phoneHint": "Chiffres, espaces ou points, avec l’indicatif +33 si besoin."
+  },
+  "patientDetails": {
+    "title": "Coordonnées",
+    "edit": "Modifier les coordonnées",
+    "invalid": "Vérifiez le téléphone, l’e-mail et la date de naissance.",
+    "failed": "Les modifications n’ont pas été enregistrées. Réessayez."
+  },
+  "receptionPatient": {
+    "documentTitle": "Fiche patient"
+  },
+  "receptionPatients": {
+    "title": "Tous les patients",
+    "register": "➕ Enregistrer un nouveau patient",
+    "search": "Rechercher par nom ou téléphone",
+    "searchHint": "Début du nom, ou au moins 3 chiffres du numéro.",
+    "noMatch": "Aucun patient ne correspond à cette recherche.",
+    "none": "Aucun patient enregistré.",
+    "bornOn": "né·e le {{date}}"
+  },
+  "register": {
+    "intro": "Pour une personne dont l’admission à l’Institut est confirmée.",
+    "failed": "L’enregistrement n’a pas abouti. Vérifiez les informations, puis réessayez.",
+    "submit": "Enregistrer le patient",
+    "duplicate": "<strong>Ce patient semble déjà enregistré</strong> : même nom, même prénom, même date de naissance.",
+    "openExisting": "Ouvrir la fiche de {{name}}, né·e le {{date}}",
+    "registerAnyway": "C’est une autre personne : enregistrer quand même"
+  },
+  "accounts": {
+    "title": "Comptes utilisateurs",
+    "create": "➕ Créer un nouveau compte",
+    "empty": "Aucun compte enregistré.",
+    "errorExists": "Un compte existe déjà avec cette adresse e-mail.",
+    "errorGeneric": "La création n’a pas abouti. Vérifiez les informations, puis réessayez.",
+    "role": "Rôle",
+    "patientRecord": "Dossier patient",
+    "patientRecordHint": "Le compte donnera accès à l’espace patient de ce dossier. Seuls les dossiers sans compte sont proposés.",
+    "chooseRecord": "Choisir un dossier",
+    "fullName": "Nom complet",
+    "email": "Adresse e-mail",
+    "discipline": "Discipline (facultatif)",
+    "disciplineHint": "Par exemple : Sophrologie, Activité physique adaptée.",
+    "password": "Mot de passe initial",
+    "passwordHint": "{{min}} caractères minimum, à transmettre à la personne en main propre.",
+    "created": "Compte créé pour {{name}}.",
+    "submit": "Créer le compte"
+  },
+  "faqAdmin": {
+    "title": "Gérer la FAQ",
+    "intro": "💡 Les questions publiées sont visibles par tous sur la page publique. Les brouillons restent visibles ici seulement.",
+    "addQuestion": "➕ Ajouter une nouvelle question",
+    "saveDraft": "Enregistrer comme brouillon",
+    "empty": "Aucune question pour le moment.",
+    "categoryNotEmpty": "Cette catégorie contient encore des questions : déplacez-les ou supprimez-les d’abord.",
+    "categories": "Catégories existantes",
+    "deleteCategoryQuestion": "Supprimer « {{name}} » ?",
+    "delete": "Supprimer",
+    "newCategory": "Nouvelle catégorie",
+    "addCategory": "Ajouter la catégorie",
+    "categoryExists": "Une catégorie porte déjà ce nom.",
+    "editQuestion": "Modifier la question",
+    "published": "Publiée",
+    "draft": "Brouillon",
+    "unpublish": "Dépublier",
+    "publish": "Publier",
+    "edit": "✏️ Modifier",
+    "deleteQuestion": "Supprimer cette question ?",
+    "deleteButton": "🗑 Supprimer",
+    "category": "Catégorie",
+    "question": "Question",
+    "answer": "Réponse",
+    "saveFailed": "L’enregistrement n’a pas abouti. Votre texte est conservé : réessayez."
+  }
+}

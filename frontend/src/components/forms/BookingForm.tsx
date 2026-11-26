@@ -1,10 +1,10 @@
 import { useState, type FormEvent } from "react";
+import { useTranslation } from "react-i18next";
 
 import { ApiError } from "../../api/core/client";
 import { useCareTeam } from "../../api/care_team";
 import { NOTE_MAX_LENGTH, useBookAppointment } from "../../api/scheduling";
 import { SlotPicker } from "../appointments/SlotPicker";
-import { ROLE_LABELS } from "../../lib/labels";
 import { instituteDateTime, instituteToday } from "../../lib/time";
 import { Button } from "./Button";
 import { SelectField } from "./SelectField";
@@ -24,6 +24,7 @@ type Props = {
 
 /** Book an appointment with a member of the patient's care team, picking from their free times. */
 export function BookingForm({ patientId, practitioner }: Props) {
+  const { t } = useTranslation();
   const team = useCareTeam(patientId);
   const book = useBookAppointment();
   const [memberId, setMemberId] = useState(practitioner?.id ?? "");
@@ -66,36 +67,36 @@ export function BookingForm({ patientId, practitioner }: Props) {
 
   const error =
     book.error instanceof ApiError && book.error.status === 409
-      ? "Ce créneau n’est pas libre pour le patient ou pour la personne choisie."
+      ? t("booking.errorTaken")
       : book.error instanceof ApiError && book.error.status === 400
-        ? "Ce jour est déjà passé : choisissez aujourd’hui ou une date à venir."
+        ? t("booking.errorPast")
         : book.isError
-          ? "La prise de rendez-vous n’a pas abouti. Réessayez."
+          ? t("booking.errorGeneric")
           : undefined;
 
   return (
     <form className="rf-form rf-narrow" onSubmit={submit}>
       {practitioner ? (
-        <p className="rf-muted">Séance avec vous ({practitioner.name}).</p>
+        <p className="rf-muted">{t("booking.withYou", { name: practitioner.name })}</p>
       ) : (
         <SelectField
-          label="Avec"
+          label={t("booking.with")}
           required
           value={memberId}
           onChange={(event) => chooseMember(event.target.value)}
-          hint={team.data?.length === 0 ? "Ajoutez d’abord quelqu’un à l’équipe de soins." : undefined}
+          hint={team.data?.length === 0 ? t("booking.emptyTeamHint") : undefined}
         >
-          <option value="">Choisir dans l’équipe de soins</option>
+          <option value="">{t("booking.chooseMember")}</option>
           {team.data?.map((m) => (
             <option key={m.user_id} value={m.user_id}>
-              {m.full_name} · {m.discipline ?? ROLE_LABELS[m.role]}
+              {m.full_name} · {m.discipline ?? t(`labels.role.${m.role}`)}
             </option>
           ))}
         </SelectField>
       )}
       <div className="rf-row">
         <TextField
-          label="Date"
+          label={t("booking.date")}
           type="date"
           required
           min={instituteToday()}
@@ -105,10 +106,14 @@ export function BookingForm({ patientId, practitioner }: Props) {
             setTime("");
           }}
         />
-        <SelectField label="Durée" value={minutes} onChange={(event) => setMinutes(Number(event.target.value))}>
+        <SelectField
+          label={t("booking.duration")}
+          value={minutes}
+          onChange={(event) => setMinutes(Number(event.target.value))}
+        >
           {DURATIONS.map((d) => (
             <option key={d} value={d}>
-              {d} min
+              {t("format.minutes", { minutes: d })}
             </option>
           ))}
         </SelectField>
@@ -122,19 +127,19 @@ export function BookingForm({ patientId, practitioner }: Props) {
         context={{ patientId }}
       />
       <TextField
-        label="Heure"
+        label={t("booking.time")}
         type="time"
         required
-        hint="Heure de Paris. Choisissez un créneau ci-dessus ou saisissez une autre heure."
+        hint={t("booking.timeHint")}
         step={300}
         value={time}
         onChange={(event) => setTime(event.target.value)}
       />
       <TextArea
-        label="Note pour l’équipe (facultatif)"
+        label={t("booking.note")}
         rows={2}
         maxLength={NOTE_MAX_LENGTH}
-        hint="Visible par l’équipe, pas par le patient. Aucune information médicale."
+        hint={t("booking.noteHint")}
         value={note}
         onChange={(event) => setNote(event.target.value)}
       />
@@ -145,11 +150,11 @@ export function BookingForm({ patientId, practitioner }: Props) {
       )}
       {booked && (
         <p className="rf-banner" role="status">
-          Rendez-vous enregistré.
+          {t("booking.booked")}
         </p>
       )}
       <Button type="submit" pending={book.isPending}>
-        Prendre le rendez-vous
+        {t("booking.submit")}
       </Button>
     </form>
   );

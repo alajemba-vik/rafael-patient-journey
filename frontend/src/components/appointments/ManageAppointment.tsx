@@ -1,4 +1,5 @@
 import { useId, useState, type FormEvent } from "react";
+import { useTranslation } from "react-i18next";
 
 import { ApiError } from "../../api/core/client";
 import {
@@ -12,8 +13,9 @@ import {
 import { Button } from "../forms/Button";
 import { TextArea } from "../forms/TextArea";
 import { TextField } from "../forms/TextField";
-import { CANCEL_REASON_LABELS } from "../../lib/labels";
-import { instituteClock, instituteDate, instituteDateTime, instituteToday, minutesBetween } from "../../lib/time";
+import { formatTime } from "../../lib/format";
+import { CANCEL_REASONS } from "../../lib/labels";
+import { instituteDate, instituteDateTime, instituteToday, minutesBetween } from "../../lib/time";
 import { SlotPicker } from "./SlotPicker";
 
 type Panel = "move" | "cancel" | "note";
@@ -23,6 +25,7 @@ type Panel = "move" | "cancel" | "note";
  * sticky note. One panel opens at a time, right under the appointment it changes.
  */
 export function ManageAppointment({ appointment }: { appointment: Appointment }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState<Panel | null>(null);
   const panelId = useId();
   const scheduled = appointment.status === "scheduled";
@@ -37,16 +40,16 @@ export function ManageAppointment({ appointment }: { appointment: Appointment })
       <div className="rf-card__actions">
         {scheduled && (
           <ToggleButton panel="move" open={open} panelId={panelId} onToggle={toggle} who={appointment.patient_name}>
-            Déplacer
+            {t("manage.move")}
           </ToggleButton>
         )}
         {scheduled && (
           <ToggleButton panel="cancel" open={open} panelId={panelId} onToggle={toggle} who={appointment.patient_name}>
-            Annuler
+            {t("manage.cancel")}
           </ToggleButton>
         )}
         <ToggleButton panel="note" open={open} panelId={panelId} onToggle={toggle} who={appointment.patient_name}>
-          {appointment.note ? "Modifier la note" : "Ajouter une note"}
+          {appointment.note ? t("manage.editNote") : t("manage.addNote")}
         </ToggleButton>
       </div>
       {open && (
@@ -84,6 +87,7 @@ function ToggleButton(props: {
 }
 
 function MoveForm({ appointment, onDone }: { appointment: Appointment; onDone: () => void }) {
+  const { t } = useTranslation();
   const move = useRescheduleAppointment();
   const minutes = minutesBetween(appointment.starts_at, appointment.ends_at);
   const [date, setDate] = useState(() => {
@@ -106,13 +110,20 @@ function MoveForm({ appointment, onDone }: { appointment: Appointment; onDone: (
   }
 
   return (
-    <form className="rf-form" onSubmit={submit} aria-label={`Déplacer le rendez-vous de ${appointment.patient_name}`}>
+    <form
+      className="rf-form"
+      onSubmit={submit}
+      aria-label={t("manage.moveFormLabel", { name: appointment.patient_name })}
+    >
       <p className="rf-muted">
-        Même durée ({minutes} min), avec {appointment.professional_name}. Actuellement à{" "}
-        {instituteClock(appointment.starts_at).replace(":", " h ")}.
+        {t("manage.moveIntro", {
+          minutes,
+          professional: appointment.professional_name,
+          time: formatTime(appointment.starts_at),
+        })}
       </p>
       <TextField
-        label="Nouvelle date"
+        label={t("manage.newDate")}
         type="date"
         required
         min={instituteToday()}
@@ -131,36 +142,33 @@ function MoveForm({ appointment, onDone }: { appointment: Appointment; onDone: (
         context={{ patientId: appointment.patient_id, ignoreId: appointment.id }}
       />
       <TextField
-        label="Nouvelle heure"
+        label={t("manage.newTime")}
         type="time"
         required
         step={300}
-        hint="Heure de Paris."
+        hint={t("manage.parisTime")}
         value={time}
         onChange={(event) => setTime(event.target.value)}
       />
       {move.isError && (
         <p className="rf-field__error" role="alert">
-          {move.error instanceof ApiError && move.error.status === 409
-            ? "Ce créneau n’est plus libre. Choisissez-en un autre."
-            : "Le rendez-vous n’a pas été déplacé. Réessayez."}
+          {move.error instanceof ApiError && move.error.status === 409 ? t("manage.moveTaken") : t("manage.moveFailed")}
         </p>
       )}
       <div className="rf-actions">
         <Button type="submit" pending={move.isPending}>
-          Déplacer le rendez-vous
+          {t("manage.moveSubmit")}
         </Button>
         <Button variant="secondary" onClick={onDone} disabled={move.isPending}>
-          Retour
+          {t("common.back")}
         </Button>
       </div>
     </form>
   );
 }
 
-const REASONS = Object.entries(CANCEL_REASON_LABELS) as [CancelReason, string][];
-
 function CancelForm({ appointment, onDone }: { appointment: Appointment; onDone: () => void }) {
+  const { t } = useTranslation();
   const cancel = useCancelAppointment();
   const [reason, setReason] = useState<CancelReason>("patient_request");
   const name = useId();
@@ -171,11 +179,15 @@ function CancelForm({ appointment, onDone }: { appointment: Appointment; onDone:
   }
 
   return (
-    <form className="rf-form" onSubmit={submit} aria-label={`Annuler le rendez-vous de ${appointment.patient_name}`}>
+    <form
+      className="rf-form"
+      onSubmit={submit}
+      aria-label={t("manage.cancelFormLabel", { name: appointment.patient_name })}
+    >
       <fieldset className="rf-question">
-        <legend>Pourquoi ce rendez-vous est-il annulé ?</legend>
+        <legend>{t("manage.cancelQuestion")}</legend>
         <div className="rf-choices">
-          {REASONS.map(([value, label]) => (
+          {CANCEL_REASONS.map((value) => (
             <label key={value} className="rf-choice">
               <input
                 type="radio"
@@ -184,22 +196,22 @@ function CancelForm({ appointment, onDone }: { appointment: Appointment; onDone:
                 checked={reason === value}
                 onChange={() => setReason(value)}
               />
-              <span>{label}</span>
+              <span>{t(`labels.cancelReason.${value}`)}</span>
             </label>
           ))}
         </div>
       </fieldset>
       {cancel.isError && (
         <p className="rf-field__error" role="alert">
-          L’annulation n’a pas abouti. Réessayez.
+          {t("manage.cancelFailed")}
         </p>
       )}
       <div className="rf-actions">
         <Button type="submit" pending={cancel.isPending}>
-          Annuler le rendez-vous
+          {t("manage.cancelSubmit")}
         </Button>
         <Button variant="secondary" onClick={onDone} disabled={cancel.isPending}>
-          Garder le rendez-vous
+          {t("manage.keep")}
         </Button>
       </div>
     </form>
@@ -207,6 +219,7 @@ function CancelForm({ appointment, onDone }: { appointment: Appointment; onDone:
 }
 
 function NoteForm({ appointment, onDone }: { appointment: Appointment; onDone: () => void }) {
+  const { t } = useTranslation();
   const save = useUpdateAppointmentNote();
   const [note, setNote] = useState(appointment.note ?? "");
 
@@ -216,32 +229,36 @@ function NoteForm({ appointment, onDone }: { appointment: Appointment; onDone: (
   }
 
   return (
-    <form className="rf-form" onSubmit={submit} aria-label={`Note sur le rendez-vous de ${appointment.patient_name}`}>
+    <form
+      className="rf-form"
+      onSubmit={submit}
+      aria-label={t("manage.noteFormLabel", { name: appointment.patient_name })}
+    >
       <TextArea
-        label="Note pour l’équipe"
+        label={t("manage.noteLabel")}
         rows={2}
         maxLength={NOTE_MAX_LENGTH}
         autoFocus
-        hint={`Visible par l’équipe, pas par le patient. Aucune information médicale. ${note.length}/${NOTE_MAX_LENGTH}`}
+        hint={t("manage.noteHint", { length: note.length, max: NOTE_MAX_LENGTH })}
         value={note}
         onChange={(event) => setNote(event.target.value)}
       />
       {save.isError && (
         <p className="rf-field__error" role="alert">
-          La note n’a pas été enregistrée. Réessayez.
+          {t("manage.noteFailed")}
         </p>
       )}
       <div className="rf-actions">
         <Button type="submit" pending={save.isPending}>
-          Enregistrer la note
+          {t("manage.noteSave")}
         </Button>
         {appointment.note && (
           <Button variant="secondary" onClick={(event) => submit(event, "")} disabled={save.isPending}>
-            Effacer la note
+            {t("manage.noteClear")}
           </Button>
         )}
         <Button variant="secondary" className="rf-btn--quiet" onClick={onDone} disabled={save.isPending}>
-          Retour
+          {t("common.back")}
         </Button>
       </div>
     </form>

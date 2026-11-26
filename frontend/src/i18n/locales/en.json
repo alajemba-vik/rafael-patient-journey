@@ -1,0 +1,490 @@
+{
+  "common": {
+    "back": "Back",
+    "cancel": "Cancel",
+    "save": "Save",
+    "retry": "Try again"
+  },
+  "format": {
+    "time": "{{hours}}:{{minutes}}",
+    "minutes": "{{minutes}} min",
+    "hoursMinutes": "{{hours}} h {{minutes}}"
+  },
+  "labels": {
+    "milestone": {
+      "intake": "Initial assessment",
+      "review": "Mid-pathway review",
+      "final": "Final assessment"
+    },
+    "dimension": {
+      "physical": "Physical and sport",
+      "psychological": "Psychological",
+      "emotional": "Emotional",
+      "sexual": "Sexual",
+      "socio_professional": "Social and work life"
+    },
+    "role": {
+      "patient": "Patient",
+      "secretary": "Receptionist",
+      "professional": "Practitioner",
+      "coordinator": "Care coordinator",
+      "admin": "Administrator"
+    },
+    "status": {
+      "scheduled": "Scheduled",
+      "arrived": "In the waiting room",
+      "in_session": "In session",
+      "done": "Done",
+      "no_show": "No-show",
+      "cancelled": "Cancelled"
+    },
+    "cancelReason": {
+      "patient_request": "The patient let us know",
+      "practitioner_unavailable": "Practitioner unavailable",
+      "other": "Other reason"
+    }
+  },
+  "shell": {
+    "skipToContent": "Skip to content",
+    "mainNav": "Main navigation",
+    "signOut": "Sign out",
+    "signIn": "Sign in",
+    "language": "Language"
+  },
+  "nav": {
+    "faq": "FAQ",
+    "patientHome": "My space",
+    "patientAppointments": "My appointments",
+    "patientPathway": "My pathway",
+    "patientQuestionnaires": "Questionnaires",
+    "receptionBoard": "Today at reception",
+    "receptionPatients": "Patients",
+    "proSchedule": "My schedule",
+    "proPatients": "My patients",
+    "proPathways": "My pathways",
+    "proNeeds": "Reported needs",
+    "dashboard": "Dashboard",
+    "adminAccounts": "Accounts",
+    "adminFaq": "Manage the FAQ"
+  },
+  "feedback": {
+    "loading": "Loading",
+    "errorTitle": "This information couldn’t be loaded.",
+    "errorHint": "Check your connection, then try again.",
+    "notAllowedTitle": "You don’t have access to this page.",
+    "notAllowedHint": "If you think this is a mistake, contact the platform administrator.",
+    "routeErrorTitle": "Something went wrong",
+    "routeErrorText": "The page couldn’t be displayed. Reload it; if the problem continues, go back to your start page.",
+    "reload": "Reload the page",
+    "backHome": "Back to my start page"
+  },
+  "booking": {
+    "errorTaken": "This slot isn’t free for the patient or for the person chosen.",
+    "errorPast": "This day has already passed: choose today or a later date.",
+    "errorGeneric": "The appointment couldn’t be booked. Try again.",
+    "withYou": "Session with you ({{name}}).",
+    "with": "With",
+    "emptyTeamHint": "First add someone to the care team.",
+    "chooseMember": "Choose from the care team",
+    "date": "Date",
+    "duration": "Duration",
+    "time": "Time",
+    "timeHint": "Paris time. Pick a slot above or type another time.",
+    "note": "Note for the team (optional)",
+    "noteHint": "Seen by the team, not by the patient. No medical information.",
+    "booked": "Appointment booked.",
+    "submit": "Book the appointment"
+  },
+  "slots": {
+    "chooseFirst": "Choose the person and the date to see the free slots.",
+    "searching": "Looking for free slots…",
+    "unavailable": "Slots unavailable right now: type the time below.",
+    "none": "No free {{minutes}}-minute slot that day. Try another date.",
+    "morning": "Morning",
+    "afternoon": "Afternoon",
+    "freeOf": "· free {{minutes}}-minute slots"
+  },
+  "manage": {
+    "move": "Move",
+    "cancel": "Cancel",
+    "editNote": "Edit the note",
+    "addNote": "Add a note",
+    "moveFormLabel": "Move {{name}}’s appointment",
+    "moveIntro": "Same length ({{minutes}} min), with {{professional}}. Currently at {{time}}.",
+    "newDate": "New date",
+    "newTime": "New time",
+    "parisTime": "Paris time.",
+    "moveTaken": "This slot is no longer free. Choose another one.",
+    "moveFailed": "The appointment wasn’t moved. Try again.",
+    "moveSubmit": "Move the appointment",
+    "cancelFormLabel": "Cancel {{name}}’s appointment",
+    "cancelQuestion": "Why is this appointment cancelled?",
+    "cancelFailed": "The cancellation didn’t go through. Try again.",
+    "cancelSubmit": "Cancel the appointment",
+    "keep": "Keep the appointment",
+    "noteFormLabel": "Note on {{name}}’s appointment",
+    "noteLabel": "Note for the team",
+    "noteHint": "Seen by the team, not by the patient. No medical information. {{length}}/{{max}}",
+    "noteFailed": "The note wasn’t saved. Try again.",
+    "noteSave": "Save the note",
+    "noteClear": "Clear the note"
+  },
+  "appointments": {
+    "title": "Appointments",
+    "book": "Book an appointment",
+    "empty": "No appointments for this patient.",
+    "upcoming": "Upcoming",
+    "noUpcoming": "No upcoming appointments.",
+    "history": "History · {{count}}",
+    "with": "with {{name}}",
+    "notePrefix": "Note: "
+  },
+  "careTeam": {
+    "title": "Care team",
+    "empty": "No members yet.",
+    "removeQuestion": "Remove {{name}}?",
+    "remove": "Remove",
+    "addLabel": "Add to the team",
+    "choosePerson": "Choose a person",
+    "addFailed": "The person wasn’t added. Try again.",
+    "add": "Add"
+  },
+  "milestones": {
+    "caption": "Self-assessment, from 0 to 4",
+    "dimension": "Dimension"
+  },
+  "faq": {
+    "title": "Frequently asked questions",
+    "intro": "Find answers to the most common questions here. Click a question to show its answer.",
+    "empty": "No questions published yet."
+  },
+  "login": {
+    "title": "Sign in",
+    "errorCredentials": "Incorrect email or password.",
+    "errorTooMany": "Too many attempts. Wait a minute, then try again.",
+    "errorUnavailable": "Signing in isn’t possible right now. Try again in a moment.",
+    "expired": "Your session has expired. Please sign in again.",
+    "email": "Email address",
+    "password": "Password",
+    "submit": "Sign in"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "text": "This address doesn’t match any page."
+  },
+  "patientHome": {
+    "title": "My space",
+    "greeting": "Hello <name>{{name}}</name> 👋",
+    "dueTitle": "A questionnaire is waiting for you",
+    "dueText": "{{title}}. It only takes a few minutes.",
+    "answerNow": "Answer now",
+    "nextTitle": "Your next appointments",
+    "noAppointments": "No appointments scheduled.",
+    "appointmentAt": "{{day}} at {{time}}",
+    "with": "With {{name}}",
+    "allAppointments": "See all your appointments →",
+    "pathwayTitle": "Your pathway",
+    "pathwayNotStarted": "Your pathway hasn’t started yet.",
+    "coordinator": "Your care coordinator",
+    "startedOn": "Started on",
+    "seePathway": "See your pathway →",
+    "scoreTitle": "Your quality of life",
+    "scoreEmpty": "Your results will appear after your first questionnaire.",
+    "outOf100": "/ 100",
+    "changeSinceLastMonth": "{{change}} since last month"
+  },
+  "patientAppointments": {
+    "title": "My appointments",
+    "empty": "No appointments scheduled.",
+    "emptyHint": "Your care coordinator sets your first appointments; after that, you arrange the next ones with your practitioners or with reception.",
+    "intro": "Here are your appointments for the next three months:",
+    "with": "With"
+  },
+  "patientPathway": {
+    "title": "My pathway",
+    "notStarted": "Your pathway hasn’t started yet.",
+    "notStartedHint": "It will start with your first assessment with your care coordinator.",
+    "coordinator": "Your care coordinator",
+    "start": "Pathway start",
+    "end": "Pathway end",
+    "noMilestones": "Your assessments will appear here as they happen.",
+    "scoresTitle": "📊 Your self-assessment",
+    "stepsTitle": "🗓️ The steps of your pathway",
+    "goals": "🎯 Your goals",
+    "plan": "🩺 Agreed care",
+    "symptoms": "⚡ Symptoms (intensity out of 10)",
+    "symptom": "{{name}}: "
+  },
+  "patientQuestionnaires": {
+    "title": "Questionnaires",
+    "thanks": "Thank you, your answers are saved. Result: {{score}} / 100.",
+    "empty": "No questionnaire to fill in right now.",
+    "emptyHint": "The next one will be waiting for you here at the start of the month.",
+    "resultsTitle": "Your quality-of-life results",
+    "noResults": "No results yet.",
+    "caption": "Out of 100: the higher the result, the better.",
+    "month": "Month",
+    "score": "Result",
+    "change": "Change"
+  },
+  "questionnaire": {
+    "progress": "Your progress",
+    "answered_one": "{{count}} answer out of {{total}}",
+    "answered_other": "{{count}} answers out of {{total}}",
+    "failed": "Sending failed. Your answers are kept: try again.",
+    "submit": "Send my answers"
+  },
+  "schedule": {
+    "title": "My schedule",
+    "empty": "No appointments in the next seven days."
+  },
+  "proPatients": {
+    "titleMine": "My patients",
+    "titleUnassigned": "New patients",
+    "whichPatients": "Which patients to show",
+    "mine": "My patients",
+    "unassigned": "Without a coordinator",
+    "search": "Search by name",
+    "noMatch": "No patient matches this search.",
+    "allAssigned": "Every patient has a care coordinator.",
+    "noneActive": "No patients in your active list yet.",
+    "bornOn": "born {{date}}"
+  },
+  "patientFile": {
+    "documentTitle": "Patient file",
+    "info": "Details",
+    "birthDate": "Date of birth",
+    "email": "Email",
+    "phone": "Phone",
+    "medicalSummary": "Medical summary",
+    "noCoordinator": "This patient doesn’t have a care coordinator yet.",
+    "takeOn": "Take on this patient"
+  },
+  "scores": {
+    "title": "Quality of life",
+    "empty": "No questionnaire yet.",
+    "caption": "Out of 100, recent months"
+  },
+  "need": {
+    "label": "Report a need to {{name}}",
+    "hint": "For example: a new pain, a difficulty to discuss in coordination.",
+    "failed": "Sending failed. Your text is kept: try again.",
+    "sent": "Need passed on to {{name}}.",
+    "submit": "Report"
+  },
+  "pathway": {
+    "title": "Pathway",
+    "lastClosed": "Last pathway ended on {{date}}.",
+    "noneOpen": "No open pathway.",
+    "open": "Open a pathway",
+    "coordination": "Coordinator: <strong>{{name}}</strong> · opened on {{date}}",
+    "closedOn": " · ended on {{date}}",
+    "symptoms": "Symptoms (out of 10)",
+    "goals": "Goals",
+    "plan": "Agreed care",
+    "note": "Coordination note",
+    "record": {
+      "intake": "Record the initial assessment",
+      "review": "Record the mid-pathway review",
+      "final": "Record the final assessment"
+    },
+    "closeWithoutSaving": "Close without saving",
+    "closeQuestion": "Close this pathway? The patient will be offered the satisfaction questionnaire.",
+    "close": "Close the pathway"
+  },
+  "milestoneForm": {
+    "intro": "The patient’s self-assessment, from 0 to 4, with no justification needed.",
+    "symptoms": "Symptoms and intensity (0 to 10)",
+    "symptom": "Symptom {{number}}",
+    "intensity": "Intensity",
+    "addSymptom": "Add a symptom",
+    "goals": "The patient’s expectations and goals",
+    "plan": "Care agreed together",
+    "note": "Coordination note",
+    "noteHint": "Seen by the care team, not by the patient.",
+    "failed": "Saving failed. What you entered is kept: try again.",
+    "submit": "Save the assessment"
+  },
+  "ledPathways": {
+    "title": "My pathways",
+    "empty": "You aren’t coordinating any ongoing pathway.",
+    "seeUnassigned": "See patients without a coordinator",
+    "patient": "Patient",
+    "openedOn": "Opened on",
+    "nextMilestone": "Next assessment",
+    "dueAround": "Due around",
+    "allDone": "All assessments done",
+    "late": "Overdue"
+  },
+  "needs": {
+    "title": "Reported needs",
+    "empty": "No needs waiting.",
+    "emptyHint": "Needs reported by practitioners on your pathways will appear here.",
+    "raisedBy": "· {{name}}, on {{date}}",
+    "resolve": "Mark as handled"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "hidden": "Hidden",
+    "privacy": "🔒 De-identified data. Figures about fewer than {{count}} patients are hidden.",
+    "activePathways": "Active pathways",
+    "noShowRate": "No-show rate",
+    "recentNoShows_one": "{{count}} recent no-show",
+    "recentNoShows_other": "{{count}} recent no-shows",
+    "recentNoShowsFew": "fewer than 5 recent no-shows",
+    "satisfaction": "Satisfaction",
+    "outOf100": "/ 100",
+    "atPathwayEnd": "At the end of the pathway",
+    "participation": "Questionnaire participation",
+    "responseRate": "Estimated overall response rate",
+    "basedOn_one": "Based on {{count}} answer at the end of the pathway.",
+    "basedOn_other": "Based on {{count}} answers at the end of the pathway.",
+    "basedOnFew": "Based on fewer than 5 answers at the end of the pathway.",
+    "qualityOfLife": "Quality of life over time",
+    "qualityCaption": "Out of 100 (last 6 months)",
+    "selfAssessment": "🌱 Self-assessment (start vs end)",
+    "symptoms": "⚡ Frequently reported symptoms",
+    "symptomFatigue": "Fatigue",
+    "symptomJointPain": "Joint pain",
+    "symptomSleep": "Sleep problems"
+  },
+  "board": {
+    "titleToday": "Today at reception",
+    "title": "Reception",
+    "autoUpdated": " · updates automatically",
+    "emptyToday": "No appointments today.",
+    "emptyDay": "No appointments that day.",
+    "summary": "Summary of the day",
+    "count": {
+      "waiting": "in the waiting room",
+      "inSession": "in session",
+      "upcoming": "upcoming",
+      "unresolved": "left open",
+      "done": "done",
+      "noShow": "no-shows",
+      "cancelled": "cancelled"
+    },
+    "lane": {
+      "waiting": "In the waiting room",
+      "waitingEmpty": "Nobody is waiting.",
+      "inSession": "In session",
+      "inSessionEmpty": "No session in progress.",
+      "upcoming": "Upcoming",
+      "upcomingEmpty": "Nothing else planned.",
+      "planned": "Planned appointments",
+      "plannedEmpty": "No appointments planned.",
+      "unresolved": "Left open",
+      "done": "Done",
+      "noShow": "No-shows",
+      "cancelled": "Cancelled"
+    },
+    "laneCount_one": "{{count}} appointment",
+    "laneCount_other": "{{count}} appointments",
+    "action": {
+      "attended": "Came",
+      "noShow": "No-show",
+      "finished": "Done",
+      "undoNoShow": "Undo no-show",
+      "arrived": "Arrived",
+      "callIn": "Call in",
+      "undoArrival": "Undo arrival",
+      "finish": "Finish",
+      "backToWaiting": "Back to waiting"
+    },
+    "with": "with {{name}}",
+    "notePrefix": "Note: ",
+    "fewerOptions": "Fewer options",
+    "moreOptions": "More options",
+    "statusConflict": "Not saved: this appointment had just changed. The card is up to date; check it before trying again.",
+    "statusFailed": "Not saved. Try again.",
+    "waitingFor": "Waiting for {{duration}}",
+    "inSessionFor": "In session for {{duration}}",
+    "late": "Late · {{duration}}",
+    "chooseDay": "Choose the day",
+    "previousDay": "Previous day",
+    "today": "Today",
+    "nextDay": "Next day",
+    "day": "Day"
+  },
+  "patientForm": {
+    "firstName": "First name",
+    "lastName": "Last name",
+    "birthDate": "Date of birth",
+    "email": "Email",
+    "emailOptional": "Email (optional)",
+    "phone": "Phone",
+    "phoneOptional": "Phone (optional)",
+    "phoneHint": "Digits, spaces or dots, with the +33 country code if needed."
+  },
+  "patientDetails": {
+    "title": "Contact details",
+    "edit": "Edit the contact details",
+    "invalid": "Check the phone number, the email and the date of birth.",
+    "failed": "The changes weren’t saved. Try again."
+  },
+  "receptionPatient": {
+    "documentTitle": "Patient record"
+  },
+  "receptionPatients": {
+    "title": "All patients",
+    "register": "➕ Register a new patient",
+    "search": "Search by name or phone",
+    "searchHint": "Start of the name, or at least 3 digits of the number.",
+    "noMatch": "No patient matches this search.",
+    "none": "No patients registered.",
+    "bornOn": "born {{date}}"
+  },
+  "register": {
+    "intro": "For someone whose admission to the Institute is confirmed.",
+    "failed": "Registration failed. Check the details, then try again.",
+    "submit": "Register the patient",
+    "duplicate": "<strong>This patient seems to be registered already</strong>: same last name, first name and date of birth.",
+    "openExisting": "Open the record of {{name}}, born {{date}}",
+    "registerAnyway": "It’s a different person: register anyway"
+  },
+  "accounts": {
+    "title": "User accounts",
+    "create": "➕ Create a new account",
+    "empty": "No accounts yet.",
+    "errorExists": "An account already exists with this email address.",
+    "errorGeneric": "The account wasn’t created. Check the details, then try again.",
+    "role": "Role",
+    "patientRecord": "Patient record",
+    "patientRecordHint": "The account will give access to this record’s patient space. Only records without an account are listed.",
+    "chooseRecord": "Choose a record",
+    "fullName": "Full name",
+    "email": "Email address",
+    "discipline": "Discipline (optional)",
+    "disciplineHint": "For example: Sophrology, Adapted physical activity.",
+    "password": "Initial password",
+    "passwordHint": "At least {{min}} characters, to hand to the person directly.",
+    "created": "Account created for {{name}}.",
+    "submit": "Create the account"
+  },
+  "faqAdmin": {
+    "title": "Manage the FAQ",
+    "intro": "💡 Published questions are visible to everyone on the public page. Drafts are only visible here.",
+    "addQuestion": "➕ Add a new question",
+    "saveDraft": "Save as draft",
+    "empty": "No questions yet.",
+    "categoryNotEmpty": "This category still has questions: move or delete them first.",
+    "categories": "Existing categories",
+    "deleteCategoryQuestion": "Delete “{{name}}”?",
+    "delete": "Delete",
+    "newCategory": "New category",
+    "addCategory": "Add the category",
+    "categoryExists": "A category already has this name.",
+    "editQuestion": "Edit the question",
+    "published": "Published",
+    "draft": "Draft",
+    "unpublish": "Unpublish",
+    "publish": "Publish",
+    "edit": "✏️ Edit",
+    "deleteQuestion": "Delete this question?",
+    "deleteButton": "🗑 Delete",
+    "category": "Category",
+    "question": "Question",
+    "answer": "Answer",
+    "saveFailed": "Saving failed. Your text is kept: try again."
+  }
+}

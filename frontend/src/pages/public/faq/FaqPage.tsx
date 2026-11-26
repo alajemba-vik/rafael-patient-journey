@@ -1,22 +1,22 @@
+import { useTranslation } from "react-i18next";
+
 import { usePublishedFaq } from "../../../api/faq";
 import { QueryState } from "../../../components/feedback/QueryState";
 import { PageHeader } from "../../../components/layout/PageHeader";
 
 export function FaqPage() {
+  const { t } = useTranslation();
   const faq = usePublishedFaq();
 
   return (
     <div style={{ maxWidth: "800px", margin: "0 auto" }}>
-      <PageHeader title="Questions fréquentes" />
+      <PageHeader title={t("faq.title")} />
 
       <p className="rf-lead" style={{ color: "var(--ink-muted)", marginBottom: "var(--space-6)" }}>
-        Retrouvez ici les réponses aux questions les plus courantes. Cliquez sur une question pour afficher la réponse.
+        {t("faq.intro")}
       </p>
 
-      <QueryState
-        query={faq}
-        empty={{ isEmpty: (categories) => categories.length === 0, title: "Aucune question publiée pour le moment." }}
-      >
+      <QueryState query={faq} empty={{ isEmpty: (categories) => categories.length === 0, title: t("faq.empty") }}>
         {(categories) =>
           categories.map((category) => (
             <section key={category.id} className="rf-section" aria-labelledby={`faq-${category.id}`}>

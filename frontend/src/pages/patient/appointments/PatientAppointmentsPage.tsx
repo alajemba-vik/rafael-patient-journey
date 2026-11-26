@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+
 import { useMyAppointments } from "../../../api/scheduling";
 import { QueryState } from "../../../components/feedback/QueryState";
 import { StatusBadge } from "../../../components/feedback/StatusBadge";
@@ -5,29 +7,25 @@ import { formatTime, formatWeekday } from "../../../lib/format";
 import { PageHeader } from "../../../components/layout/PageHeader";
 
 export function PatientAppointmentsPage() {
+  const { t } = useTranslation();
   const appointments = useMyAppointments();
 
   return (
     <div style={{ maxWidth: "800px", margin: "0 auto" }}>
-      <PageHeader title="Mes rendez-vous" />
+      <PageHeader title={t("patientAppointments.title")} />
 
       <QueryState
         query={appointments}
         empty={{
           isEmpty: (list) => list.length === 0,
-          title: "Aucun rendez-vous prévu.",
-          children: (
-            <p className="rf-lead">
-              Votre coordinatrice ou coordinateur fixe vos premiers rendez-vous ; ensuite, vous convenez des suivants
-              avec vos praticiens ou avec l’accueil.
-            </p>
-          ),
+          title: t("patientAppointments.empty"),
+          children: <p className="rf-lead">{t("patientAppointments.emptyHint")}</p>,
         }}
       >
         {(list) => (
           <div className="rf-stack" style={{ gap: "var(--space-4)" }}>
             <p className="rf-muted" style={{ marginBottom: "var(--space-2)" }}>
-              Voici vos rendez-vous pour les trois prochains mois :
+              {t("patientAppointments.intro")}
             </p>
 
             {list.map((a) => (
@@ -67,7 +65,7 @@ export function PatientAppointmentsPage() {
                     className="rf-muted"
                     style={{ fontSize: "13px", textTransform: "uppercase", letterSpacing: "0.5px" }}
                   >
-                    Avec
+                    {t("patientAppointments.with")}
                   </span>
                   <span style={{ fontWeight: 600, fontSize: "16px" }}>{a.professional_name}</span>
                 </div>

@@ -1,6 +1,7 @@
+import { useTranslation } from "react-i18next";
+
 import { useAccounts } from "../../../api/identity_access";
 import { QueryState } from "../../../components/feedback/QueryState";
-import { ROLE_LABELS } from "../../../lib/labels";
 import { PageHeader } from "../../../components/layout/PageHeader";
 import { CreateAccountForm } from "./CreateAccountForm";
 
@@ -31,21 +32,22 @@ function getRoleColor(role: string) {
 }
 
 export function AccountsPage() {
+  const { t } = useTranslation();
   const accounts = useAccounts();
 
   return (
     <div style={{ maxWidth: "1080px", margin: "0 auto" }}>
-      <PageHeader title="Comptes utilisateurs" />
+      <PageHeader title={t("accounts.title")} />
 
       {/* Le formulaire de création, bien enveloppé dans son accordéon */}
       <details className="rf-disclosure rf-section" style={{ marginBottom: "var(--space-7)" }}>
-        <summary>➕ Créer un nouveau compte</summary>
+        <summary>{t("accounts.create")}</summary>
         <div className="rf-disclosure__body">
           <CreateAccountForm />
         </div>
       </details>
 
-      <QueryState query={accounts} empty={{ isEmpty: (list) => list.length === 0, title: "Aucun compte enregistré." }}>
+      <QueryState query={accounts} empty={{ isEmpty: (list) => list.length === 0, title: t("accounts.empty") }}>
         {(list) => (
           <div className="rf-grid" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))" }}>
             {list.map((a) => {
@@ -125,7 +127,7 @@ export function AccountsPage() {
                           letterSpacing: "0.5px",
                         }}
                       >
-                        {ROLE_LABELS[a.role]}
+                        {t(`labels.role.${a.role}`)}
                       </span>
 
                       {/* Badge de discipline si applicable */}

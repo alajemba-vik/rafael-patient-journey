@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { useTranslation } from "react-i18next";
 
 import type { Questionnaire } from "../../../api/questionnaires";
 import { useSubmitQuestionnaire } from "../../../api/questionnaires";
@@ -7,6 +8,7 @@ import { Button } from "../../../components/forms/Button";
 type Props = { questionnaire: Questionnaire; onSubmitted: (score: number) => void };
 
 export function QuestionnaireForm({ questionnaire, onSubmitted }: Props) {
+  const { t } = useTranslation();
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const submit = useSubmitQuestionnaire();
   const answered = Object.keys(answers).length;
@@ -62,10 +64,10 @@ export function QuestionnaireForm({ questionnaire, onSubmitted }: Props) {
       <div style={{ width: "100%", marginTop: "var(--space-5)" }}>
         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "var(--space-2)" }}>
           <span className="rf-muted" style={{ fontWeight: 600 }}>
-            Votre progression
+            {t("questionnaire.progress")}
           </span>
           <span className="rf-muted" aria-live="polite">
-            {answered} réponse{answered > 1 ? "s" : ""} sur {total}
+            {t("questionnaire.answered", { count: answered, total })}
           </span>
         </div>
         <div style={{ height: "10px", background: "var(--surface-tint)", borderRadius: "999px", overflow: "hidden" }}>
@@ -83,13 +85,13 @@ export function QuestionnaireForm({ questionnaire, onSubmitted }: Props) {
 
       {submit.isError && (
         <p className="rf-field__error" role="alert">
-          L’envoi n’a pas abouti. Vos réponses sont conservées : réessayez.
+          {t("questionnaire.failed")}
         </p>
       )}
 
       <div style={{ marginTop: "var(--space-6)", width: "100%", display: "flex", justifyContent: "flex-end" }}>
         <Button type="submit" pending={submit.isPending} disabled={answered < total}>
-          Envoyer mes réponses
+          {t("questionnaire.submit")}
         </Button>
       </div>
     </form>

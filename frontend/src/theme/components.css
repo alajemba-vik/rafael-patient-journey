@@ -321,6 +321,9 @@ body {
   align-items: center;
   gap: var(--space-4);
 }
+.rf-language__select {
+  padding-block: var(--space-2);
+}
 .rf-shell__user {
   font-size: 14px;
   color: var(--ink-muted);
@@ -413,6 +416,10 @@ body {
 }
 .rf-field__error::before {
   content: "Erreur : ";
+}
+/* The prefix follows the page language set by src/i18n. */
+.rf-field__error:lang(en)::before {
+  content: "Error: ";
 }
 
 /* Feedback */

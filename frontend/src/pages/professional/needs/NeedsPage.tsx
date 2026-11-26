@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 
 import { useOpenNeeds, useResolveNeed } from "../../../api/pathways";
@@ -8,18 +9,19 @@ import { PageHeader } from "../../../components/layout/PageHeader";
 import { paths } from "../../../app/paths";
 
 export function NeedsPage() {
+  const { t } = useTranslation();
   const needs = useOpenNeeds();
   const resolve = useResolveNeed();
 
   return (
     <div className="rf-narrow">
-      <PageHeader title="Besoins signalés" />
+      <PageHeader title={t("needs.title")} />
       <QueryState
         query={needs}
         empty={{
           isEmpty: (list) => list.length === 0,
-          title: "Aucun besoin en attente.",
-          children: <p>Les besoins signalés par les praticiens sur vos parcours apparaîtront ici.</p>,
+          title: t("needs.empty"),
+          children: <p>{t("needs.emptyHint")}</p>,
         }}
       >
         {(list) => (
@@ -32,7 +34,7 @@ export function NeedsPage() {
                       {need.patient_name}
                     </Link>{" "}
                     <span className="rf-muted">
-                      · {need.raised_by_name}, le {formatDate(need.raised_at)}
+                      {t("needs.raisedBy", { name: need.raised_by_name, date: formatDate(need.raised_at) })}
                     </span>
                   </p>
                   <p>{need.note}</p>
@@ -42,7 +44,7 @@ export function NeedsPage() {
                   onClick={() => resolve.mutate(need.id)}
                   pending={resolve.isPending && resolve.variables === need.id}
                 >
-                  Marquer comme traité
+                  {t("needs.resolve")}
                 </Button>
               </li>
             ))}

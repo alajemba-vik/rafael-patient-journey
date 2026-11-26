@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { useTranslation } from "react-i18next";
 
 import { useAddToCareTeam, useCareStaff, useCareTeam, useRemoveFromCareTeam } from "../../api/care_team";
 import { usePermissions } from "../../api/identity_access";
@@ -6,9 +7,9 @@ import { QueryState } from "../feedback/QueryState";
 import { Button } from "../forms/Button";
 import { ConfirmButton } from "../forms/ConfirmButton";
 import { SelectField } from "../forms/SelectField";
-import { ROLE_LABELS } from "../../lib/labels";
 
 export function CareTeamSection({ patientId }: { patientId: string }) {
+  const { t } = useTranslation();
   const team = useCareTeam(patientId);
   const canManage = usePermissions().manageCareTeam;
   const remove = useRemoveFromCareTeam();
@@ -16,9 +17,9 @@ export function CareTeamSection({ patientId }: { patientId: string }) {
   return (
     <section className="rf-panel" aria-labelledby="team-title">
       <h2 id="team-title" className="rf-title">
-        Équipe de soins
+        {t("careTeam.title")}
       </h2>
-      <QueryState query={team} empty={{ isEmpty: (list) => list.length === 0, title: "Aucun membre pour le moment." }}>
+      <QueryState query={team} empty={{ isEmpty: (list) => list.length === 0, title: t("careTeam.empty") }}>
         {(members) => (
           <ul className="rf-list">
             {members.map((m) => (
@@ -26,16 +27,16 @@ export function CareTeamSection({ patientId }: { patientId: string }) {
                 <span>
                   {m.full_name}
                   <br />
-                  <span className="rf-muted">{m.discipline ?? ROLE_LABELS[m.role]}</span>
+                  <span className="rf-muted">{m.discipline ?? t(`labels.role.${m.role}`)}</span>
                 </span>
                 {canManage && (
                   <ConfirmButton
-                    question={`Retirer ${m.full_name} ?`}
-                    confirmLabel="Retirer"
+                    question={t("careTeam.removeQuestion", { name: m.full_name })}
+                    confirmLabel={t("careTeam.remove")}
                     onConfirm={() => remove.mutate(m.assignment_id)}
                     pending={remove.isPending && remove.variables === m.assignment_id}
                   >
-                    Retirer
+                    {t("careTeam.remove")}
                   </ConfirmButton>
                 )}
               </li>
@@ -51,6 +52,7 @@ export function CareTeamSection({ patientId }: { patientId: string }) {
 }
 
 function AddMemberForm({ patientId, memberIds }: { patientId: string; memberIds: Set<string> }) {
+  const { t } = useTranslation();
   const staff = useCareStaff();
   const add = useAddToCareTeam();
   const [chosen, setChosen] = useState("");
@@ -65,21 +67,21 @@ function AddMemberForm({ patientId, memberIds }: { patientId: string; memberIds:
 
   return (
     <form className="rf-form" onSubmit={submit}>
-      <SelectField label="Ajouter à l’équipe" required value={chosen} onChange={(e) => setChosen(e.target.value)}>
-        <option value="">Choisir une personne</option>
+      <SelectField label={t("careTeam.addLabel")} required value={chosen} onChange={(e) => setChosen(e.target.value)}>
+        <option value="">{t("careTeam.choosePerson")}</option>
         {available.map((s) => (
           <option key={s.id} value={s.id}>
-            {s.discipline ?? ROLE_LABELS[s.role]} · {s.full_name}
+            {s.discipline ?? t(`labels.role.${s.role}`)} · {s.full_name}
           </option>
         ))}
       </SelectField>
       {add.isError && (
         <p className="rf-field__error" role="alert">
-          L’ajout n’a pas abouti. Réessayez.
+          {t("careTeam.addFailed")}
         </p>
       )}
       <Button type="submit" variant="secondary" pending={add.isPending}>
-        Ajouter
+        {t("careTeam.add")}
       </Button>
     </form>
   );

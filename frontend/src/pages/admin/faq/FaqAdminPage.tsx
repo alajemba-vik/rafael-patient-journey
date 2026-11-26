@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { useTranslation } from "react-i18next";
 
 import { ApiError } from "../../../api/core/client";
 import {
@@ -20,6 +21,7 @@ import { PageHeader } from "../../../components/layout/PageHeader";
 import { EntryForm } from "./EntryForm";
 
 export function FaqAdminPage() {
+  const { t } = useTranslation();
   const categories = useFaqCategories();
   const entries = useFaqEntries();
   const createEntry = useCreateEntry();
@@ -27,7 +29,7 @@ export function FaqAdminPage() {
 
   return (
     <div style={{ maxWidth: "1080px", margin: "0 auto" }}>
-      <PageHeader title="Gérer la FAQ" />
+      <PageHeader title={t("faqAdmin.title")} />
 
       <p
         className="rf-muted"
@@ -39,8 +41,7 @@ export function FaqAdminPage() {
           marginBottom: "var(--space-6)",
         }}
       >
-        💡 Les questions publiées sont visibles par tous sur la page publique. Les brouillons restent visibles ici
-        seulement.
+        {t("faqAdmin.intro")}
       </p>
 
       <QueryState query={categories}>
@@ -50,12 +51,12 @@ export function FaqAdminPage() {
 
             {cats.length > 0 && (
               <details className="rf-disclosure rf-section" style={{ marginBottom: "var(--space-6)" }}>
-                <summary>➕ Ajouter une nouvelle question</summary>
+                <summary>{t("faqAdmin.addQuestion")}</summary>
                 <div className="rf-disclosure__body" style={{ maxWidth: "640px", marginTop: "var(--space-4)" }}>
                   <EntryForm
                     key={formKey}
                     categories={cats}
-                    submitLabel="Enregistrer comme brouillon"
+                    submitLabel={t("faqAdmin.saveDraft")}
                     pending={createEntry.isPending}
                     failed={createEntry.isError}
                     onSubmit={(fields) =>
@@ -69,10 +70,7 @@ export function FaqAdminPage() {
               </details>
             )}
 
-            <QueryState
-              query={entries}
-              empty={{ isEmpty: (list) => list.length === 0, title: "Aucune question pour le moment." }}
-            >
+            <QueryState query={entries} empty={{ isEmpty: (list) => list.length === 0, title: t("faqAdmin.empty") }}>
               {(list) =>
                 cats.map((category) => (
                   <EntriesOfCategory
@@ -92,6 +90,7 @@ export function FaqAdminPage() {
 }
 
 function CategoriesSection({ categories }: { categories: FaqCategory[] }) {
+  const { t } = useTranslation();
   const create = useCreateCategory();
   const remove = useDeleteCategory();
   const [name, setName] = useState("");
@@ -102,14 +101,12 @@ function CategoriesSection({ categories }: { categories: FaqCategory[] }) {
   }
 
   const removeError =
-    remove.error instanceof ApiError && remove.error.status === 409
-      ? "Cette catégorie contient encore des questions : déplacez-les ou supprimez-les d’abord."
-      : undefined;
+    remove.error instanceof ApiError && remove.error.status === 409 ? t("faqAdmin.categoryNotEmpty") : undefined;
 
   return (
     <section className="rf-section" aria-labelledby="categories-title">
       <h2 id="categories-title" className="rf-title" style={{ marginBottom: "var(--space-4)" }}>
-        Catégories existantes
+        {t("faqAdmin.categories")}
       </h2>
 
       {categories.length > 0 && (
@@ -130,8 +127,8 @@ function CategoriesSection({ categories }: { categories: FaqCategory[] }) {
             >
               <span style={{ fontWeight: 600, color: "var(--ink)" }}>{c.name}</span>
               <ConfirmButton
-                question={`Supprimer « ${c.name} » ?`}
-                confirmLabel="Supprimer"
+                question={t("faqAdmin.deleteCategoryQuestion", { name: c.name })}
+                confirmLabel={t("faqAdmin.delete")}
                 onConfirm={() => remove.mutate(c.id)}
                 pending={remove.isPending && remove.variables === c.id}
               >
@@ -155,7 +152,7 @@ function CategoriesSection({ categories }: { categories: FaqCategory[] }) {
       >
         <div style={{ width: "100%", maxWidth: "300px" }}>
           <TextField
-            label="Nouvelle catégorie"
+            label={t("faqAdmin.newCategory")}
             required
             maxLength={120}
             value={name}
@@ -163,13 +160,13 @@ function CategoriesSection({ categories }: { categories: FaqCategory[] }) {
           />
         </div>
         <Button type="submit" variant="secondary" pending={create.isPending}>
-          Ajouter la catégorie
+          {t("faqAdmin.addCategory")}
         </Button>
       </form>
 
       {create.error instanceof ApiError && create.error.status === 409 && (
         <p className="rf-field__error" role="alert" style={{ marginTop: "var(--space-2)" }}>
-          Une catégorie porte déjà ce nom.
+          {t("faqAdmin.categoryExists")}
         </p>
       )}
     </section>
@@ -205,6 +202,7 @@ function EntriesOfCategory({
 }
 
 function EntryRow({ entry, categories }: { entry: FaqEntry; categories: FaqCategory[] }) {
+  const { t } = useTranslation();
   const update = useUpdateEntry();
   const remove = useDeleteEntry();
   const [editing, setEditing] = useState(false);
@@ -212,11 +210,11 @@ function EntryRow({ entry, categories }: { entry: FaqEntry; categories: FaqCateg
   if (editing) {
     return (
       <div className="rf-panel" style={{ gridColumn: "1 / -1", border: "2px solid var(--accent)" }}>
-        <h3 style={{ margin: "0 0 var(--space-4) 0", color: "var(--accent)" }}>Modifier la question</h3>
+        <h3 style={{ margin: "0 0 var(--space-4) 0", color: "var(--accent)" }}>{t("faqAdmin.editQuestion")}</h3>
         <EntryForm
           categories={categories}
           initial={entry}
-          submitLabel="Enregistrer"
+          submitLabel={t("common.save")}
           pending={update.isPending}
           failed={update.isError}
           onSubmit={(body) => update.mutate({ id: entry.id, body }, { onSuccess: () => setEditing(false) })}
@@ -242,7 +240,7 @@ function EntryRow({ entry, categories }: { entry: FaqEntry; categories: FaqCateg
             whiteSpace: "nowrap",
           }}
         >
-          {entry.published ? "Publiée" : "Brouillon"}
+          {entry.published ? t("faqAdmin.published") : t("faqAdmin.draft")}
         </span>
       </div>
 
@@ -278,19 +276,19 @@ function EntryRow({ entry, categories }: { entry: FaqEntry; categories: FaqCateg
           pending={update.isPending}
           onClick={() => update.mutate({ id: entry.id, body: { published: !entry.published } })}
         >
-          {entry.published ? "Dépublier" : "Publier"}
+          {entry.published ? t("faqAdmin.unpublish") : t("faqAdmin.publish")}
         </Button>
         <Button variant="secondary" className="rf-btn--compact" onClick={() => setEditing(true)}>
-          ✏️ Modifier
+          {t("faqAdmin.edit")}
         </Button>
         <div style={{ marginLeft: "auto" }}>
           <ConfirmButton
-            question="Supprimer cette question ?"
-            confirmLabel="Supprimer"
+            question={t("faqAdmin.deleteQuestion")}
+            confirmLabel={t("faqAdmin.delete")}
             onConfirm={() => remove.mutate(entry.id)}
             pending={remove.isPending}
           >
-            <span style={{ color: "#E53935" }}>🗑 Supprimer</span>
+            <span style={{ color: "#E53935" }}>{t("faqAdmin.deleteButton")}</span>
           </ConfirmButton>
         </div>
       </div>

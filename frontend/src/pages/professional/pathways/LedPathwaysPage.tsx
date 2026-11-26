@@ -1,28 +1,29 @@
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 
 import { useLedPathways } from "../../../api/pathways";
 import { QueryState } from "../../../components/feedback/QueryState";
 import { formatDate } from "../../../lib/format";
-import { MILESTONE_LABELS } from "../../../lib/labels";
 import { PageHeader } from "../../../components/layout/PageHeader";
 import { instituteToday } from "../../../lib/time";
 import { paths } from "../../../app/paths";
 
 export function LedPathwaysPage() {
+  const { t } = useTranslation();
   const pathways = useLedPathways();
   const today = instituteToday();
 
   return (
     <>
-      <PageHeader title="Mes parcours" />
+      <PageHeader title={t("ledPathways.title")} />
       <QueryState
         query={pathways}
         empty={{
           isEmpty: (list) => list.length === 0,
-          title: "Vous ne coordonnez aucun parcours en cours.",
+          title: t("ledPathways.empty"),
           children: (
             <Link className="rf-link" to={paths.pro.patients}>
-              Voir les patients sans coordination
+              {t("ledPathways.seeUnassigned")}
             </Link>
           ),
         }}
@@ -32,10 +33,10 @@ export function LedPathwaysPage() {
             <table className="rf-table">
               <thead>
                 <tr>
-                  <th scope="col">Patient</th>
-                  <th scope="col">Ouvert le</th>
-                  <th scope="col">Prochain bilan</th>
-                  <th scope="col">Prévu vers le</th>
+                  <th scope="col">{t("ledPathways.patient")}</th>
+                  <th scope="col">{t("ledPathways.openedOn")}</th>
+                  <th scope="col">{t("ledPathways.nextMilestone")}</th>
+                  <th scope="col">{t("ledPathways.dueAround")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -49,10 +50,10 @@ export function LedPathwaysPage() {
                         </Link>
                       </td>
                       <td>{formatDate(p.opened_at)}</td>
-                      <td>{p.next_milestone ? MILESTONE_LABELS[p.next_milestone] : "Tous les bilans sont faits"}</td>
+                      <td>{p.next_milestone ? t(`labels.milestone.${p.next_milestone}`) : t("ledPathways.allDone")}</td>
                       <td>
                         {p.next_due_on ? formatDate(p.next_due_on) : "—"}{" "}
-                        {late && <span className="rf-badge rf-badge--no_show">En retard</span>}
+                        {late && <span className="rf-badge rf-badge--no_show">{t("ledPathways.late")}</span>}
                       </td>
                     </tr>
                   );

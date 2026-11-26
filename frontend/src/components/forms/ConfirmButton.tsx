@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "./Button";
 
@@ -13,6 +14,7 @@ type Props = {
 
 /** A button that asks once more, inline, before something that can't be undone. */
 export function ConfirmButton({ children, question, confirmLabel, onConfirm, pending = false }: Props) {
+  const { t } = useTranslation();
   const [asking, setAsking] = useState(false);
 
   if (!asking) {
@@ -29,7 +31,7 @@ export function ConfirmButton({ children, question, confirmLabel, onConfirm, pen
         {confirmLabel}
       </Button>
       <Button variant="secondary" onClick={() => setAsking(false)} disabled={pending}>
-        Retour
+        {t("common.back")}
       </Button>
     </span>
   );

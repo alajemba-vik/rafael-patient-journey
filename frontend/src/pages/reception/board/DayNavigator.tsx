@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+
 import { Button } from "../../../components/forms/Button";
 import { TextField } from "../../../components/forms/TextField";
 import { addDays } from "../../../lib/time";
@@ -10,19 +12,20 @@ type Props = { day: string; today: string; onChange: (day: string) => void };
 
 /** Step through days, jump back to today, or pick any date: reception plans ahead and looks back. */
 export function DayNavigator({ day, today, onChange }: Props) {
+  const { t } = useTranslation();
   return (
-    <div className="rf-daynav" role="group" aria-label="Choisir le jour">
+    <div className="rf-daynav" role="group" aria-label={t("board.chooseDay")}>
       <Button variant="secondary" onClick={() => onChange(addDays(day, -1))}>
-        <span aria-hidden="true">‹</span> Veille
+        <span aria-hidden="true">‹</span> {t("board.previousDay")}
       </Button>
       <Button variant="secondary" onClick={() => onChange(today)} disabled={day === today}>
-        Aujourd’hui
+        {t("board.today")}
       </Button>
       <Button variant="secondary" onClick={() => onChange(addDays(day, 1))}>
-        Lendemain <span aria-hidden="true">›</span>
+        {t("board.nextDay")} <span aria-hidden="true">›</span>
       </Button>
       <TextField
-        label="Jour"
+        label={t("board.day")}
         type="date"
         value={day}
         min={FIRST_DAY}

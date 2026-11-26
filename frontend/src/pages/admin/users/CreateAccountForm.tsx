@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { useTranslation } from "react-i18next";
 
 import { ApiError } from "../../../api/core/client";
 import { useCreateAccount, type AccountCreate } from "../../../api/identity_access";
@@ -6,13 +7,13 @@ import { usePatients } from "../../../api/patients";
 import { Button } from "../../../components/forms/Button";
 import { SelectField } from "../../../components/forms/SelectField";
 import { TextField } from "../../../components/forms/TextField";
-import { ROLE_LABELS } from "../../../lib/labels";
 
 type Role = AccountCreate["role"];
 const ROLES: Role[] = ["patient", "secretary", "professional", "coordinator", "admin"];
 const MIN_PASSWORD = 12;
 
 export function CreateAccountForm() {
+  const { t } = useTranslation();
   const create = useCreateAccount();
   const patients = usePatients("");
   const [fullName, setFullName] = useState("");
@@ -46,29 +47,29 @@ export function CreateAccountForm() {
 
   const error =
     create.error instanceof ApiError && create.error.status === 409
-      ? "Un compte existe déjà avec cette adresse e-mail."
+      ? t("accounts.errorExists")
       : create.isError
-        ? "La création n’a pas abouti. Vérifiez les informations, puis réessayez."
+        ? t("accounts.errorGeneric")
         : undefined;
 
   return (
     <form className="rf-form rf-narrow" onSubmit={submit}>
-      <SelectField label="Rôle" value={role} onChange={(e) => setRole(e.target.value as Role)}>
+      <SelectField label={t("accounts.role")} value={role} onChange={(e) => setRole(e.target.value as Role)}>
         {ROLES.map((r) => (
           <option key={r} value={r}>
-            {ROLE_LABELS[r]}
+            {t(`labels.role.${r}`)}
           </option>
         ))}
       </SelectField>
       {role === "patient" && (
         <SelectField
-          label="Dossier patient"
+          label={t("accounts.patientRecord")}
           required
           value={patientId}
           onChange={(e) => setPatientId(e.target.value)}
-          hint="Le compte donnera accès à l’espace patient de ce dossier. Seuls les dossiers sans compte sont proposés."
+          hint={t("accounts.patientRecordHint")}
         >
-          <option value="">Choisir un dossier</option>
+          <option value="">{t("accounts.chooseRecord")}</option>
           {withoutLogin.map((p) => (
             <option key={p.id} value={p.id}>
               {p.last_name.toUpperCase()} {p.first_name}
@@ -77,14 +78,14 @@ export function CreateAccountForm() {
         </SelectField>
       )}
       <TextField
-        label="Nom complet"
+        label={t("accounts.fullName")}
         required
         autoComplete="off"
         value={fullName}
         onChange={(e) => setFullName(e.target.value)}
       />
       <TextField
-        label="Adresse e-mail"
+        label={t("accounts.email")}
         type="email"
         required
         autoComplete="off"
@@ -93,20 +94,20 @@ export function CreateAccountForm() {
       />
       {practises && (
         <TextField
-          label="Discipline (facultatif)"
-          hint="Par exemple : Sophrologie, Activité physique adaptée."
+          label={t("accounts.discipline")}
+          hint={t("accounts.disciplineHint")}
           value={discipline}
           maxLength={120}
           onChange={(e) => setDiscipline(e.target.value)}
         />
       )}
       <TextField
-        label="Mot de passe initial"
+        label={t("accounts.password")}
         type="password"
         required
         minLength={MIN_PASSWORD}
         autoComplete="new-password"
-        hint={`${MIN_PASSWORD} caractères minimum, à transmettre à la personne en main propre.`}
+        hint={t("accounts.passwordHint", { min: MIN_PASSWORD })}
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
@@ -117,11 +118,11 @@ export function CreateAccountForm() {
       )}
       {created && (
         <p className="rf-banner" role="status">
-          Compte créé pour {created}.
+          {t("accounts.created", { name: created })}
         </p>
       )}
       <Button type="submit" pending={create.isPending}>
-        Créer le compte
+        {t("accounts.submit")}
       </Button>
     </form>
   );

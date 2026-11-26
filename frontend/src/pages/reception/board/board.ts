@@ -1,3 +1,5 @@
+import type { ParseKeys } from "i18next";
+
 import type { BoardStatus } from "../../../api/reception";
 import type { Appointment } from "../../../api/scheduling";
 import { minutesBetween } from "../../../lib/time";
@@ -39,7 +41,8 @@ export function minutesLate(appointment: Appointment, now: Date): number {
 
 export type DayKind = "past" | "today" | "future";
 
-export type StatusAction = { status: BoardStatus; label: string; primary?: boolean };
+/** `label` is a translation key, translated where the button is shown. */
+export type StatusAction = { status: BoardStatus; label: ParseKeys; primary?: boolean };
 
 /**
  * What reception can record next, mirroring the API's rules. Today runs the waiting room
@@ -53,13 +56,13 @@ export function actionsFor(a: Appointment, dayKind: DayKind, now: Date): StatusA
       case "scheduled":
       case "arrived":
         return [
-          { status: "done", label: "Venu·e", primary: true },
-          { status: "no_show", label: "Absent·e" },
+          { status: "done", label: "board.action.attended", primary: true },
+          { status: "no_show", label: "board.action.noShow" },
         ];
       case "in_session":
-        return [{ status: "done", label: "Terminé", primary: true }];
+        return [{ status: "done", label: "board.action.finished", primary: true }];
       case "no_show":
-        return [{ status: "scheduled", label: "Annuler l’absence" }];
+        return [{ status: "scheduled", label: "board.action.undoNoShow" }];
       default:
         return [];
     }
@@ -67,23 +70,25 @@ export function actionsFor(a: Appointment, dayKind: DayKind, now: Date): StatusA
   switch (a.status) {
     case "scheduled":
       return [
-        { status: "arrived", label: "Arrivé·e", primary: true },
+        { status: "arrived", label: "board.action.arrived", primary: true },
         // Absent only once the session should have started: no premature no-shows.
-        ...(new Date(a.starts_at) <= now ? [{ status: "no_show" as const, label: "Absent·e" }] : []),
+        ...(new Date(a.starts_at) <= now
+          ? [{ status: "no_show" as const, label: "board.action.noShow" as const }]
+          : []),
       ];
     case "arrived":
       return [
-        { status: "in_session", label: "Appeler", primary: true },
-        { status: "done", label: "Terminé" },
-        { status: "scheduled", label: "Annuler l’arrivée" },
+        { status: "in_session", label: "board.action.callIn", primary: true },
+        { status: "done", label: "board.action.finished" },
+        { status: "scheduled", label: "board.action.undoArrival" },
       ];
     case "in_session":
       return [
-        { status: "done", label: "Terminer", primary: true },
-        { status: "arrived", label: "Remettre en attente" },
+        { status: "done", label: "board.action.finish", primary: true },
+        { status: "arrived", label: "board.action.backToWaiting" },
       ];
     case "no_show":
-      return [{ status: "scheduled", label: "Annuler l’absence" }];
+      return [{ status: "scheduled", label: "board.action.undoNoShow" }];
     default:
       return [];
   }

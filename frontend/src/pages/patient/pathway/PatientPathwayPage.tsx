@@ -1,23 +1,25 @@
+import { useTranslation } from "react-i18next";
+
 import { useMyPathways } from "../../../api/pathways";
 import { QueryState } from "../../../components/feedback/QueryState";
 import { formatDate } from "../../../lib/format";
-import { MILESTONE_LABELS } from "../../../lib/labels";
 import { PageHeader } from "../../../components/layout/PageHeader";
 import { MilestonesTable } from "../../../components/tables/MilestonesTable";
 
 export function PatientPathwayPage() {
+  const { t } = useTranslation();
   const pathways = useMyPathways();
 
   return (
     <div style={{ maxWidth: "800px", margin: "0 auto" }}>
-      <PageHeader title="Mon parcours" />
+      <PageHeader title={t("patientPathway.title")} />
 
       <QueryState
         query={pathways}
         empty={{
           isEmpty: (list) => list.length === 0,
-          title: "Votre parcours n’a pas encore commencé.",
-          children: <p>Il commencera avec votre premier bilan auprès de votre coordinatrice ou coordinateur.</p>,
+          title: t("patientPathway.notStarted"),
+          children: <p>{t("patientPathway.notStartedHint")}</p>,
         }}
       >
         {([current]) => (
@@ -34,20 +36,20 @@ export function PatientPathwayPage() {
               <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--space-6)" }}>
                 <div>
                   <span className="rf-muted" style={{ display: "block", marginBottom: "4px" }}>
-                    Votre coordinateur·rice
+                    {t("patientPathway.coordinator")}
                   </span>
                   <strong style={{ fontSize: "18px", color: "var(--ink)" }}>{current.coordinator_name}</strong>
                 </div>
                 <div>
                   <span className="rf-muted" style={{ display: "block", marginBottom: "4px" }}>
-                    Début du parcours
+                    {t("patientPathway.start")}
                   </span>
                   <strong style={{ fontSize: "18px", color: "var(--ink)" }}>{formatDate(current.opened_at)}</strong>
                 </div>
                 {current.closed_at && (
                   <div>
                     <span className="rf-muted" style={{ display: "block", marginBottom: "4px" }}>
-                      Fin du parcours
+                      {t("patientPathway.end")}
                     </span>
                     <strong style={{ fontSize: "18px", color: "var(--ink)" }}>{formatDate(current.closed_at)}</strong>
                   </div>
@@ -56,13 +58,13 @@ export function PatientPathwayPage() {
             </section>
 
             {current.milestones.length === 0 ? (
-              <p className="rf-lead">Vos bilans apparaîtront ici au fur et à mesure.</p>
+              <p className="rf-lead">{t("patientPathway.noMilestones")}</p>
             ) : (
               <>
                 {/* Le tableau d'auto-évaluation, mis en valeur */}
                 <section className="rf-section" aria-labelledby="scores-title">
                   <h2 id="scores-title" className="rf-title" style={{ marginBottom: "var(--space-4)" }}>
-                    📊 Votre auto-évaluation
+                    {t("patientPathway.scoresTitle")}
                   </h2>
                   <div className="rf-panel" style={{ padding: "var(--space-4) 0" }}>
                     <MilestonesTable milestones={current.milestones} />
@@ -72,7 +74,7 @@ export function PatientPathwayPage() {
                 {/* La chronologie des bilans */}
                 <section className="rf-section">
                   <h2 className="rf-title" style={{ marginBottom: "var(--space-4)" }}>
-                    🗓️ Les étapes de votre parcours
+                    {t("patientPathway.stepsTitle")}
                   </h2>
 
                   <div className="rf-timeline">
@@ -93,7 +95,7 @@ export function PatientPathwayPage() {
                               gap: "8px",
                             }}
                           >
-                            <span>{MILESTONE_LABELS[m.kind]}</span>
+                            <span>{t(`labels.milestone.${m.kind}`)}</span>
                             <span style={{ fontSize: "14px", color: "var(--accent)", fontWeight: 700 }}>
                               {formatDate(m.recorded_at)}
                             </span>
@@ -111,7 +113,7 @@ export function PatientPathwayPage() {
                                     fontSize: "14px",
                                   }}
                                 >
-                                  🎯 Vos objectifs
+                                  {t("patientPathway.goals")}
                                 </strong>
                                 <span style={{ color: "var(--ink)" }}>{m.goals}</span>
                               </div>
@@ -126,7 +128,7 @@ export function PatientPathwayPage() {
                                     fontSize: "14px",
                                   }}
                                 >
-                                  🩺 Soins convenus
+                                  {t("patientPathway.plan")}
                                 </strong>
                                 <span style={{ color: "var(--ink)" }}>{m.plan}</span>
                               </div>
@@ -141,12 +143,13 @@ export function PatientPathwayPage() {
                                     fontSize: "14px",
                                   }}
                                 >
-                                  ⚡ Symptômes (intensité sur 10)
+                                  {t("patientPathway.symptoms")}
                                 </strong>
                                 <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginTop: "8px" }}>
                                   {m.symptoms.map((s, idx) => (
                                     <span key={idx} className="rf-badge" style={{ borderColor: "var(--hairline)" }}>
-                                      {s.name} : <strong style={{ color: "var(--ink)" }}>{s.intensity}</strong>
+                                      {t("patientPathway.symptom", { name: s.name })}
+                                      <strong style={{ color: "var(--ink)" }}>{s.intensity}</strong>
                                     </span>
                                   ))}
                                 </div>

@@ -1,20 +1,10 @@
+import { useTranslation } from "react-i18next";
+
 import { useDashboard } from "../../../api/analytics";
 import { QueryState } from "../../../components/feedback/QueryState";
-import { formatChange, formatMonth, formatNumber } from "../../../lib/format";
+import { formatChange, formatMonthShort, formatNumber } from "../../../lib/format";
 import { DIMENSIONS } from "../../../lib/labels";
 import { PageHeader } from "../../../components/layout/PageHeader";
-
-const HIDDEN = "Masqué";
-const FEW = "moins de 5";
-
-function counted(value: number | null, noun: string): string {
-  if (value === null) return `${FEW} ${noun}s`;
-  return `${value} ${noun}${value > 1 ? "s" : ""}`;
-}
-
-function shown(value: number | null, format = formatNumber): string {
-  return value === null ? HIDDEN : format(value);
-}
 
 // Composant de statistique (KPI)
 function StatCard({
@@ -107,11 +97,14 @@ function DonutChart({ value, label }: { value: number; label: string }) {
 }
 
 export function DashboardPage() {
+  const { t } = useTranslation();
   const dashboard = useDashboard();
+  const hidden = t("dashboard.hidden");
+  const shown = (value: number | null) => (value === null ? hidden : formatNumber(value));
 
   return (
     <div style={{ maxWidth: "1080px", margin: "0 auto" }}>
-      <PageHeader title="Tableau de bord" />
+      <PageHeader title={t("dashboard.title")} />
 
       <QueryState query={dashboard}>
         {(data) => (
@@ -126,24 +119,28 @@ export function DashboardPage() {
                 marginBottom: "var(--space-6)",
               }}
             >
-              🔒 Données anonymisées. Les chiffres portant sur moins de {data.min_group_size} patients sont masqués.
+              {t("dashboard.privacy", { count: data.min_group_size })}
             </p>
 
             {/* 1. KPI Cards */}
             <div className="rf-grid rf-section" style={{ marginBottom: "var(--space-7)" }}>
-              <StatCard title="Parcours actifs" value={data.active_pathways} icon="🧭" />
+              <StatCard title={t("dashboard.activePathways")} value={data.active_pathways} icon="🧭" />
               <StatCard
-                title="Taux d'absence"
+                title={t("dashboard.noShowRate")}
                 value={shown(data.attendance.no_show_rate)}
                 suffix={data.attendance.no_show_rate !== null ? "%" : ""}
-                subtitle={`${counted(data.attendance.no_show, "absence")} récente(s)`}
+                subtitle={
+                  data.attendance.no_show === null
+                    ? t("dashboard.recentNoShowsFew")
+                    : t("dashboard.recentNoShows", { count: data.attendance.no_show })
+                }
                 icon="📉"
               />
               <StatCard
-                title="Satisfaction"
+                title={t("dashboard.satisfaction")}
                 value={shown(data.satisfaction.average)}
-                suffix={data.satisfaction.average !== null ? "/ 100" : ""}
-                subtitle="En fin de parcours"
+                suffix={data.satisfaction.average !== null ? t("dashboard.outOf100") : ""}
+                subtitle={t("dashboard.atPathwayEnd")}
                 icon="⭐"
               />
             </div>
@@ -162,14 +159,16 @@ export function DashboardPage() {
                     marginBottom: "var(--space-5)",
                   }}
                 >
-                  <span aria-hidden="true">✉️</span> Participation aux questionnaires
+                  <span aria-hidden="true">✉️</span> {t("dashboard.participation")}
                 </h2>
                 <DonutChart
                   value={data.satisfaction.respondents !== null && data.satisfaction.respondents > 0 ? 85 : 0}
-                  label="Taux de réponse global estimé"
+                  label={t("dashboard.responseRate")}
                 />
                 <p className="rf-muted" style={{ marginTop: "var(--space-4)", fontSize: "13px" }}>
-                  Basé sur {counted(data.satisfaction.respondents, "réponse")} en fin de parcours.
+                  {data.satisfaction.respondents === null
+                    ? t("dashboard.basedOnFew")
+                    : t("dashboard.basedOn", { count: data.satisfaction.respondents })}
                 </p>
               </section>
 
@@ -185,7 +184,7 @@ export function DashboardPage() {
                     marginBottom: "var(--space-5)",
                   }}
                 >
-                  <span aria-hidden="true">📈</span> Évolution de la qualité de vie
+                  <span aria-hidden="true">📈</span> {t("dashboard.qualityOfLife")}
                 </h2>
 
                 {/* Conteneur principal avec une hauteur fixe */}
@@ -236,13 +235,13 @@ export function DashboardPage() {
                         className="rf-muted"
                         style={{ fontSize: "12px", textTransform: "capitalize", marginTop: "4px" }}
                       >
-                        {formatMonth(m.period).substring(0, 4)}
+                        {formatMonthShort(m.period)}
                       </span>
                     </div>
                   ))}
                 </div>
                 <p className="rf-muted" style={{ marginTop: "var(--space-3)", fontSize: "13px" }}>
-                  Sur 100 (6 derniers mois)
+                  {t("dashboard.qualityCaption")}
                 </p>
               </section>
             </div>
@@ -251,22 +250,22 @@ export function DashboardPage() {
             <div className="rf-grid rf-section">
               <section className="rf-panel" aria-labelledby="change-title">
                 <h2 id="change-title" className="rf-title" style={{ fontSize: "18px" }}>
-                  🌱 Auto-évaluation (Début vs Fin)
+                  {t("dashboard.selfAssessment")}
                 </h2>
                 <div className="rf-table-wrap">
                   <table className="rf-table">
                     <tbody>
-                      {DIMENSIONS.map(([key, label]) => {
+                      {DIMENSIONS.map((key) => {
                         const change = data.self_assessment.by_dimension.find((d) => d.dimension === key);
                         const val = change?.average_change ?? null;
                         return (
                           <tr key={key}>
                             <th scope="row" style={{ fontWeight: 600, fontSize: "14px" }}>
-                              {label}
+                              {t(`labels.dimension.${key}`)}
                             </th>
                             <td className="rf-num">
                               {val === null ? (
-                                <span className="rf-muted">{HIDDEN}</span>
+                                <span className="rf-muted">{hidden}</span>
                               ) : (
                                 <span
                                   style={{
@@ -292,7 +291,7 @@ export function DashboardPage() {
 
               <section className="rf-panel" aria-labelledby="symptoms-title">
                 <h2 id="symptoms-title" className="rf-title" style={{ fontSize: "18px" }}>
-                  ⚡ Symptômes signalés fréquents
+                  {t("dashboard.symptoms")}
                 </h2>
                 <div
                   style={{
@@ -312,7 +311,7 @@ export function DashboardPage() {
                         marginBottom: "4px",
                       }}
                     >
-                      <span>Fatigue</span>
+                      <span>{t("dashboard.symptomFatigue")}</span>
                       <strong>42%</strong>
                     </div>
                     <div style={{ height: "8px", background: "var(--surface-tint)", borderRadius: "4px" }}>
@@ -328,7 +327,7 @@ export function DashboardPage() {
                         marginBottom: "4px",
                       }}
                     >
-                      <span>Douleurs articulaires</span>
+                      <span>{t("dashboard.symptomJointPain")}</span>
                       <strong>28%</strong>
                     </div>
                     <div style={{ height: "8px", background: "var(--surface-tint)", borderRadius: "4px" }}>
@@ -344,7 +343,7 @@ export function DashboardPage() {
                         marginBottom: "4px",
                       }}
                     >
-                      <span>Troubles du sommeil</span>
+                      <span>{t("dashboard.symptomSleep")}</span>
                       <strong>15%</strong>
                     </div>
                     <div style={{ height: "8px", background: "var(--surface-tint)", borderRadius: "4px" }}>

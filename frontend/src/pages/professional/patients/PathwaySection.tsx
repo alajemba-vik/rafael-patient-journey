@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Trans, useTranslation } from "react-i18next";
 
 import { usePermissions } from "../../../api/identity_access";
 import { useClosePathway, useOpenPathway, usePatientPathways, type Pathway } from "../../../api/pathways";
@@ -6,7 +7,6 @@ import { QueryState } from "../../../components/feedback/QueryState";
 import { Button } from "../../../components/forms/Button";
 import { ConfirmButton } from "../../../components/forms/ConfirmButton";
 import { formatDate } from "../../../lib/format";
-import { MILESTONE_LABELS } from "../../../lib/labels";
 import { MilestonesTable } from "../../../components/tables/MilestonesTable";
 import { MilestoneForm } from "./MilestoneForm";
 import { NeedForm } from "./NeedForm";
@@ -14,6 +14,7 @@ import { NeedForm } from "./NeedForm";
 const MILESTONE_ORDER = ["intake", "review", "final"] as const;
 
 export function PathwaySection({ patientId }: { patientId: string }) {
+  const { t } = useTranslation();
   const pathways = usePatientPathways(patientId);
   const canLead = usePermissions().leadPathways;
   const open = useOpenPathway();
@@ -21,7 +22,7 @@ export function PathwaySection({ patientId }: { patientId: string }) {
   return (
     <section className="rf-section" aria-labelledby="pathway-title">
       <h2 id="pathway-title" className="rf-title">
-        Parcours
+        {t("pathway.title")}
       </h2>
       <QueryState query={pathways}>
         {(list) => {
@@ -31,13 +32,13 @@ export function PathwaySection({ patientId }: { patientId: string }) {
               <div className="rf-stack">
                 <p>
                   {current
-                    ? `Dernier parcours terminé le ${formatDate(current.closed_at ?? "")}.`
-                    : "Aucun parcours ouvert."}
+                    ? t("pathway.lastClosed", { date: formatDate(current.closed_at ?? "") })
+                    : t("pathway.noneOpen")}
                 </p>
                 {canLead && (
                   <div>
                     <Button onClick={() => open.mutate(patientId)} pending={open.isPending}>
-                      Ouvrir un parcours
+                      {t("pathway.open")}
                     </Button>
                   </div>
                 )}
@@ -61,40 +62,45 @@ export function PathwaySection({ patientId }: { patientId: string }) {
 }
 
 function PathwayDetails({ pathway }: { pathway: Pathway }) {
+  const { t } = useTranslation();
   return (
     <>
       <p>
-        Coordination : <strong>{pathway.coordinator_name}</strong> · ouvert le {formatDate(pathway.opened_at)}
-        {pathway.closed_at ? ` · terminé le ${formatDate(pathway.closed_at)}` : ""}
+        <Trans
+          i18nKey="pathway.coordination"
+          values={{ name: pathway.coordinator_name, date: formatDate(pathway.opened_at) }}
+          components={{ strong: <strong /> }}
+        />
+        {pathway.closed_at ? t("pathway.closedOn", { date: formatDate(pathway.closed_at) }) : ""}
       </p>
       {pathway.milestones.length > 0 && <MilestonesTable milestones={pathway.milestones} />}
       {pathway.milestones.map((m) => (
         <details key={m.kind} className="rf-disclosure">
           <summary>
-            {MILESTONE_LABELS[m.kind]} · {formatDate(m.recorded_at)}
+            {t(`labels.milestone.${m.kind}`)} · {formatDate(m.recorded_at)}
           </summary>
           <dl className="rf-dl rf-disclosure__body">
             {m.symptoms.length > 0 && (
               <>
-                <dt>Symptômes (sur 10)</dt>
+                <dt>{t("pathway.symptoms")}</dt>
                 <dd>{m.symptoms.map((s) => `${s.name} (${s.intensity})`).join(", ")}</dd>
               </>
             )}
             {m.goals && (
               <>
-                <dt>Objectifs</dt>
+                <dt>{t("pathway.goals")}</dt>
                 <dd>{m.goals}</dd>
               </>
             )}
             {m.plan && (
               <>
-                <dt>Soins convenus</dt>
+                <dt>{t("pathway.plan")}</dt>
                 <dd>{m.plan}</dd>
               </>
             )}
             {m.note && (
               <>
-                <dt>Note de coordination</dt>
+                <dt>{t("pathway.note")}</dt>
                 <dd>{m.note}</dd>
               </>
             )}
@@ -106,6 +112,7 @@ function PathwayDetails({ pathway }: { pathway: Pathway }) {
 }
 
 function CoordinatorActions({ pathway }: { pathway: Pathway }) {
+  const { t } = useTranslation();
   const close = useClosePathway();
   const [recording, setRecording] = useState(false);
   const recorded = new Set(pathway.milestones.map((m) => m.kind));
@@ -115,28 +122,28 @@ function CoordinatorActions({ pathway }: { pathway: Pathway }) {
     <div className="rf-stack">
       {next && !recording && (
         <div>
-          <Button onClick={() => setRecording(true)}>Enregistrer le {MILESTONE_LABELS[next].toLowerCase()}</Button>
+          <Button onClick={() => setRecording(true)}>{t(`pathway.record.${next}`)}</Button>
         </div>
       )}
       {next && recording && (
         <div className="rf-panel rf-narrow">
-          <h3 className="rf-title">{MILESTONE_LABELS[next]}</h3>
+          <h3 className="rf-title">{t(`labels.milestone.${next}`)}</h3>
           <MilestoneForm pathwayId={pathway.id} kind={next} onDone={() => setRecording(false)} />
           <div>
             <Button variant="secondary" onClick={() => setRecording(false)}>
-              Fermer sans enregistrer
+              {t("pathway.closeWithoutSaving")}
             </Button>
           </div>
         </div>
       )}
       <div>
         <ConfirmButton
-          question="Clore ce parcours ? Le questionnaire de satisfaction sera proposé au patient."
-          confirmLabel="Clore le parcours"
+          question={t("pathway.closeQuestion")}
+          confirmLabel={t("pathway.close")}
           onConfirm={() => close.mutate(pathway.id)}
           pending={close.isPending}
         >
-          Clore le parcours
+          {t("pathway.close")}
         </ConfirmButton>
       </div>
     </div>

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 
 import { usePatients } from "../../../api/patients";
@@ -16,16 +17,17 @@ function getInitials(first: string, last: string) {
 }
 
 export function ReceptionPatientsPage() {
+  const { t } = useTranslation();
   const [search, setSearch] = useState("");
   const patients = usePatients(useDebouncedValue(search));
 
   return (
     <div style={{ maxWidth: "1080px", margin: "0 auto" }}>
-      <PageHeader title="Tous les patients" />
+      <PageHeader title={t("receptionPatients.title")} />
 
       {/* Formulaire d'enregistrement dans un accordéon */}
       <details className="rf-disclosure rf-section" style={{ marginBottom: "var(--space-6)" }}>
-        <summary>➕ Enregistrer un nouveau patient</summary>
+        <summary>{t("receptionPatients.register")}</summary>
         <div className="rf-disclosure__body">
           <RegisterPatientForm />
         </div>
@@ -43,8 +45,8 @@ export function ReceptionPatientsPage() {
       >
         <div style={{ width: "100%", maxWidth: "400px" }}>
           <TextField
-            label="Rechercher par nom ou téléphone"
-            hint="Début du nom, ou au moins 3 chiffres du numéro."
+            label={t("receptionPatients.search")}
+            hint={t("receptionPatients.searchHint")}
             type="search"
             autoComplete="off"
             value={search}
@@ -57,7 +59,7 @@ export function ReceptionPatientsPage() {
         query={patients}
         empty={{
           isEmpty: (list) => list.length === 0,
-          title: search ? "Aucun patient ne correspond à cette recherche." : "Aucun patient enregistré.",
+          title: search ? t("receptionPatients.noMatch") : t("receptionPatients.none"),
         }}
       >
         {(list) => (
@@ -126,7 +128,7 @@ export function ReceptionPatientsPage() {
                     style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "4px" }}
                   >
                     <span className="rf-muted" style={{ fontSize: "13px" }}>
-                      né·e le {formatDate(p.birth_date)}
+                      {t("receptionPatients.bornOn", { date: formatDate(p.birth_date) })}
                     </span>
                     <span style={{ fontSize: "12px", color: "var(--accent)", fontWeight: 700 }}>
                       {p.phone ? formatPhone(p.phone) : ""}

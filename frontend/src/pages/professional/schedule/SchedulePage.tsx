@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 
 import { useMyAppointments, type Appointment } from "../../../api/scheduling";
@@ -30,16 +31,14 @@ function byDay(appointments: Appointment[]): [string, Appointment[]][] {
 }
 
 export function SchedulePage() {
+  const { t } = useTranslation();
   const [range] = useState(thisWeek);
   const appointments = useMyAppointments(range, REFRESH_MS);
 
   return (
     <div style={{ maxWidth: "800px", margin: "0 auto" }}>
-      <PageHeader title="Mon planning" />
-      <QueryState
-        query={appointments}
-        empty={{ isEmpty: (list) => list.length === 0, title: "Aucun rendez-vous dans les sept prochains jours." }}
-      >
+      <PageHeader title={t("schedule.title")} />
+      <QueryState query={appointments} empty={{ isEmpty: (list) => list.length === 0, title: t("schedule.empty") }}>
         {(list) =>
           byDay(list).map(([day, items]) => (
             <section key={day} className="rf-section" aria-label={day}>

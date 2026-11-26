@@ -3,6 +3,7 @@ import createClient, { type Middleware } from "openapi-fetch";
 import type { components, paths as ApiPaths } from "./schema";
 import { session } from "./session";
 import { paths } from "../../app/paths";
+import { currentLanguage } from "../../i18n";
 
 export type Schemas = components["schemas"];
 
@@ -24,6 +25,8 @@ const authMiddleware: Middleware = {
   onRequest({ request }) {
     const token = session.getToken();
     if (token) request.headers.set("Authorization", `Bearer ${token}`);
+    // Lets the API answer in the interface's language once it translates its own messages.
+    request.headers.set("Accept-Language", currentLanguage());
     return request;
   },
   onResponse({ response }) {

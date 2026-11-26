@@ -1,5 +1,7 @@
+import { useTranslation } from "react-i18next";
+
 import type { Schemas } from "../../api/core/client";
-import { DIMENSIONS, MILESTONE_LABELS } from "../../lib/labels";
+import { DIMENSIONS } from "../../lib/labels";
 
 type Milestone = Schemas["PatientMilestone"];
 
@@ -23,28 +25,29 @@ function getScoreColor(score: number | null | undefined) {
 
 /** The 0–4 self-assessment at each milestone, one column per milestone, so progress reads across. */
 export function MilestonesTable({ milestones }: { milestones: Milestone[] }) {
+  const { t } = useTranslation();
   return (
     <div className="rf-table-wrap rf-narrow">
       <table className="rf-table">
         {/* Ajout de padding sur la légende pour l'aérer */}
         <caption className="rf-muted" style={{ textAlign: "left", padding: "var(--space-4) var(--space-5)" }}>
-          Auto-évaluation, de 0 à 4
+          {t("milestones.caption")}
         </caption>
         <thead>
           <tr>
-            <th scope="col">Dimension</th>
+            <th scope="col">{t("milestones.dimension")}</th>
             {milestones.map((m) => (
               <th key={m.kind} scope="col" className="rf-num">
-                {MILESTONE_LABELS[m.kind]}
+                {t(`labels.milestone.${m.kind}`)}
               </th>
             ))}
           </tr>
         </thead>
         <tbody>
-          {DIMENSIONS.map(([key, label]) => (
+          {DIMENSIONS.map((key) => (
             <tr key={key}>
               <th scope="row" style={{ fontWeight: 600 }}>
-                {label}
+                {t(`labels.dimension.${key}`)}
               </th>
               {milestones.map((m) => {
                 const score = m[key];

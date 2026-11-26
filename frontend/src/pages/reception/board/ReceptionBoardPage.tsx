@@ -1,4 +1,5 @@
 import { useId } from "react";
+import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router";
 
 import { useDayBoard } from "../../../api/reception";
@@ -16,6 +17,7 @@ const DAY_PARAM = "jour";
 const ISO_DAY = /^\d{4}-\d{2}-\d{2}$/;
 
 export function ReceptionBoardPage() {
+  const { t } = useTranslation();
   const [params, setParams] = useSearchParams();
   const today = instituteToday();
   // A hand-edited or stale link falls back to today rather than an error page.
@@ -41,18 +43,18 @@ export function ReceptionBoardPage() {
 
   return (
     <>
-      <PageHeader title={isToday ? "Accueil du jour" : "Accueil"}>
+      <PageHeader title={isToday ? t("board.titleToday") : t("board.title")}>
         <DayNavigator day={day} today={today} onChange={goTo} />
       </PageHeader>
       <p className="rf-muted rf-section">
         <span className="rf-capitalize">{dayLabel}</span>
-        {isToday && " · mis à jour automatiquement"}
+        {isToday && t("board.autoUpdated")}
       </p>
       <QueryState
         query={board}
         empty={{
           isEmpty: (list) => list.length === 0,
-          title: isToday ? "Aucun rendez-vous aujourd’hui." : "Aucun rendez-vous ce jour-là.",
+          title: isToday ? t("board.emptyToday") : t("board.emptyDay"),
         }}
       >
         {(list) => {
@@ -63,45 +65,68 @@ export function ReceptionBoardPage() {
           const show = (a: Appointment) => <AppointmentCard key={a.id} {...cardProps(a)} />;
           return (
             <>
-              <ul className="rf-summary" aria-live="polite" aria-label="Résumé de la journée">
-                {isToday && <Count value={lanes.waiting.length} label="en salle d’attente" />}
-                {isToday && <Count value={lanes.inSession.length} label="en séance" />}
-                {!isPast && <Count value={lanes.upcoming.length} label="à venir" />}
-                {isPast && unresolved.length > 0 && <Count value={unresolved.length} label="sans suite" />}
-                {!isFuture && <Count value={lanes.done.length} label="terminés" />}
-                {!isFuture && <Count value={lanes.noShow.length} label="absents" />}
-                <Count value={lanes.cancelled.length} label="annulés" />
+              <ul className="rf-summary" aria-live="polite" aria-label={t("board.summary")}>
+                {isToday && <Count value={lanes.waiting.length} label={t("board.count.waiting")} />}
+                {isToday && <Count value={lanes.inSession.length} label={t("board.count.inSession")} />}
+                {!isPast && <Count value={lanes.upcoming.length} label={t("board.count.upcoming")} />}
+                {isPast && unresolved.length > 0 && (
+                  <Count value={unresolved.length} label={t("board.count.unresolved")} />
+                )}
+                {!isFuture && <Count value={lanes.done.length} label={t("board.count.done")} />}
+                {!isFuture && <Count value={lanes.noShow.length} label={t("board.count.noShow")} />}
+                <Count value={lanes.cancelled.length} label={t("board.count.cancelled")} />
               </ul>
               {isToday && (
                 <div className="rf-board">
-                  <Lane icon="⏳" title="En salle d’attente" items={lanes.waiting} empty="Personne n’attend.">
+                  <Lane
+                    icon="⏳"
+                    title={t("board.lane.waiting")}
+                    items={lanes.waiting}
+                    empty={t("board.lane.waitingEmpty")}
+                  >
                     {manage}
                   </Lane>
-                  <Lane icon="🩺" title="En séance" items={lanes.inSession} empty="Aucune séance en cours.">
+                  <Lane
+                    icon="🩺"
+                    title={t("board.lane.inSession")}
+                    items={lanes.inSession}
+                    empty={t("board.lane.inSessionEmpty")}
+                  >
                     {manage}
                   </Lane>
-                  <Lane icon="📅" title="À venir" items={lanes.upcoming} empty="Plus rien de prévu.">
+                  <Lane
+                    icon="📅"
+                    title={t("board.lane.upcoming")}
+                    items={lanes.upcoming}
+                    empty={t("board.lane.upcomingEmpty")}
+                  >
                     {manage}
                   </Lane>
                 </div>
               )}
               {isFuture && (
-                <Lane icon="📅" title="Rendez-vous prévus" items={lanes.upcoming} empty="Aucun rendez-vous prévu." wide>
+                <Lane
+                  icon="📅"
+                  title={t("board.lane.planned")}
+                  items={lanes.upcoming}
+                  empty={t("board.lane.plannedEmpty")}
+                  wide
+                >
                   {manage}
                 </Lane>
               )}
               {isPast && unresolved.length > 0 && (
-                <Lane icon="⚠️" title="Sans suite" items={unresolved} empty="" wide>
+                <Lane icon="⚠️" title={t("board.lane.unresolved")} items={unresolved} empty="" wide>
                   {manage}
                 </Lane>
               )}
-              <ClosedLane title="Terminés" items={lanes.done} open={isPast}>
+              <ClosedLane title={t("board.lane.done")} items={lanes.done} open={isPast}>
                 {show}
               </ClosedLane>
-              <ClosedLane title="Absents" items={lanes.noShow} open={isPast}>
+              <ClosedLane title={t("board.lane.noShow")} items={lanes.noShow} open={isPast}>
                 {show}
               </ClosedLane>
-              <ClosedLane title="Annulés" items={lanes.cancelled}>
+              <ClosedLane title={t("board.lane.cancelled")} items={lanes.cancelled}>
                 {show}
               </ClosedLane>
             </>
@@ -130,6 +155,7 @@ function Lane({
   wide,
   children,
 }: LaneProps & { icon: string; empty: string; wide?: boolean }) {
+  const { t } = useTranslation();
   const id = useId();
   return (
     <section className={wide ? "rf-lane rf-section" : "rf-lane"} aria-labelledby={id}>
@@ -138,7 +164,7 @@ function Lane({
         <h2 id={id} className="rf-title">
           <span aria-hidden="true">{icon}</span> {title}
         </h2>
-        <span className="rf-lane__count" aria-label={`${items.length} rendez-vous`}>
+        <span className="rf-lane__count" aria-label={t("board.laneCount", { count: items.length })}>
           {items.length}
         </span>
       </div>

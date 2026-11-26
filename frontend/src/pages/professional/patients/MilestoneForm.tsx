@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { useTranslation } from "react-i18next";
 
 import { useRecordMilestone, type MilestoneCreate } from "../../../api/pathways";
 import { Button } from "../../../components/forms/Button";
@@ -7,18 +8,19 @@ import { TextField } from "../../../components/forms/TextField";
 import { DIMENSIONS } from "../../../lib/labels";
 
 type Kind = MilestoneCreate["kind"];
-type Scores = Pick<MilestoneCreate, (typeof DIMENSIONS)[number][0]>;
+type Scores = Pick<MilestoneCreate, (typeof DIMENSIONS)[number]>;
 const SCALE = [0, 1, 2, 3, 4];
 
 /** The coordinator records a milestone with the patient: self-assessment, symptoms, goals, plan. */
 export function MilestoneForm({ pathwayId, kind, onDone }: { pathwayId: string; kind: Kind; onDone: () => void }) {
+  const { t } = useTranslation();
   const record = useRecordMilestone();
   const [scores, setScores] = useState<Partial<Scores>>({});
   const [symptoms, setSymptoms] = useState([{ name: "", intensity: 5 }]);
   const [goals, setGoals] = useState("");
   const [plan, setPlan] = useState("");
   const [note, setNote] = useState("");
-  const complete = DIMENSIONS.every(([key]) => scores[key] !== undefined);
+  const complete = DIMENSIONS.every((key) => scores[key] !== undefined);
 
   function setSymptom(index: number, change: Partial<(typeof symptoms)[number]>) {
     setSymptoms(symptoms.map((s, i) => (i === index ? { ...s, ...change } : s)));
@@ -39,10 +41,10 @@ export function MilestoneForm({ pathwayId, kind, onDone }: { pathwayId: string; 
 
   return (
     <form className="rf-form" onSubmit={submit}>
-      <p className="rf-muted">Auto-évaluation du patient, de 0 à 4, sans justification.</p>
-      {DIMENSIONS.map(([key, label]) => (
+      <p className="rf-muted">{t("milestoneForm.intro")}</p>
+      {DIMENSIONS.map((key) => (
         <fieldset key={key} className="rf-question">
-          <legend>{label}</legend>
+          <legend>{t(`labels.dimension.${key}`)}</legend>
           <div className="rf-choices">
             {SCALE.map((value) => (
               <label key={value} className="rf-choice">
@@ -60,18 +62,18 @@ export function MilestoneForm({ pathwayId, kind, onDone }: { pathwayId: string; 
       ))}
 
       <fieldset className="rf-question">
-        <legend>Symptômes et intensité (0 à 10)</legend>
+        <legend>{t("milestoneForm.symptoms")}</legend>
         <div className="rf-stack">
           {symptoms.map((symptom, index) => (
             <div key={index} className="rf-row">
               <TextField
-                label={`Symptôme ${index + 1}`}
+                label={t("milestoneForm.symptom", { number: index + 1 })}
                 value={symptom.name}
                 maxLength={120}
                 onChange={(event) => setSymptom(index, { name: event.target.value })}
               />
               <TextField
-                label="Intensité"
+                label={t("milestoneForm.intensity")}
                 type="number"
                 min={0}
                 max={10}
@@ -82,27 +84,27 @@ export function MilestoneForm({ pathwayId, kind, onDone }: { pathwayId: string; 
           ))}
           <div>
             <Button variant="secondary" onClick={() => setSymptoms([...symptoms, { name: "", intensity: 5 }])}>
-              Ajouter un symptôme
+              {t("milestoneForm.addSymptom")}
             </Button>
           </div>
         </div>
       </fieldset>
 
-      <TextArea label="Attentes et objectifs du patient" value={goals} onChange={(e) => setGoals(e.target.value)} />
-      <TextArea label="Soins convenus ensemble" value={plan} onChange={(e) => setPlan(e.target.value)} />
+      <TextArea label={t("milestoneForm.goals")} value={goals} onChange={(e) => setGoals(e.target.value)} />
+      <TextArea label={t("milestoneForm.plan")} value={plan} onChange={(e) => setPlan(e.target.value)} />
       <TextArea
-        label="Note de coordination"
-        hint="Visible par l’équipe de soins, pas par le patient."
+        label={t("milestoneForm.note")}
+        hint={t("milestoneForm.noteHint")}
         value={note}
         onChange={(e) => setNote(e.target.value)}
       />
       {record.isError && (
         <p className="rf-field__error" role="alert">
-          L’enregistrement n’a pas abouti. Vos saisies sont conservées : réessayez.
+          {t("milestoneForm.failed")}
         </p>
       )}
       <Button type="submit" pending={record.isPending} disabled={!complete}>
-        Enregistrer le bilan
+        {t("milestoneForm.submit")}
       </Button>
     </form>
   );

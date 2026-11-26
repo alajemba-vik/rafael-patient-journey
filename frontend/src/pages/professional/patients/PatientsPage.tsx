@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 
 import { usePermissions } from "../../../api/identity_access";
@@ -16,6 +17,7 @@ function getInitials(first: string, last: string) {
 }
 
 export function PatientsPage() {
+  const { t } = useTranslation();
   const [search, setSearch] = useState("");
   const [unassigned, setUnassigned] = useState(false);
   const patients = usePatients(useDebouncedValue(search), unassigned);
@@ -23,7 +25,7 @@ export function PatientsPage() {
 
   return (
     <div style={{ maxWidth: "1080px", margin: "0 auto" }}>
-      <PageHeader title={unassigned ? "Nouveaux patients" : "Mes patients"} />
+      <PageHeader title={unassigned ? t("proPatients.titleUnassigned") : t("proPatients.titleMine")} />
 
       {/* Barre d'outils avec fond doux pour démarquer la recherche */}
       <div
@@ -40,18 +42,18 @@ export function PatientsPage() {
         }}
       >
         {canTakeOn && (
-          <div className="rf-segmented" role="group" aria-label="Quels patients afficher">
+          <div className="rf-segmented" role="group" aria-label={t("proPatients.whichPatients")}>
             <button type="button" aria-pressed={!unassigned} onClick={() => setUnassigned(false)}>
-              Mes patients
+              {t("proPatients.mine")}
             </button>
             <button type="button" aria-pressed={unassigned} onClick={() => setUnassigned(true)}>
-              Sans coordination
+              {t("proPatients.unassigned")}
             </button>
           </div>
         )}
         <div style={{ flex: 1, minWidth: "250px" }}>
           <TextField
-            label="Rechercher par nom"
+            label={t("proPatients.search")}
             type="search"
             value={search}
             onChange={(event) => setSearch(event.target.value)}
@@ -65,10 +67,10 @@ export function PatientsPage() {
         empty={{
           isEmpty: (list) => list.length === 0,
           title: search
-            ? "Aucun patient ne correspond à cette recherche."
+            ? t("proPatients.noMatch")
             : unassigned
-              ? "Tous les patients ont une coordinatrice ou un coordinateur."
-              : "Aucun patient dans votre file active pour le moment.",
+              ? t("proPatients.allAssigned")
+              : t("proPatients.noneActive"),
         }}
       >
         {(list) => (
@@ -133,7 +135,7 @@ export function PatientsPage() {
                     {p.last_name.toUpperCase()} <span style={{ fontWeight: 400 }}>{p.first_name}</span>
                   </h3>
                   <span className="rf-muted" style={{ fontSize: "13px", marginTop: "4px" }}>
-                    né·e le {formatDate(p.birth_date)}
+                    {t("proPatients.bornOn", { date: formatDate(p.birth_date) })}
                   </span>
                 </div>
               </Link>
