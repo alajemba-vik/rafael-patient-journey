@@ -69,7 +69,8 @@
     "dashboard": "Dashboard",
     "adminAccounts": "Accounts",
     "adminFaq": "Manage the FAQ",
-    "patientMessages": "Messages"
+    "patientMessages": "Messages",
+    "receptionCallBacks": "To call back"
   },
   "feedback": {
     "loading": "Loading",
@@ -572,5 +573,19 @@
         "4": "Very much at ease"
       }
     }
+  },
+  "callBacks": {
+    "title": "Patients to call back",
+    "intro": "Patients who missed an appointment in the last 30 days. Those with nothing booked come first.",
+    "empty": "Nobody to call back.",
+    "emptyHint": "Patients who miss an appointment will appear here.",
+    "missed_one": "{{count}} missed",
+    "missed_other": "{{count}} missed",
+    "lastMissed": "Last on {{date}}",
+    "next": "Next appointment on {{date}} at {{time}}",
+    "nothingBooked": "Nothing booked",
+    "noPhone": "No phone on file",
+    "call": "Call {{name}}",
+    "open": "{{name}}'s file"
   }
 }

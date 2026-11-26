@@ -23,6 +23,7 @@ export const paths = {
   reception: {
     board: "/accueil",
     patients: "/accueil/patients",
+    callBacks: "/accueil/a-rappeler",
     patient: (patientId: string) => `/accueil/patients/${patientId}`,
   },
   admin: {

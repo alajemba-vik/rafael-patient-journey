@@ -731,6 +731,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/reception/call-backs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Call Backs
+         * @description Patients to phone because they missed appointments lately.
+         */
+        get: operations["list_call_backs_api_v1_reception_call_backs_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/scheduling/appointments": {
         parameters: {
             query?: never;
@@ -1032,6 +1052,30 @@ export interface components {
             busy: components["schemas"]["TimeSlot"][];
             /** Free */
             free: components["schemas"]["TimeSlot"][];
+        };
+        /**
+         * CallBack
+         * @description A patient to phone: they missed appointments lately.
+         */
+        CallBack: {
+            /**
+             * Patient Id
+             * Format: uuid
+             */
+            patient_id: string;
+            /** Patient Name */
+            patient_name: string;
+            /** Phone */
+            phone: string | null;
+            /** Missed */
+            missed: number;
+            /**
+             * Last Missed At
+             * Format: date-time
+             */
+            last_missed_at: string;
+            /** Next Appointment At */
+            next_appointment_at: string | null;
         };
         /**
          * CancelReason
@@ -3296,6 +3340,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_call_backs_api_v1_reception_call_backs_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CallBack"][];
                 };
             };
         };

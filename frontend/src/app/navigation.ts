@@ -21,6 +21,7 @@ export const NAV_BY_ROLE: Record<Role, NavItem[]> = {
   secretary: [
     { to: paths.reception.board, label: "nav.receptionBoard" },
     { to: paths.reception.patients, label: "nav.receptionPatients" },
+    { to: paths.reception.callBacks, label: "nav.receptionCallBacks" },
     FAQ,
   ],
   professional: [

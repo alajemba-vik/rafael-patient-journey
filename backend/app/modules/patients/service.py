@@ -138,6 +138,14 @@ def get_names(db: Session, patient_ids: set[uuid.UUID]) -> dict[uuid.UUID, str]:
     return {row.id: f"{row.first_name} {row.last_name}" for row in rows}
 
 
+def get_phones(db: Session, patient_ids: set[uuid.UUID]) -> dict[uuid.UUID, str | None]:
+    """Phone numbers for reception's call-back list. The calling module checks access and audits."""
+    if not patient_ids:
+        return {}
+    rows = db.execute(select(Patient.id, Patient.phone).where(Patient.id.in_(patient_ids)))
+    return {row.id: row.phone for row in rows}
+
+
 def patient_exists(db: Session, patient_id: uuid.UUID) -> bool:
     """For other modules that take a patient id: make sure it points to a real record."""
     return db.scalar(select(Patient.id).where(Patient.id == patient_id)) is not None

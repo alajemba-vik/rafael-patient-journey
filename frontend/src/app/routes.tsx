@@ -60,6 +60,7 @@ export const router = createBrowserRouter([
         children: [
           page(paths.reception.board, () => import("../pages/reception/board/ReceptionBoardPage")),
           page(paths.reception.patients, () => import("../pages/reception/patients/ReceptionPatientsPage")),
+          page(paths.reception.callBacks, () => import("../pages/reception/call_backs/CallBacksPage")),
           page(
             paths.reception.patient(PATIENT_ID_PARAM),
             () => import("../pages/reception/patients/ReceptionPatientPage"),

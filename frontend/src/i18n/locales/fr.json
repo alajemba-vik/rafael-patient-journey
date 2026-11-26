@@ -69,7 +69,8 @@
     "dashboard": "Tableau de bord",
     "adminAccounts": "Comptes",
     "adminFaq": "Gérer la FAQ",
-    "patientMessages": "Messages"
+    "patientMessages": "Messages",
+    "receptionCallBacks": "À rappeler"
   },
   "feedback": {
     "loading": "Chargement en cours",
@@ -572,5 +573,19 @@
         "4": "Très à l’aise"
       }
     }
+  },
+  "callBacks": {
+    "title": "Patients à rappeler",
+    "intro": "Patients absents à un rendez-vous ces 30 derniers jours. Ceux sans rendez-vous prévu sont en haut.",
+    "empty": "Personne à rappeler.",
+    "emptyHint": "Les patients absents à un rendez-vous apparaîtront ici.",
+    "missed_one": "{{count}} absence",
+    "missed_other": "{{count}} absences",
+    "lastMissed": "Dernière le {{date}}",
+    "next": "Prochain rendez-vous le {{date}} à {{time}}",
+    "nothingBooked": "Aucun rendez-vous prévu",
+    "noPhone": "Pas de téléphone enregistré",
+    "call": "Appeler {{name}}",
+    "open": "Fiche de {{name}}"
   }
 }

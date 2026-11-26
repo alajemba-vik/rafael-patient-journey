@@ -278,3 +278,41 @@ def test_a_board_for_a_day_outside_the_agenda_is_refused(db, client_as):
     response = client_as(Role.SECRETARY).get("/api/v1/reception/day", params={"day": "0001-01-01"})
 
     assert response.status_code == 400
+
+
+def test_secretary_sees_patients_to_call_back_most_urgent_first(db, client_as):
+    now = datetime.now(UTC)
+    nothing_booked = add_appointment(db, now - timedelta(days=3), AppointmentStatus.NO_SHOW)
+    rebooked = add_appointment(db, now - timedelta(days=2), AppointmentStatus.NO_SHOW)
+    db.add(
+        Appointment(
+            patient_id=rebooked.patient_id,
+            professional_id=uuid.uuid4(),
+            starts_at=now + timedelta(days=5),
+            ends_at=now + timedelta(days=5, minutes=45),
+            created_by=uuid.uuid4(),
+        )
+    )
+    db.commit()
+    add_appointment(db, now - timedelta(days=40), AppointmentStatus.NO_SHOW)  # too old
+    add_appointment(db, now - timedelta(days=1), AppointmentStatus.DONE)
+
+    body = client_as(Role.SECRETARY).get("/api/v1/reception/call-backs").json()
+
+    assert [c["patient_id"] for c in body] == [
+        str(nothing_booked.patient_id),
+        str(rebooked.patient_id),
+    ]
+    assert body[0]["next_appointment_at"] is None
+    assert body[1]["next_appointment_at"] is not None
+    assert body[0]["missed"] == 1
+    assert audit_actions(db).count("reception.call_backs.read") == 2
+
+
+@pytest.mark.parametrize("role", OTHER_ROLES)
+def test_other_roles_cannot_see_the_call_back_list(db, client_as, role):
+    add_appointment(db, datetime.now(UTC) - timedelta(days=1), AppointmentStatus.NO_SHOW)
+
+    response = client_as(role).get("/api/v1/reception/call-backs")
+
+    assert response.status_code == 403

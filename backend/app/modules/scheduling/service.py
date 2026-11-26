@@ -358,6 +358,30 @@ def list_done_sessions(
     return _to_out(db, db.scalars(query.order_by(Appointment.starts_at.desc())))
 
 
+def list_missed_since(db: Session, since: datetime) -> list[AppointmentOut]:
+    """No-shows since a date, newest first. Callers check access and audit."""
+    query = select(Appointment).where(
+        Appointment.status == AppointmentStatus.NO_SHOW, Appointment.starts_at >= since
+    )
+    return _to_out(db, db.scalars(query.order_by(Appointment.starts_at.desc())))
+
+
+def next_appointments(db: Session, patient_ids: set[uuid.UUID]) -> dict[uuid.UUID, datetime]:
+    """Each patient's next scheduled appointment, if any. Callers check access and audit."""
+    if not patient_ids:
+        return {}
+    query = (
+        select(Appointment.patient_id, func.min(Appointment.starts_at))
+        .where(
+            Appointment.patient_id.in_(patient_ids),
+            Appointment.status == AppointmentStatus.SCHEDULED,
+            Appointment.starts_at >= datetime.now(UTC),
+        )
+        .group_by(Appointment.patient_id)
+    )
+    return {patient_id: _aware(starts_at) for patient_id, starts_at in db.execute(query)}
+
+
 def get_appointment(db: Session, appointment_id: uuid.UUID) -> AppointmentOut:
     """One appointment, for other modules that act on it. Callers check access and audit."""
     return _to_out(db, [_get(db, appointment_id)])[0]

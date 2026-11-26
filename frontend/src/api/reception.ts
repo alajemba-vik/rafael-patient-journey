@@ -31,3 +31,11 @@ export function useChangeStatus() {
     onSettled: () => queryClient.invalidateQueries({ queryKey: APPOINTMENTS }),
   });
 }
+
+/** Patients to phone because they missed appointments lately, most urgent first. */
+export function useCallBacks() {
+  return useQuery({
+    queryKey: [...APPOINTMENTS, "call-backs"],
+    queryFn: () => unwrap(api.GET("/api/v1/reception/call-backs")),
+  });
+}

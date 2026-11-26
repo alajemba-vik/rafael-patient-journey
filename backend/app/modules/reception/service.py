@@ -5,17 +5,21 @@ Reads and changes appointments through scheduling.service; the status lifecycle 
 """
 
 import uuid
-from datetime import date, datetime
+from datetime import UTC, date, datetime, timedelta
 
 from sqlalchemy.orm import Session
 
 from app import audit
 from app.errors import ForbiddenError
 from app.modules.identity_access.service import CurrentUser, Role
+from app.modules.patients import service as patients
+from app.modules.reception.schemas import CallBack
 from app.modules.scheduling import service as scheduling
 from app.modules.scheduling.service import AppointmentOut, AppointmentStatus, day_window
 
 RECEPTION_ROLES = {Role.SECRETARY}
+# Absences older than this no longer call for a phone call.
+CALL_BACK_WINDOW = timedelta(days=30)
 
 
 def list_today(db: Session, user: CurrentUser) -> list[AppointmentOut]:
@@ -52,6 +56,34 @@ def change_status(
     audit.record(db, user.id, f"appointment.{status.value}", appointment.patient_id)
     db.commit()
     return appointment
+
+
+def list_call_backs(db: Session, user: CurrentUser) -> list[CallBack]:
+    """Patients who missed an appointment in the last 30 days, those with nothing booked
+    first, then those who missed most. Unreachable patients are how people get lost."""
+    _require_reception(db, user)
+    missed = scheduling.list_missed_since(db, datetime.now(UTC) - CALL_BACK_WINDOW)
+    by_patient: dict[uuid.UUID, list[AppointmentOut]] = {}
+    for appointment in missed:
+        by_patient.setdefault(appointment.patient_id, []).append(appointment)
+    ids = set(by_patient)
+    phones = patients.get_phones(db, ids)
+    upcoming = scheduling.next_appointments(db, ids)
+    call_backs = [
+        CallBack(
+            patient_id=patient_id,
+            patient_name=appointments[0].patient_name,
+            phone=phones.get(patient_id),
+            missed=len(appointments),
+            last_missed_at=appointments[0].starts_at,
+            next_appointment_at=upcoming.get(patient_id),
+        )
+        for patient_id, appointments in by_patient.items()
+    ]
+    call_backs.sort(key=lambda c: (c.next_appointment_at is not None, -c.missed))
+    audit.record_many(db, user.id, "reception.call_backs.read", ids)
+    db.commit()
+    return call_backs
 
 
 def _today() -> date:
