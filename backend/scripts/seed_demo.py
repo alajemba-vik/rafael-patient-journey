@@ -15,7 +15,8 @@ What it creates, around today in the Institute's time zone:
 - yesterday's appointments (done or missed), today's at every stage of the waiting room,
   and the next five working days;
 - an open pathway per patient, led by their coordinator, with its intake (and for some a
-  three-month review) recorded;
+  three-month review) recorded: care plan goals and disciplines, and the assessment day's
+  main test scores;
 - a short conversation with the care team for some patients, and patient and practitioner
   ratings for most finished sessions.
 
@@ -43,7 +44,16 @@ from app.db import Base, SessionLocal, load_all_models
 from app.modules.care_team.models import CareAssignment
 from app.modules.identity_access.models import Role, User
 from app.modules.notifications.models import Notification
-from app.modules.pathways.models import CarePathway, Message, MilestoneKind, PathwayMilestone
+from app.modules.pathways.models import (
+    DISCIPLINES,
+    AssessmentScore,
+    AssessmentTest,
+    CarePathway,
+    Goal,
+    Message,
+    MilestoneKind,
+    PathwayMilestone,
+)
 from app.modules.patients.models import Patient
 from app.modules.questionnaires.models import SessionEvaluation
 from app.modules.scheduling.models import Appointment, AppointmentStatus, CancelReason
@@ -374,8 +384,27 @@ def _add_pathways(db: Session, teams: dict[uuid.UUID, list[User]], rng: random.R
                     ],
                     goals=rng.choice(GOALS),
                     plan=rng.choice(PLANS),
+                    goal_codes=[g.value for g in rng.sample(list(Goal), k=rng.randint(1, 3))],
+                    discipline_codes=rng.sample(DISCIPLINES, k=rng.randint(2, 5)),
                 )
             )
+            # The assessment day's main tests, a little better at the review.
+            for test, value in (
+                (AssessmentTest.K10, rng.randint(18, 32) - 4 * step),
+                (AssessmentTest.MNA_SCREENING, min(14, rng.randint(8, 13) + step)),
+                (AssessmentTest.MARSHALL, min(8, rng.randint(1, 5) + 2 * step)),
+                (AssessmentTest.SIT_TO_STAND, rng.randint(8, 14) + 2 * step),
+            ):
+                db.add(
+                    AssessmentScore(
+                        pathway_id=pathway.id,
+                        kind=kind,
+                        test=test,
+                        value=value,
+                        recorded_by=rng.choice(team).id,
+                        recorded_at=recorded_at,
+                    )
+                )
     db.flush()
     return len(teams)
 

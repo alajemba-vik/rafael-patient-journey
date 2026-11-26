@@ -1313,3 +1313,23 @@ body {
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
+
+/* Care plan: goals and disciplines as chips; a long list of choices scrolls */
+.rf-chips {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.rf-chip {
+  padding: var(--space-1) var(--space-3);
+  background: var(--secondary-blue);
+  border-radius: var(--radius-xs);
+  font-size: 14px;
+}
+.rf-choices--scroll {
+  max-height: 320px;
+  overflow-y: auto;
+}

@@ -4,9 +4,18 @@ import uuid
 from datetime import date, datetime
 from typing import Annotated
 
-from pydantic import BaseModel, ConfigDict, Field, StringConstraints
+from pydantic import AfterValidator, BaseModel, ConfigDict, Field, StringConstraints
 
-from app.modules.pathways.models import MESSAGE_MAX_LENGTH, MilestoneKind, PathwayStatus
+from app.modules.pathways.models import (
+    DISCIPLINES,
+    MAX_DISCIPLINES,
+    MAX_GOALS,
+    MESSAGE_MAX_LENGTH,
+    AssessmentTest,
+    Goal,
+    MilestoneKind,
+    PathwayStatus,
+)
 
 Score = Annotated[int, Field(ge=0, le=4)]
 
@@ -21,6 +30,27 @@ class PathwayOpen(BaseModel):
     patient_id: uuid.UUID
 
 
+def _known_disciplines(codes: list[str]) -> list[str]:
+    unknown = [code for code in codes if code not in DISCIPLINES]
+    if unknown:
+        raise ValueError(f"Unknown disciplines: {', '.join(unknown)}")
+    if len(set(codes)) != len(codes):
+        raise ValueError("Each discipline once")
+    return codes
+
+
+def _distinct(goals: list[Goal]) -> list[Goal]:
+    if len(set(goals)) != len(goals):
+        raise ValueError("Each goal once")
+    return goals
+
+
+Goals = Annotated[list[Goal], Field(max_length=MAX_GOALS), AfterValidator(_distinct)]
+Disciplines = Annotated[
+    list[str], Field(max_length=MAX_DISCIPLINES), AfterValidator(_known_disciplines)
+]
+
+
 class MilestoneCreate(BaseModel):
     kind: MilestoneKind
     physical: Score
@@ -32,6 +62,8 @@ class MilestoneCreate(BaseModel):
     goals: str = ""
     plan: str = ""
     note: str = ""
+    goal_codes: Goals = []
+    discipline_codes: Disciplines = []
 
 
 class PatientMilestone(BaseModel):
@@ -49,6 +81,8 @@ class PatientMilestone(BaseModel):
     symptoms: list[Symptom]
     goals: str
     plan: str
+    goal_codes: list[Goal]
+    discipline_codes: list[str]
 
 
 class Milestone(PatientMilestone):
@@ -122,3 +156,19 @@ class MessageOut(BaseModel):
     from_patient: bool
     body: str
     sent_at: datetime
+
+
+class AssessmentRecord(BaseModel):
+    kind: MilestoneKind
+    test: AssessmentTest
+    value: float = Field(ge=0)
+
+
+class AssessmentOut(BaseModel):
+    kind: MilestoneKind
+    test: AssessmentTest
+    value: float
+    # How the score reads, e.g. "moderate" for a K10 of 27; None for tests without bands.
+    band: str | None
+    recorded_by_name: str
+    recorded_at: datetime

@@ -5,7 +5,9 @@ import { useRecordMilestone, type MilestoneCreate } from "../../../api/pathways"
 import { Button } from "../../../components/forms/Button";
 import { TextArea } from "../../../components/forms/TextArea";
 import { TextField } from "../../../components/forms/TextField";
+import type { Goal } from "../../../lib/carePlan";
 import { DIMENSIONS } from "../../../lib/labels";
+import { CarePlanFields } from "./CarePlanFields";
 
 type Kind = MilestoneCreate["kind"];
 type Scores = Pick<MilestoneCreate, (typeof DIMENSIONS)[number]>;
@@ -20,6 +22,8 @@ export function MilestoneForm({ pathwayId, kind, onDone }: { pathwayId: string; 
   const [goals, setGoals] = useState("");
   const [plan, setPlan] = useState("");
   const [note, setNote] = useState("");
+  const [goalCodes, setGoalCodes] = useState<Goal[]>([]);
+  const [disciplineCodes, setDisciplineCodes] = useState<string[]>([]);
   const complete = DIMENSIONS.every((key) => scores[key] !== undefined);
 
   function setSymptom(index: number, change: Partial<(typeof symptoms)[number]>) {
@@ -35,6 +39,8 @@ export function MilestoneForm({ pathwayId, kind, onDone }: { pathwayId: string; 
       goals,
       plan,
       note,
+      goal_codes: goalCodes,
+      discipline_codes: disciplineCodes,
     };
     record.mutate({ pathwayId, body }, { onSuccess: onDone });
   }
@@ -90,6 +96,12 @@ export function MilestoneForm({ pathwayId, kind, onDone }: { pathwayId: string; 
         </div>
       </fieldset>
 
+      <CarePlanFields
+        goals={goalCodes}
+        disciplines={disciplineCodes}
+        onGoalsChange={setGoalCodes}
+        onDisciplinesChange={setDisciplineCodes}
+      />
       <TextArea label={t("milestoneForm.goals")} value={goals} onChange={(e) => setGoals(e.target.value)} />
       <TextArea label={t("milestoneForm.plan")} value={plan} onChange={(e) => setPlan(e.target.value)} />
       <TextArea

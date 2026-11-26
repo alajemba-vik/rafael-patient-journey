@@ -519,6 +519,43 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/pathways/{pathway_id}/assessments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Record Assessment
+         * @description Record one test of the assessment day; recording it again replaces the score.
+         */
+        post: operations["record_assessment_api_v1_pathways__pathway_id__assessments_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pathways/patients/{patient_id}/assessments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Patient Assessments */
+        get: operations["list_patient_assessments_api_v1_pathways_patients__patient_id__assessments_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/patients": {
         parameters: {
             query?: never;
@@ -1006,6 +1043,35 @@ export interface components {
             /** Note */
             note: string;
         };
+        /** AssessmentOut */
+        AssessmentOut: {
+            kind: components["schemas"]["MilestoneKind"];
+            test: components["schemas"]["AssessmentTest"];
+            /** Value */
+            value: number;
+            /** Band */
+            band: string | null;
+            /** Recorded By Name */
+            recorded_by_name: string;
+            /**
+             * Recorded At
+             * Format: date-time
+             */
+            recorded_at: string;
+        };
+        /** AssessmentRecord */
+        AssessmentRecord: {
+            kind: components["schemas"]["MilestoneKind"];
+            test: components["schemas"]["AssessmentTest"];
+            /** Value */
+            value: number;
+        };
+        /**
+         * AssessmentTest
+         * @description The scored tests of the assessment day (HDJ), each recorded by its practitioner.
+         * @enum {string}
+         */
+        AssessmentTest: "k10" | "mna_screening" | "marshall" | "sitting_hours" | "balance_right" | "balance_left" | "sit_to_stand" | "handgrip";
         /** AssignmentCreate */
         AssignmentCreate: {
             /**
@@ -1269,6 +1335,12 @@ export interface components {
             /** Position */
             position?: number | null;
         };
+        /**
+         * Goal
+         * @description What the patient wants from the pathway: up to three, from the Institute's list.
+         * @enum {string}
+         */
+        Goal: "pain" | "treatment_side_effects" | "self_esteem" | "weight_loss" | "weight_gain" | "muscle_strength" | "emotional_support" | "sleep" | "sexual_health" | "wellbeing";
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
@@ -1360,6 +1432,10 @@ export interface components {
             goals: string;
             /** Plan */
             plan: string;
+            /** Goal Codes */
+            goal_codes: components["schemas"]["Goal"][];
+            /** Discipline Codes */
+            discipline_codes: string[];
             /** Note */
             note: string;
         };
@@ -1396,6 +1472,16 @@ export interface components {
              * @default
              */
             note: string;
+            /**
+             * Goal Codes
+             * @default []
+             */
+            goal_codes: components["schemas"]["Goal"][];
+            /**
+             * Discipline Codes
+             * @default []
+             */
+            discipline_codes: string[];
         };
         /**
          * MilestoneKind
@@ -1663,6 +1749,10 @@ export interface components {
             goals: string;
             /** Plan */
             plan: string;
+            /** Goal Codes */
+            goal_codes: components["schemas"]["Goal"][];
+            /** Discipline Codes */
+            discipline_codes: string[];
         };
         /**
          * PatientPathway
@@ -2967,6 +3057,72 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MessageOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    record_assessment_api_v1_pathways__pathway_id__assessments_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                pathway_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AssessmentRecord"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssessmentOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_patient_assessments_api_v1_pathways_patients__patient_id__assessments_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                patient_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssessmentOut"][];
                 };
             };
             /** @description Validation Error */

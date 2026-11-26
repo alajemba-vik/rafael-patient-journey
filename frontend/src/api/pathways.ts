@@ -126,3 +126,28 @@ export function useSendMessage(patientId: string | null) {
     onSuccess: () => void queryClient.invalidateQueries({ queryKey: [...MESSAGES, patientId ?? "mine"] }),
   });
 }
+
+export type Assessment = Schemas["AssessmentOut"];
+const ASSESSMENTS = ["assessments"] as const;
+
+/** The scored tests of the patient's current or latest pathway, for their care team. */
+export function usePatientAssessments(patientId: string) {
+  return useQuery({
+    queryKey: [...ASSESSMENTS, patientId],
+    queryFn: () =>
+      unwrap(
+        api.GET("/api/v1/pathways/patients/{patient_id}/assessments", { params: { path: { patient_id: patientId } } }),
+      ),
+  });
+}
+
+export function useRecordAssessment() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ pathwayId, body }: { pathwayId: string; body: Schemas["AssessmentRecord"] }) =>
+      unwrap(
+        api.POST("/api/v1/pathways/{pathway_id}/assessments", { params: { path: { pathway_id: pathwayId } }, body }),
+      ),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ASSESSMENTS }),
+  });
+}

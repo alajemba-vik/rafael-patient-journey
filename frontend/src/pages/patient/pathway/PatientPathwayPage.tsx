@@ -4,6 +4,7 @@ import { useMyPathways } from "../../../api/pathways";
 import { QueryState } from "../../../components/feedback/QueryState";
 import { formatDate } from "../../../lib/format";
 import { PageHeader } from "../../../components/layout/PageHeader";
+import { CarePlan } from "../../../components/patient/CarePlan";
 import { MilestonesTable } from "../../../components/tables/MilestonesTable";
 
 export function PatientPathwayPage() {
@@ -103,6 +104,7 @@ export function PatientPathwayPage() {
 
                           {/* Contenu détaillé de l'étape */}
                           <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
+                            <CarePlan goals={m.goal_codes} disciplines={m.discipline_codes} />
                             {m.goals && (
                               <div>
                                 <strong

@@ -4,8 +4,10 @@ from enum import StrEnum
 
 from sqlalchemy import (
     JSON,
+    CheckConstraint,
     DateTime,
     Enum,
+    Float,
     ForeignKey,
     Index,
     SmallInteger,
@@ -34,6 +36,40 @@ class MilestoneKind(StrEnum):
     INTAKE = "intake"
     REVIEW = "review"  # around 3 months
     FINAL = "final"  # around 6 months
+
+
+class Goal(StrEnum):
+    """What the patient wants from the pathway: up to three, from the Institute's list."""
+
+    PAIN = "pain"
+    TREATMENT_SIDE_EFFECTS = "treatment_side_effects"
+    SELF_ESTEEM = "self_esteem"
+    WEIGHT_LOSS = "weight_loss"
+    WEIGHT_GAIN = "weight_gain"
+    MUSCLE_STRENGTH = "muscle_strength"
+    EMOTIONAL_SUPPORT = "emotional_support"
+    SLEEP = "sleep"
+    SEXUAL_HEALTH = "sexual_health"
+    WELLBEING = "wellbeing"
+
+
+# The disciplines a care plan can draw on, as listed in the Institute's assessment form.
+DISCIPLINES = (
+    "adapted_physical_activity", "acupuncture", "auriculotherapy", "chef_workshop",
+    "universal_workshop", "art_therapy", "therapeutic_singing", "choir", "sports_coaching",
+    "image_consulting", "healthy_cooking", "dance_therapy", "dietetics", "drama_therapy",
+    "occupational_therapy", "writing_therapy", "femininity_sensuality", "support_group",
+    "homeopathy", "hypnosis", "sensory_immersion", "physiotherapy", "luxopuncture", "massage",
+    "neurofeedback_massage", "manicure", "nutrition_doctor", "sleep_medicine", "pain_medicine",
+    "individual_meditation", "group_meditation", "micronutrition", "career_pathway",
+    "music_therapy", "naturopathy", "neurofeedback", "oil_yoga", "osteopathy",
+    "oncology_aesthetics", "pilates", "psychiatry", "psychology", "occupational_psychology",
+    "psychomotor_therapy", "hair_prosthesis", "qi_gong", "reiki", "reflexology", "sexology",
+    "sound_therapy", "sophrology", "sophro_sexology", "shiatsu", "therapeutic_touch", "tuina",
+    "yoga",
+)  # fmt: skip
+MAX_GOALS = 3
+MAX_DISCIPLINES = 5
 
 
 class CarePathway(Base):
@@ -87,6 +123,9 @@ class PathwayMilestone(Base):
     plan: Mapped[str] = mapped_column(Text, default="")
     # The coordinator's own note: shown to the care team, not to the patient.
     note: Mapped[str] = mapped_column(Text, default="")
+    # The care plan: Goal values and DISCIPLINES codes, in the order chosen.
+    goal_codes: Mapped[list[str]] = mapped_column(JSON, default=list, server_default="[]")
+    discipline_codes: Mapped[list[str]] = mapped_column(JSON, default=list, server_default="[]")
 
 
 class PathwayNeed(Base):
@@ -124,3 +163,34 @@ class Message(Base):
     sent_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(UTC)
     )
+
+
+class AssessmentTest(StrEnum):
+    """The scored tests of the assessment day (HDJ), each recorded by its practitioner."""
+
+    K10 = "k10"  # psychological distress, 10 to 50
+    MNA_SCREENING = "mna_screening"  # nutrition, 0 to 14
+    MARSHALL = "marshall"  # physical activity, 0 to 8
+    SITTING_HOURS = "sitting_hours"  # hours a day sitting or lying, sleep excluded
+    BALANCE_RIGHT = "balance_right"  # seconds on the right foot, 30 at most
+    BALANCE_LEFT = "balance_left"  # seconds on the left foot, 30 at most
+    SIT_TO_STAND = "sit_to_stand"  # times standing up from a chair in 30 seconds
+    HANDGRIP = "handgrip"  # grip strength, kg
+
+
+class AssessmentScore(Base):
+    """One test's result at one milestone of a pathway. Recorded again, it is replaced."""
+
+    __tablename__ = "assessment_scores"
+    __table_args__ = (
+        UniqueConstraint("pathway_id", "kind", "test"),
+        CheckConstraint("value >= 0", name="ck_assessment_scores_value_positive"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    pathway_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("care_pathways.id"))
+    kind: Mapped[MilestoneKind] = mapped_column(_enum(MilestoneKind, 8))
+    test: Mapped[AssessmentTest] = mapped_column(_enum(AssessmentTest, 16))
+    value: Mapped[float] = mapped_column(Float)
+    recorded_by: Mapped[uuid.UUID] = mapped_column(Uuid)
+    recorded_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))

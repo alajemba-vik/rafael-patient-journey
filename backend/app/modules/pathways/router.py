@@ -7,6 +7,8 @@ from app.db import get_db
 from app.modules.identity_access.service import CurrentUser, get_current_user
 from app.modules.pathways import service
 from app.modules.pathways.schemas import (
+    AssessmentOut,
+    AssessmentRecord,
     MessageCreate,
     MessageOut,
     MilestoneCreate,
@@ -133,3 +135,23 @@ def send_message(
     db: Session = Depends(get_db),
 ) -> MessageOut:
     return service.send_message(db, user, patient_id, body)
+
+
+@router.post("/{pathway_id}/assessments")
+def record_assessment(
+    pathway_id: uuid.UUID,
+    body: AssessmentRecord,
+    user: CurrentUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> AssessmentOut:
+    """Record one test of the assessment day; recording it again replaces the score."""
+    return service.record_assessment(db, user, pathway_id, body)
+
+
+@router.get("/patients/{patient_id}/assessments")
+def list_patient_assessments(
+    patient_id: uuid.UUID,
+    user: CurrentUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> list[AssessmentOut]:
+    return service.list_patient_assessments(db, user, patient_id)

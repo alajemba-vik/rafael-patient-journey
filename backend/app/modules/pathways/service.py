@@ -21,13 +21,15 @@ from sqlalchemy import and_, func, select
 from sqlalchemy.orm import Session, aliased
 
 from app import audit
-from app.errors import ConflictError, ForbiddenError, NotFoundError
+from app.errors import AppError, ConflictError, ForbiddenError, NotFoundError
 from app.modules.care_team import service as care_team
 from app.modules.identity_access import service as identity
 from app.modules.identity_access.service import CurrentUser, Role
 from app.modules.notifications import service as notifications
 from app.modules.notifications.models import Template
 from app.modules.pathways.models import (
+    AssessmentScore,
+    AssessmentTest,
     CarePathway,
     Message,
     MilestoneKind,
@@ -36,6 +38,8 @@ from app.modules.pathways.models import (
     PathwayStatus,
 )
 from app.modules.pathways.schemas import (
+    AssessmentOut,
+    AssessmentRecord,
     MessageCreate,
     MessageOut,
     Milestone,
@@ -168,6 +172,87 @@ def list_led_pathways(db: Session, user: CurrentUser) -> list[PathwaySummary]:
     audit.record_many(db, user.id, "pathway.list", {p.patient_id for p in pathways})
     db.commit()
     return [_summary(p, milestones[p.id], names.get(p.patient_id, "")) for p in pathways]
+
+
+# The highest value each test can take, and its bands as (lowest score, name), from the
+# interpretation printed in the Institute's assessment report.
+TEST_MAXIMUM = {
+    AssessmentTest.K10: 50,
+    AssessmentTest.MNA_SCREENING: 14,
+    AssessmentTest.MARSHALL: 8,
+    AssessmentTest.SITTING_HOURS: 24,
+    AssessmentTest.BALANCE_RIGHT: 30,
+    AssessmentTest.BALANCE_LEFT: 30,
+    AssessmentTest.SIT_TO_STAND: 60,
+    AssessmentTest.HANDGRIP: 100,
+}
+TEST_MINIMUM = {AssessmentTest.K10: 10}
+TEST_BANDS = {
+    AssessmentTest.K10: [(10, "well"), (20, "mild"), (25, "moderate"), (30, "severe")],
+    AssessmentTest.MNA_SCREENING: [(0, "malnourished"), (8, "at_risk"), (12, "normal")],
+    AssessmentTest.MARSHALL: [(0, "insufficiently_active"), (4, "sufficiently_active")],
+    AssessmentTest.SITTING_HOURS: [(0, "low"), (3, "moderate"), (7.01, "high")],
+}
+
+
+def record_assessment(
+    db: Session, user: CurrentUser, pathway_id: uuid.UUID, data: AssessmentRecord
+) -> AssessmentOut:
+    """A care-team member records a test of the assessment day; the coach Marshall and the
+    physical tests, the dietitian MNA, the psychologist K10. Recording it again replaces it."""
+    pathway = _get(db, pathway_id)
+    if user.role not in CARE_ROLES or not care_team.is_in_care_team(
+        db, user.id, pathway.patient_id
+    ):
+        _deny(db, user, "assessment.record.denied", pathway.patient_id)
+    if pathway.status != PathwayStatus.OPEN:
+        raise ConflictError("This pathway is closed")
+    low, high = TEST_MINIMUM.get(data.test, 0), TEST_MAXIMUM[data.test]
+    if not low <= data.value <= high:
+        raise AppError(f"This test's score is between {low} and {high}")
+    query = select(AssessmentScore).where(
+        AssessmentScore.pathway_id == pathway.id,
+        AssessmentScore.kind == data.kind,
+        AssessmentScore.test == data.test,
+    )
+    score = db.scalar(query.with_for_update())
+    if score is None:
+        score = AssessmentScore(pathway_id=pathway.id, kind=data.kind, test=data.test)
+        db.add(score)
+    score.value = data.value
+    score.recorded_by = user.id
+    score.recorded_at = datetime.now(UTC)
+    audit.record(db, user.id, "assessment.record", pathway.patient_id)
+    db.commit()
+    return _assessments_out(db, [score])[0]
+
+
+def list_patient_assessments(
+    db: Session, user: CurrentUser, patient_id: uuid.UUID
+) -> list[AssessmentOut]:
+    """Every test result of the patient's current or latest pathway, for their care team."""
+    if user.role not in CARE_ROLES or not care_team.is_in_care_team(db, user.id, patient_id):
+        _deny(db, user, "assessment.read.denied", patient_id)
+    pathways = _pathways_of(db, patient_id)
+    scores = (
+        list(
+            db.scalars(select(AssessmentScore).where(AssessmentScore.pathway_id == pathways[0].id))
+        )
+        if pathways
+        else []
+    )
+    audit.record(db, user.id, "assessment.read", patient_id)
+    db.commit()
+    return _assessments_out(db, scores)
+
+
+def band_of(test: AssessmentTest, value: float) -> str | None:
+    """The band a score falls in, or None for a test without bands."""
+    band = None
+    for lowest, name in TEST_BANDS.get(test, []):
+        if value >= lowest:
+            band = name
+    return band
 
 
 def raise_need(db: Session, user: CurrentUser, pathway_id: uuid.UUID, data: NeedCreate) -> NeedOut:
@@ -382,6 +467,26 @@ def _messages_out(db: Session, patient_id: uuid.UUID, messages: list[Message]) -
             sent_at=m.sent_at if m.sent_at.tzinfo else m.sent_at.replace(tzinfo=UTC),
         )
         for m in messages
+    ]
+
+
+def _assessments_out(db: Session, scores: list[AssessmentScore]) -> list[AssessmentOut]:
+    ids = list({s.recorded_by for s in scores})
+    names = {u.id: u.full_name for u in identity.get_users(db, ids)} if ids else {}
+    order = {kind: i for i, kind in enumerate(MILESTONE_ORDER)}
+    tests = list(AssessmentTest)
+    return [
+        AssessmentOut(
+            kind=s.kind,
+            test=s.test,
+            value=s.value,
+            band=band_of(s.test, s.value),
+            recorded_by_name=names.get(s.recorded_by, ""),
+            recorded_at=s.recorded_at
+            if s.recorded_at.tzinfo
+            else s.recorded_at.replace(tzinfo=UTC),
+        )
+        for s in sorted(scores, key=lambda s: (tests.index(s.test), order[s.kind]))
     ]
 
 

@@ -7,6 +7,7 @@ import { QueryState } from "../../../components/feedback/QueryState";
 import { Button } from "../../../components/forms/Button";
 import { ConfirmButton } from "../../../components/forms/ConfirmButton";
 import { formatDate } from "../../../lib/format";
+import { CarePlan } from "../../../components/patient/CarePlan";
 import { MilestonesTable } from "../../../components/tables/MilestonesTable";
 import { MilestoneForm } from "./MilestoneForm";
 import { NeedForm } from "./NeedForm";
@@ -79,6 +80,9 @@ function PathwayDetails({ pathway }: { pathway: Pathway }) {
           <summary>
             {t(`labels.milestone.${m.kind}`)} · {formatDate(m.recorded_at)}
           </summary>
+          <div className="rf-disclosure__body">
+            <CarePlan goals={m.goal_codes} disciplines={m.discipline_codes} />
+          </div>
           <dl className="rf-dl rf-disclosure__body">
             {m.symptoms.length > 0 && (
               <>
