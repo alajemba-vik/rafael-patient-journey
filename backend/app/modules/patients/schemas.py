@@ -1,6 +1,6 @@
 import re
 import uuid
-from datetime import date
+from datetime import date, datetime
 from typing import Annotated
 
 from pydantic import (
@@ -8,8 +8,20 @@ from pydantic import (
     BaseModel,
     ConfigDict,
     EmailStr,
+    Field,
     StringConstraints,
     computed_field,
+    model_validator,
+)
+
+from app.modules.patients.models import (
+    MAX_TREATMENTS,
+    NOTE_MAX_LENGTH,
+    TEXT_MAX_LENGTH,
+    CancerSite,
+    TreatmentKind,
+    TreatmentStatus,
+    WorkSituation,
 )
 
 Name = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=100)]
@@ -99,3 +111,71 @@ class PatientDetail(PatientAdministrative):
     """Administrative + clinical data: the patient themself and their care team."""
 
     medical_summary: str | None
+
+
+def _blank_to_none(value: str | None) -> str | None:
+    return value or None
+
+
+ShortText = Annotated[
+    str | None,
+    StringConstraints(strip_whitespace=True, max_length=TEXT_MAX_LENGTH),
+    AfterValidator(_blank_to_none),
+]
+Note = Annotated[
+    str | None,
+    StringConstraints(strip_whitespace=True, max_length=NOTE_MAX_LENGTH),
+    AfterValidator(_blank_to_none),
+]
+
+
+class TreatmentIn(BaseModel):
+    kind: TreatmentKind
+    status: TreatmentStatus
+    started_on: date | None = None
+    ended_on: date | None = None
+    details: ShortText = None
+
+    @model_validator(mode="after")
+    def _dates_in_order(self) -> "TreatmentIn":
+        if self.started_on and self.ended_on and self.ended_on < self.started_on:
+            raise ValueError("A treatment can't end before it starts")
+        return self
+
+
+class TreatmentOut(TreatmentIn):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+
+
+class ClinicalProfileIn(BaseModel):
+    """The whole profile, sent at once: fields left out or null are unknown. Treatments
+    replace the previous list."""
+
+    cancer_site: CancerSite | None = None
+    diagnosed_on: date | None = None
+    metastatic: bool | None = None
+    height_cm: int | None = Field(default=None, ge=50, le=250)
+    weight_kg: int | None = Field(default=None, ge=20, le=350)
+    allergies: ShortText = None
+    occupation: ShortText = None
+    work_situation: WorkSituation | None = None
+    lives_alone: bool | None = None
+    has_dependants: bool | None = None
+    has_caregivers: bool | None = None
+    caregivers: ShortText = None
+    smoker: bool | None = None
+    drinks_alcohol: bool | None = None
+    drinks_per_week: int | None = Field(default=None, ge=0, le=200)
+    takes_supplements: bool | None = None
+    notes: Note = None
+    treatments: list[TreatmentIn] = Field(default_factory=list, max_length=MAX_TREATMENTS)
+
+
+class ClinicalProfileOut(ClinicalProfileIn):
+    """An empty profile (nothing recorded yet) has no `updated_at`."""
+
+    treatments: list[TreatmentOut] = Field(default_factory=list)  # type: ignore[assignment]
+    updated_at: datetime | None = None
+    updated_by: uuid.UUID | None = None

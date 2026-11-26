@@ -592,6 +592,24 @@ export interface paths {
         patch: operations["update_patient_api_v1_patients__patient_id__patch"];
         trace?: never;
     };
+    "/api/v1/patients/{patient_id}/clinical-profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Clinical Profile */
+        get: operations["get_clinical_profile_api_v1_patients__patient_id__clinical_profile_get"];
+        /** Set Clinical Profile */
+        put: operations["set_clinical_profile_api_v1_patients__patient_id__clinical_profile_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/questionnaires/due": {
         parameters: {
             query?: never;
@@ -1344,6 +1362,12 @@ export interface components {
          * @enum {string}
          */
         CancelReason: "patient_request" | "practitioner_unavailable" | "other";
+        /**
+         * CancerSite
+         * @description Where the cancer is, as listed in the Institute's pathway questionnaire.
+         * @enum {string}
+         */
+        CancerSite: "breast" | "prostate" | "brain" | "head_neck" | "sinus" | "thyroid" | "lung" | "oesophagus" | "stomach" | "liver" | "gallbladder" | "pancreas" | "kidney" | "colorectal" | "urothelial" | "anal" | "ovary" | "endometrium" | "cervix" | "vagina" | "vulva" | "testis" | "skin" | "lymph_node" | "blood" | "other";
         /** CareTeamMember */
         CareTeamMember: {
             /**
@@ -1397,6 +1421,91 @@ export interface components {
             value: number;
             /** Label */
             label: string;
+        };
+        /**
+         * ClinicalProfileIn
+         * @description The whole profile, sent at once: fields left out or null are unknown. Treatments
+         *     replace the previous list.
+         */
+        ClinicalProfileIn: {
+            cancer_site?: components["schemas"]["CancerSite"] | null;
+            /** Diagnosed On */
+            diagnosed_on?: string | null;
+            /** Metastatic */
+            metastatic?: boolean | null;
+            /** Height Cm */
+            height_cm?: number | null;
+            /** Weight Kg */
+            weight_kg?: number | null;
+            /** Allergies */
+            allergies?: string | null;
+            /** Occupation */
+            occupation?: string | null;
+            work_situation?: components["schemas"]["WorkSituation"] | null;
+            /** Lives Alone */
+            lives_alone?: boolean | null;
+            /** Has Dependants */
+            has_dependants?: boolean | null;
+            /** Has Caregivers */
+            has_caregivers?: boolean | null;
+            /** Caregivers */
+            caregivers?: string | null;
+            /** Smoker */
+            smoker?: boolean | null;
+            /** Drinks Alcohol */
+            drinks_alcohol?: boolean | null;
+            /** Drinks Per Week */
+            drinks_per_week?: number | null;
+            /** Takes Supplements */
+            takes_supplements?: boolean | null;
+            /** Notes */
+            notes?: string | null;
+            /** Treatments */
+            treatments?: components["schemas"]["TreatmentIn"][];
+        };
+        /**
+         * ClinicalProfileOut
+         * @description An empty profile (nothing recorded yet) has no `updated_at`.
+         */
+        ClinicalProfileOut: {
+            cancer_site?: components["schemas"]["CancerSite"] | null;
+            /** Diagnosed On */
+            diagnosed_on?: string | null;
+            /** Metastatic */
+            metastatic?: boolean | null;
+            /** Height Cm */
+            height_cm?: number | null;
+            /** Weight Kg */
+            weight_kg?: number | null;
+            /** Allergies */
+            allergies?: string | null;
+            /** Occupation */
+            occupation?: string | null;
+            work_situation?: components["schemas"]["WorkSituation"] | null;
+            /** Lives Alone */
+            lives_alone?: boolean | null;
+            /** Has Dependants */
+            has_dependants?: boolean | null;
+            /** Has Caregivers */
+            has_caregivers?: boolean | null;
+            /** Caregivers */
+            caregivers?: string | null;
+            /** Smoker */
+            smoker?: boolean | null;
+            /** Drinks Alcohol */
+            drinks_alcohol?: boolean | null;
+            /** Drinks Per Week */
+            drinks_per_week?: number | null;
+            /** Takes Supplements */
+            takes_supplements?: boolean | null;
+            /** Notes */
+            notes?: string | null;
+            /** Treatments */
+            treatments?: components["schemas"]["TreatmentOut"][];
+            /** Updated At */
+            updated_at?: string | null;
+            /** Updated By */
+            updated_by?: string | null;
         };
         /** Dashboard */
         Dashboard: {
@@ -2318,6 +2427,43 @@ export interface components {
              */
             ends_at: string;
         };
+        /** TreatmentIn */
+        TreatmentIn: {
+            kind: components["schemas"]["TreatmentKind"];
+            status: components["schemas"]["TreatmentStatus"];
+            /** Started On */
+            started_on?: string | null;
+            /** Ended On */
+            ended_on?: string | null;
+            /** Details */
+            details?: string | null;
+        };
+        /**
+         * TreatmentKind
+         * @enum {string}
+         */
+        TreatmentKind: "surgery" | "chemotherapy" | "radiotherapy" | "hormone_therapy" | "immunotherapy" | "targeted_therapy" | "other";
+        /** TreatmentOut */
+        TreatmentOut: {
+            kind: components["schemas"]["TreatmentKind"];
+            status: components["schemas"]["TreatmentStatus"];
+            /** Started On */
+            started_on?: string | null;
+            /** Ended On */
+            ended_on?: string | null;
+            /** Details */
+            details?: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+        };
+        /**
+         * TreatmentStatus
+         * @enum {string}
+         */
+        TreatmentStatus: "ongoing" | "finished";
         /**
          * UserCreate
          * @description A new login. The initial password is set by whoever creates the account.
@@ -2364,6 +2510,11 @@ export interface components {
             /** Context */
             ctx?: Record<string, never>;
         };
+        /**
+         * WorkSituation
+         * @enum {string}
+         */
+        WorkSituation: "active" | "retired" | "sick_leave" | "therapeutic_part_time" | "other";
     };
     responses: never;
     parameters: never;
@@ -3555,6 +3706,72 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PatientAdministrative"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_clinical_profile_api_v1_patients__patient_id__clinical_profile_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                patient_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClinicalProfileOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_clinical_profile_api_v1_patients__patient_id__clinical_profile_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                patient_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ClinicalProfileIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClinicalProfileOut"];
                 };
             };
             /** @description Validation Error */

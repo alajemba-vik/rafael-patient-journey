@@ -46,3 +46,32 @@ export function useUpdatePatient(patientId: string) {
     onSuccess: () => void queryClient.invalidateQueries({ queryKey: PATIENTS }),
   });
 }
+
+export type ClinicalProfile = Schemas["ClinicalProfileOut"];
+export type ClinicalProfileInput = Schemas["ClinicalProfileIn"];
+
+/** Disease, treatments, social life and habits. The patient and their care team only. */
+export function useClinicalProfile(patientId: string) {
+  return useQuery({
+    queryKey: [...PATIENTS, patientId, "clinical"],
+    queryFn: () =>
+      unwrap(
+        api.GET("/api/v1/patients/{patient_id}/clinical-profile", { params: { path: { patient_id: patientId } } }),
+      ),
+  });
+}
+
+/** The care team saves the whole profile at once; treatments replace the previous list. */
+export function useSaveClinicalProfile(patientId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (body: ClinicalProfileInput) =>
+      unwrap(
+        api.PUT("/api/v1/patients/{patient_id}/clinical-profile", {
+          params: { path: { patient_id: patientId } },
+          body,
+        }),
+      ),
+    onSuccess: (saved) => queryClient.setQueryData([...PATIENTS, patientId, "clinical"], saved),
+  });
+}

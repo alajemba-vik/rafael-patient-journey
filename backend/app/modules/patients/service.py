@@ -11,8 +11,9 @@ Access policy (role + care relationship):
 
 import unicodedata
 import uuid
+from datetime import UTC, datetime
 
-from sqlalchemy import ColumnElement, or_, select
+from sqlalchemy import ColumnElement, delete, or_, select
 from sqlalchemy.orm import Session
 
 from app import audit
@@ -20,13 +21,16 @@ from app.errors import ConflictError, ForbiddenError, NotFoundError
 from app.modules.care_team import service as care_team
 from app.modules.identity_access import service as identity
 from app.modules.identity_access.service import CurrentUser, Role
-from app.modules.patients.models import Patient
+from app.modules.patients.models import ClinicalProfile, Patient, Treatment
 from app.modules.patients.schemas import (
     FRANCE_CODE,
+    ClinicalProfileIn,
+    ClinicalProfileOut,
     PatientAdministrative,
     PatientCreate,
     PatientDetail,
     PatientUpdate,
+    TreatmentOut,
 )
 
 CARE_ROLES = {Role.PROFESSIONAL, Role.COORDINATOR}
@@ -128,6 +132,51 @@ def list_patients(
     return [PatientAdministrative.model_validate(p) for p in patients]
 
 
+def get_clinical_profile(
+    db: Session, user: CurrentUser, patient_id: uuid.UUID
+) -> ClinicalProfileOut:
+    """The patient themself and their care team. Empty until someone fills it in."""
+    patient = _patient_or_404(db, patient_id)
+    if not _can_see_clinical(db, user, patient):
+        audit.record(db, user.id, "patient.clinical.read.denied", patient.id)
+        db.commit()
+        raise ForbiddenError("Only the patient and their care team can see this profile")
+    view = _profile_out(db, patient.id)
+    audit.record(db, user.id, "patient.clinical.read", patient.id)
+    db.commit()
+    return view
+
+
+def set_clinical_profile(
+    db: Session, user: CurrentUser, patient_id: uuid.UUID, data: ClinicalProfileIn
+) -> ClinicalProfileOut:
+    """The care team records the whole profile at once; treatments replace the old list."""
+    patient = _patient_or_404(db, patient_id)
+    if user.role not in CARE_ROLES or not care_team.is_in_care_team(db, user.id, patient.id):
+        audit.record(db, user.id, "patient.clinical.update.denied", patient.id)
+        db.commit()
+        raise ForbiddenError("Only the patient's care team can update this profile")
+
+    profile = db.scalar(
+        select(ClinicalProfile).where(ClinicalProfile.patient_id == patient.id).with_for_update()
+    )
+    if profile is None:
+        profile = ClinicalProfile(patient_id=patient.id)
+        db.add(profile)
+    for field, value in data.model_dump(exclude={"treatments"}).items():
+        setattr(profile, field, value)
+    profile.updated_at = datetime.now(UTC)
+    profile.updated_by = user.id
+
+    db.execute(delete(Treatment).where(Treatment.patient_id == patient.id))
+    for treatment in data.treatments:
+        db.add(Treatment(patient_id=patient.id, **treatment.model_dump()))
+    db.flush()
+    audit.record(db, user.id, "patient.clinical.update", patient.id)
+    db.commit()
+    return _profile_out(db, patient.id)
+
+
 def get_names(db: Session, patient_ids: set[uuid.UUID]) -> dict[uuid.UUID, str]:
     """Display names for other modules' lists. The calling module checks access and audits."""
     if not patient_ids:
@@ -221,3 +270,31 @@ def _can_see_clinical(db: Session, user: CurrentUser, patient: Patient) -> bool:
     if user.role in CARE_ROLES:
         return care_team.is_in_care_team(db, user.id, patient.id)
     return False
+
+
+def _patient_or_404(db: Session, patient_id: uuid.UUID) -> Patient:
+    patient = db.get(Patient, patient_id)
+    if patient is None:
+        raise NotFoundError("Patient not found")
+    return patient
+
+
+def _profile_out(db: Session, patient_id: uuid.UUID) -> ClinicalProfileOut:
+    profile = db.get(ClinicalProfile, patient_id)
+    treatments = db.scalars(
+        select(Treatment)
+        .where(Treatment.patient_id == patient_id)
+        .order_by(Treatment.started_on.desc().nulls_last(), Treatment.kind)
+    )
+    fields = (
+        {
+            name: getattr(profile, name)
+            for name in ClinicalProfileOut.model_fields
+            if name != "treatments"
+        }
+        if profile
+        else {}
+    )
+    return ClinicalProfileOut(
+        **fields, treatments=[TreatmentOut.model_validate(t) for t in treatments]
+    )

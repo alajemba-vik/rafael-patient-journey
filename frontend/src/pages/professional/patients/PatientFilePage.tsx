@@ -12,6 +12,7 @@ import { PageHeader } from "../../../components/layout/PageHeader";
 import { AppointmentsSection } from "../../../components/patient/AppointmentsSection";
 import { CareTeamSection } from "../../../components/patient/CareTeamSection";
 import { AssessmentSection } from "./AssessmentSection";
+import { ClinicalProfileSection } from "./ClinicalProfileSection";
 import { MessagesSection } from "./MessagesSection";
 import { PathwaySection } from "./PathwaySection";
 import { ScoresSection } from "./ScoresSection";
@@ -58,6 +59,7 @@ export function PatientFilePage() {
           </div>
           {isDetail(record) ? (
             <>
+              <ClinicalProfileSection patientId={record.id} />
               <PathwaySection patientId={record.id} />
               <AssessmentSection patientId={record.id} />
               <AppointmentsSection patientId={record.id} />

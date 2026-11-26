@@ -7,6 +7,8 @@ from app.db import get_db
 from app.modules.identity_access.service import CurrentUser, get_current_user
 from app.modules.patients import service
 from app.modules.patients.schemas import (
+    ClinicalProfileIn,
+    ClinicalProfileOut,
     PatientAdministrative,
     PatientCreate,
     PatientDetail,
@@ -52,3 +54,22 @@ def update_patient(
     db: Session = Depends(get_db),
 ) -> PatientAdministrative:
     return service.update_patient(db, user, patient_id, body)
+
+
+@router.get("/{patient_id}/clinical-profile")
+def get_clinical_profile(
+    patient_id: uuid.UUID,
+    user: CurrentUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> ClinicalProfileOut:
+    return service.get_clinical_profile(db, user, patient_id)
+
+
+@router.put("/{patient_id}/clinical-profile")
+def set_clinical_profile(
+    patient_id: uuid.UUID,
+    body: ClinicalProfileIn,
+    user: CurrentUser = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> ClinicalProfileOut:
+    return service.set_clinical_profile(db, user, patient_id, body)

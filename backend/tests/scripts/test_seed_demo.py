@@ -16,7 +16,7 @@ from app.modules.pathways.models import (
     PathwayMilestone,
     PathwayStatus,
 )
-from app.modules.patients.models import Patient
+from app.modules.patients.models import ClinicalProfile, Patient, Treatment
 from app.modules.questionnaires.models import SessionEvaluation
 from app.modules.scheduling.models import Appointment, AppointmentStatus
 from scripts.seed_demo import remove_demo_data, seed
@@ -171,3 +171,15 @@ def test_seed_fills_pathways_messages_and_session_ratings_and_removal_clears_the
 
     assert seeded[0] == 16 and seeded[1] > 0 and seeded[2] > 0
     assert (count(db, CarePathway), count(db, Message), count(db, SessionEvaluation)) == (0, 0, 0)
+
+
+def test_seed_gives_every_patient_a_clinical_profile_and_removal_clears_it(db):
+    seed(db, attach=[], rng=random.Random(4))
+    db.commit()
+
+    seeded = (count(db, ClinicalProfile), count(db, Treatment))
+    remove_demo_data(db)
+    db.commit()
+
+    assert seeded[0] == 16 and seeded[1] >= 32
+    assert (count(db, ClinicalProfile), count(db, Treatment)) == (0, 0)

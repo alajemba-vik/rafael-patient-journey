@@ -19,6 +19,8 @@ What it creates, around today in the Institute's time zone:
   main test scores;
 - an adapted physical activity class and a yoga class at 18:00 on the next working days,
   each with a few enrolled patients;
+- a clinical profile per patient (cancer site, treatments with dates, social life and
+  habits);
 - a short conversation with the care team for some patients, and patient and practitioner
   ratings for most finished sessions.
 
@@ -56,7 +58,15 @@ from app.modules.pathways.models import (
     MilestoneKind,
     PathwayMilestone,
 )
-from app.modules.patients.models import Patient
+from app.modules.patients.models import (
+    CancerSite,
+    ClinicalProfile,
+    Patient,
+    Treatment,
+    TreatmentKind,
+    TreatmentStatus,
+    WorkSituation,
+)
 from app.modules.questionnaires.models import SessionEvaluation
 from app.modules.scheduling.models import (
     Appointment,
@@ -215,6 +225,7 @@ def seed(db: Session, attach: list[str], rng: random.Random) -> dict[str, int]:
     messages = _add_messages(db, patients, teams, rng)
     ratings = _add_session_ratings(db, rng)
     groups = _add_group_sessions(db, practitioners, patients, rng)
+    profiles = _add_clinical_profiles(db, teams, rng)
     return {
         "staff": len(STAFF),
         "patients": len(patients),
@@ -224,6 +235,7 @@ def seed(db: Session, attach: list[str], rng: random.Random) -> dict[str, int]:
         "messages": messages,
         "session ratings": ratings,
         "group sessions": groups,
+        "clinical profiles": profiles,
     }
 
 
@@ -478,6 +490,85 @@ def _add_group_sessions(
             count += 1
     db.flush()
     return count
+
+
+SITES = [
+    CancerSite.BREAST,
+    CancerSite.PROSTATE,
+    CancerSite.COLORECTAL,
+    CancerSite.LUNG,
+    CancerSite.OVARY,
+    CancerSite.BLOOD,
+    CancerSite.THYROID,
+]
+OCCUPATIONS = ["Enseignante", "Comptable", "Infirmier", "Graphiste", "Commerçante", "Retraité"]
+
+
+def _add_clinical_profiles(
+    db: Session, teams: dict[uuid.UUID, list[User]], rng: random.Random
+) -> int:
+    """Each patient: diagnosed one to two years ago, surgery then chemotherapy, and for some
+    an ongoing hormone therapy or radiotherapy."""
+    today = datetime.now(UTC).date()
+    for patient_id, team in teams.items():
+        diagnosed = today - timedelta(days=rng.randint(300, 700))
+        drinks = rng.random() < 0.5
+        db.add(
+            ClinicalProfile(
+                patient_id=patient_id,
+                cancer_site=rng.choice(SITES),
+                diagnosed_on=diagnosed,
+                metastatic=rng.random() < 0.2,
+                height_cm=rng.randint(155, 190),
+                weight_kg=rng.randint(50, 95),
+                allergies=rng.choice([None, "Pénicilline", "Aucune connue"]),
+                occupation=rng.choice(OCCUPATIONS),
+                work_situation=rng.choice(list(WorkSituation)),
+                lives_alone=rng.random() < 0.3,
+                has_dependants=rng.random() < 0.5,
+                has_caregivers=True,
+                caregivers=rng.choice(["Conjoint(e)", "Une fille", "Des amis proches"]),
+                smoker=rng.random() < 0.2,
+                drinks_alcohol=drinks,
+                drinks_per_week=rng.randint(1, 6) if drinks else None,
+                takes_supplements=rng.random() < 0.4,
+                updated_at=datetime.now(UTC),
+                updated_by=team[0].id,
+            )
+        )
+        surgery = diagnosed + timedelta(days=rng.randint(20, 50))
+        chemo_start = surgery + timedelta(days=30)
+        chemo_end = chemo_start + timedelta(days=rng.randint(90, 150))
+        db.add(
+            Treatment(
+                patient_id=patient_id,
+                kind=TreatmentKind.SURGERY,
+                status=TreatmentStatus.FINISHED,
+                started_on=surgery,
+                ended_on=surgery,
+            )
+        )
+        db.add(
+            Treatment(
+                patient_id=patient_id,
+                kind=TreatmentKind.CHEMOTHERAPY,
+                status=TreatmentStatus.FINISHED,
+                started_on=chemo_start,
+                ended_on=min(chemo_end, today),
+                details="Protocole fictif",
+            )
+        )
+        if rng.random() < 0.5:
+            db.add(
+                Treatment(
+                    patient_id=patient_id,
+                    kind=TreatmentKind.HORMONE_THERAPY,
+                    status=TreatmentStatus.ONGOING,
+                    started_on=min(chemo_end + timedelta(days=30), today),
+                )
+            )
+    db.flush()
+    return len(teams)
 
 
 def _add_session_ratings(db: Session, rng: random.Random) -> int:
