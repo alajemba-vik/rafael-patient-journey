@@ -46,7 +46,7 @@ export function AppShell() {
       <header className="rf-shell__header">
         <div className="rf-shell__bar">
           <Link to={paths.home} className="rf-shell__brand">
-            Institut Rafaël
+            {t("shell.brand")}
           </Link>
           {me && (
             <nav className="rf-nav" aria-label={t("shell.mainNav")}>

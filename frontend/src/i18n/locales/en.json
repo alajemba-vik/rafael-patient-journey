@@ -45,6 +45,7 @@
     }
   },
   "shell": {
+    "brand": "Cordina",
     "skipToContent": "Skip to content",
     "mainNav": "Main navigation",
     "signOut": "Sign out",
