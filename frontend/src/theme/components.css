@@ -2,66 +2,14 @@
  * Shared components: plain CSS classes prefixed rf-, built only from tokens.css.
  */
 
-/* =========================================
-   FOND ANIMÉ ET PATTERNS
-   ========================================= */
 body {
-  overflow-x: hidden; /* Empêche le fond de créer une barre de défilement horizontale */
+  margin: 0;
+  overflow-x: hidden;
+  background: var(--surface);
 }
 
 .rf-root {
-  position: relative;
-  background-color: var(--surface);
-  z-index: 0;
-}
-
-/* Lumières floues animées */
-.rf-root::before,
-.rf-root::after {
-  content: "";
-  position: fixed;
-  width: 35vw; /* Réduit de 60vw à 35vw */
-  height: 35vw;
-  border-radius: 50%;
-  filter: blur(100px); /* Un peu moins flou pour qu'on distingue mieux la forme */
-  z-index: -1;
-  opacity: 0.6;
-  pointer-events: none;
-}
-
-/* La lumière bleue en haut à gauche */
-.rf-root::before {
-  background: var(--secondary-blue);
-  top: -10vh;
-  left: -5vw;
-  /* Distance de parcours beaucoup plus grande */
-  animation: floatBlue 25s ease-in-out infinite alternate;
-}
-
-/* La lumière verte en bas à droite */
-.rf-root::after {
-  background: var(--secondary-green);
-  bottom: -10vh;
-  right: -5vw;
-  animation: floatGreen 30s ease-in-out infinite alternate;
-}
-
-@keyframes floatBlue {
-  0% {
-    transform: translate(0, 0) scale(1);
-  }
-  100% {
-    transform: translate(40vw, 50vh) scale(1.2);
-  } /* Voyage plus loin */
-}
-
-@keyframes floatGreen {
-  0% {
-    transform: translate(0, 0) scale(1);
-  }
-  100% {
-    transform: translate(-40vw, -50vh) scale(1.1);
-  } /* Voyage plus loin */
+  background: var(--surface);
 }
 
 .rf-root {
@@ -69,7 +17,7 @@ body {
   color: var(--ink);
   font-family: var(--font-body);
   font-size: 16px;
-  line-height: 1.7;
+  line-height: 1.5;
 }
 
 .rf-root :focus-visible {
@@ -77,35 +25,38 @@ body {
   outline-offset: 2px;
 }
 
-/* --- BOUTONS (Ajout de la forme pilule et de l'ombre) --- */
 .rf-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  font-family: var(--font-display);
-  font-size: 14px; /* Un peu plus grand */
-  line-height: 20.4px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
+  min-height: 42px;
+  box-sizing: border-box;
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 650;
+  white-space: nowrap;
   text-decoration: none;
   cursor: pointer;
-  padding: var(--space-3) var(--space-6);
-  border: none; /* On retire la grosse bordure carrée */
+  padding: var(--space-3) var(--space-5);
+  border: 1px solid var(--accent);
   border-radius: var(--radius-xs);
   background: var(--accent);
   color: var(--on-accent);
-  box-shadow: 0 2px 8px rgba(240, 165, 0, 0.2);
-  transition: all 0.2s ease;
+  box-shadow: none;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
 }
 .rf-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(240, 165, 0, 0.3);
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
 }
 .rf-btn--secondary {
   background: transparent;
-  border: 2px solid var(--ink);
+  border: 1px solid var(--hairline);
   color: var(--ink);
   box-shadow: none;
 }
@@ -133,17 +84,17 @@ body {
   gap: 6px;
   min-height: 44px;
   box-sizing: border-box;
-  font-family: var(--font-display);
+  font-family: var(--font-body);
   font-size: 14px;
-  font-weight: 700;
-  line-height: 14px;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  color: var(--ink-muted); /* Gris par défaut */
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--ink-muted);
   text-decoration: none;
   padding: 0 var(--space-3);
-  border-bottom: 3px solid transparent; /* Ligne invisible par défaut */
-  transition: all 0.2s ease;
+  border-bottom: 2px solid transparent;
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease;
 }
 
 .rf-navlink:hover {
@@ -152,7 +103,7 @@ body {
 
 .rf-navlink[aria-current="page"] {
   color: var(--ink);
-  border-bottom-color: var(--accent); /* Ligne orange en dessous */
+  border-bottom-color: var(--accent);
   background: transparent;
 }
 
@@ -188,17 +139,17 @@ body {
   width: 240px;
   max-width: 100%;
   box-sizing: border-box;
-  padding: 30px var(--space-7);
+  padding: var(--space-6);
   border-radius: var(--radius-md);
   background: var(--band);
   color: var(--on-band);
-  box-shadow: 0 4px 16px rgba(18, 35, 74, 0.15); /* Ombre douce */
+  box-shadow: none;
 }
 .rf-stat__value {
   font-family: var(--font-display);
   font-size: 35px;
   line-height: 45px;
-  font-weight: 800;
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
 .rf-stat__unit {
@@ -206,10 +157,10 @@ body {
 }
 .rf-stat__title {
   margin: 0;
-  font-family: var(--font-display);
+  font-family: var(--font-body);
   font-size: 20px;
   line-height: 30px;
-  font-weight: 700;
+  font-weight: 650;
   color: var(--accent);
 }
 .rf-stat__text {
@@ -279,10 +230,10 @@ body {
 .rf-shell__header {
   background: var(--surface-raised);
   border-bottom: 1px solid var(--hairline);
-  box-shadow: 0 2px 10px rgba(18, 35, 74, 0.02);
+  box-shadow: none;
 }
 .rf-shell__bar {
-  max-width: 1080px;
+  max-width: 1280px;
   margin: 0 auto;
   box-sizing: border-box;
   padding: var(--space-4) var(--space-5);
@@ -290,7 +241,7 @@ body {
   grid-template-columns: 1fr auto;
   grid-template-areas: "brand account" "nav nav";
   align-items: center;
-  gap: var(--space-4) var(--space-5); /* Ajout d'un espace vertical entre l'en-tête et le menu */
+  gap: var(--space-3) var(--space-5);
 }
 .rf-shell__bar > .rf-nav {
   grid-area: nav;
@@ -301,19 +252,17 @@ body {
   display: inline-flex;
   align-items: center;
   min-height: 44px;
-  font-family: var(--font-display);
-  font-size: 28px;
-  font-weight: 800;
-  letter-spacing: -0.5px;
-  text-transform: uppercase;
-  color: var(--ink); /* Bleu marine plein */
+  font-family: var(--font-body);
+  font-size: 23px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--ink);
   text-decoration: none;
 }
 
-/* Optionnel : on ajoute un petit effet de remplissage au survol pour le fun */
 .rf-shell__brand:hover {
   color: var(--accent);
-  transition: color 0.3s ease;
+  transition: color 0.15s ease;
 }
 .rf-shell__account {
   grid-area: account;
@@ -332,7 +281,7 @@ body {
 .rf-shell__main {
   flex: 1;
   width: 100%;
-  max-width: 1080px;
+  max-width: 1280px;
   margin: 0 auto;
   box-sizing: border-box;
   padding: var(--space-7) var(--space-5);
@@ -380,26 +329,43 @@ body {
   flex-direction: column;
   gap: var(--space-2);
   width: 100%;
+  min-width: 0;
 }
 .rf-field__label {
   font-size: 14px;
-  font-weight: 700;
+  line-height: 1.4;
+  font-weight: 650;
   color: var(--ink);
 }
 .rf-input {
   font: inherit;
+  width: 100%;
   color: var(--ink);
   background: var(--surface-raised);
-  min-height: 44px;
+  min-height: 42px;
   box-sizing: border-box;
   padding: var(--space-3) var(--space-4);
   border: 1px solid var(--hairline);
-  border-radius: var(--radius-md); /* Coins arrondis */
-  transition: border-color 0.2s ease;
+  border-radius: var(--radius-xs);
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 .rf-input:focus {
-  border-color: var(--accent);
+  border-color: var(--focus-ring);
+  box-shadow: 0 0 0 3px var(--secondary-blue);
   outline: none;
+}
+input.rf-input,
+select.rf-input {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+textarea.rf-input {
+  min-height: 104px;
+  line-height: 1.5;
+  resize: vertical;
 }
 .rf-input[aria-invalid="true"] {
   border: 2px solid #ef4444;
@@ -455,7 +421,7 @@ body {
   border: 1px solid var(--hairline);
   border-radius: var(--radius-md);
   background: var(--surface-raised);
-  box-shadow: 0 4px 12px rgba(18, 35, 74, 0.04);
+  box-shadow: none;
 }
 .rf-state p {
   margin: 0;
@@ -468,6 +434,7 @@ body {
 .rf-banner {
   padding: var(--space-4) var(--space-5);
   background: var(--surface-tint);
+  border: 1px solid var(--hairline);
   border-radius: var(--radius-md);
   margin: 0 0 var(--space-5);
 }
@@ -492,13 +459,13 @@ body {
 .rf-disclosure {
   margin-bottom: var(--space-3);
   background: var(--surface-raised);
-  border: 2px solid var(--hairline);
+  border: 1px solid var(--hairline);
   border-radius: var(--radius-md);
   transition: all 0.2s ease;
 }
 .rf-disclosure[open] {
   border-color: var(--accent);
-  box-shadow: 0 4px 12px rgba(240, 165, 0, 0.08);
+  box-shadow: none;
 }
 .rf-disclosure summary {
   cursor: pointer;
@@ -551,16 +518,16 @@ body {
   min-width: 0;
   padding: var(--space-5);
   background: var(--surface-raised);
-  border: 2px solid var(--hairline); /* Épaisseur passée à 2px */
+  border: 1px solid var(--hairline);
   border-radius: var(--radius-md);
-  box-shadow: 0 4px 12px rgba(18, 35, 74, 0.04);
+  box-shadow: none;
 }
 .rf-panel > h2 {
   margin: 0;
 }
 .rf-panel--highlight {
-  border: 2px solid var(--accent);
-  box-shadow: 0 4px 20px rgba(240, 165, 0, 0.15);
+  border: 1px solid var(--accent);
+  box-shadow: none;
 }
 .rf-panel p {
   margin: 0;
@@ -718,23 +685,22 @@ body {
   box-sizing: border-box;
   padding: 0 var(--space-5);
   background: var(--surface-raised);
-  border: 2px solid var(--hairline);
-  border-radius: var(--radius-md); /* Plus arrondi */
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-xs);
   cursor: pointer;
   font-weight: 500;
   transition: all 0.2s ease;
 }
 .rf-choice span:hover {
   border-color: var(--accent);
-  background: var(--accent-doux);
+  background: var(--accent-soft);
 }
 .rf-choice input:checked + span {
   background: var(--accent);
   border-color: var(--accent);
   color: var(--ink);
   font-weight: 700;
-  box-shadow: 0 4px 12px rgba(240, 165, 0, 0.3); /* Effet de "pop" */
-  transform: translateY(-2px);
+  box-shadow: none;
 }
 .rf-choice input:focus-visible + span {
   outline: 2px solid var(--focus-ring);
